@@ -41,6 +41,40 @@
   body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
   #app { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
 
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    #app { padding: 12px 10px 80px; }
+    h1 { font-size: 18px; }
+    .top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .top-bar-right { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .top-bar-right .btn-primary { grid-column: 1 / -1; justify-content: center; }
+    .filter-bar { flex-direction: column; }
+    .filter-bar select { width: 100%; }
+    .filter-panel { gap: 6px; }
+    .filter-chip { font-size: 11px; padding: 4px 9px; }
+    .crm-layout { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; position: static; max-height: unset; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; }
+    .sidebar-title { grid-column: 1 / -1; }
+    .sidebar-section { margin-bottom: 0; }
+    .contact-list { gap: 8px; }
+    .contact-card { padding: 10px 12px; }
+    .contact-chips { gap: 4px; }
+    .chip { font-size: 10px; padding: 2px 7px; }
+    .main-content { padding-left: 0; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .form-actions { flex-direction: column; }
+    .form-actions .btn { width: 100%; justify-content: center; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .btn-sm { font-size: 11px; padding: 4px 8px; }
+    .urgency-row { flex-wrap: wrap; }
+    .multi-toggle { gap: 4px; }
+    .toggle-btn { font-size: 11px; padding: 3px 8px; }
+    .note-type-row { gap: 4px; }
+    .note-type-btn { font-size: 10px; padding: 2px 7px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+
   /* Login screen */
   .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 20px; }
   .login-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
@@ -380,7 +414,7 @@ const URGENCY = {
 const PROP_TYPES=['Apartamento','Casa','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Reunión','Referido'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
 const ZONE_SUGG=['Toda la Costa','Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const NOTE_TYPES=[
@@ -407,6 +441,9 @@ const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2
 const avatarColor = n => AVATAR_COLORS[(n?.charCodeAt(0)||65) % AVATAR_COLORS.length];
 const initials = n => (n||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
 const fmt = n => n ? '€' + Number(n).toLocaleString('es-ES') : '';
+const fmtDate = d => { if(!d) return ''; try { const dt=new Date(d); return isNaN(dt)?d:dt.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'}); } catch { return d; } };
+const urgLabel = v => (URGENCY[v]||URGENCY[2]).l;
+const urgColor = v => (URGENCY[v]||URGENCY[2]).c;
 const cleanPhone = p => (p||'').replace(/[\s\-\(\)]/g,'');
 
 // ─── GOOGLE SHEETS CONFIG ────────────────────────────────────────────────────
@@ -663,7 +700,7 @@ function avatar(name, size='') {
 }
 
 function urgencyBadge(u) {
-  const urg = URGENCY[u]||URGENCY[3];
+  const urg = URGENCY[u]||URGENCY[2];
   return h('span',{class:'urgency-badge',style:{background:urg.c+'22',color:urg.c,border:`1px solid ${urg.c}55`}}, urg.l);
 }
 
@@ -903,7 +940,7 @@ function renderForm() {
 
 // CONTACT CARD (list item)
 function renderCard(c, filtered) {
-  const u = URGENCY[c.urgency]||URGENCY[3];
+  const u = URGENCY[c.urgency]||URGENCY[2];
   const card = h('div',{class:'card contact-card'+(c.isVIP?' vip':'')});
   card.addEventListener('click',()=>setState({view:'detail',detailContact:c}));
 
@@ -937,7 +974,7 @@ function renderCard(c, filtered) {
     metaRow.append(phoneWrap);
   }
   if(c.email) metaRow.append(h('span',{},c.email));
-  if(c.lastContact) metaRow.append(h('span',{},'Contacto: '+c.lastContact));
+  if(c.lastContact) metaRow.append(h('span',{},'Contacto: '+fmtDate(c.lastContact)));
   info.append(metaRow);
 
   const chips = h('div',{class:'contact-chips'});
@@ -995,7 +1032,7 @@ function renderCard(c, filtered) {
 function renderDetail() {
   const c = state.detailContact;
   if(!c) return h('div',{},'No hay contacto seleccionado');
-  const u = URGENCY[c.urgency]||URGENCY[3];
+  const u = URGENCY[c.urgency]||URGENCY[2];
   const wrap = h('div',{});
 
   // Header
@@ -1378,7 +1415,7 @@ function renderStats() {
   ));
 
   const vip=cs.filter(c=>c.isVIP).length;
-  const urgent=cs.filter(c=>c.urgency>=4).length;
+  const urgent=cs.filter(c=>c.urgency>=3).length;
   const mortgage=cs.filter(c=>c.needsMortgage).length;
   const pool=cs.filter(c=>c.wantsPool).length;
   const budgets=cs.filter(c=>c.budgetMax).map(c=>Number(c.budgetMax));
@@ -1406,7 +1443,7 @@ function renderStats() {
 
   // By urgency
   const urgSec=sectionEl('Distribución por urgencia');
-  [1,2,3,4,5].forEach(v=>{
+  [1,2,3].forEach(v=>{
     const n=cs.filter(c=>c.urgency===v).length;
     const urg=URGENCY[v];
     const row=h('div',{class:'bar-row'});
@@ -1527,18 +1564,6 @@ function renderList() {
   const sidebar=h('div',{class:'sidebar'});
   sidebar.append(h('div',{class:'sidebar-title'},'Filtros'));
 
-  // Urgencia
-  const urgSection=h('div',{class:'sidebar-section'});
-  urgSection.append(h('span',{class:'sidebar-section-label'},'Urgencia'));
-  const urgSel=h('select',{class:'sidebar-select'+(f.urgencyMin>0?' active':'')},
-    h('option',{value:'0'},'Todas'),
-    ...[1,2,3].map(v=>h('option',{value:String(v)},URGENCY[v].l+' o más'))
-  );
-  urgSel.value=String(f.urgencyMin);
-  urgSel.addEventListener('change',e=>setState({filters:{...f,urgencyMin:Number(e.target.value)}}));
-  urgSection.append(urgSel);
-  sidebar.append(urgSection);
-
   // Zona
   const zoneSection=h('div',{class:'sidebar-section'});
   zoneSection.append(h('span',{class:'sidebar-section-label'},'Zona'));
@@ -1550,6 +1575,17 @@ function renderList() {
   zoneSel.addEventListener('change',e=>setState({filters:{...f,zone:e.target.value}}));
   zoneSection.append(zoneSel);
   sidebar.append(zoneSection);
+
+  // Presupuesto
+  const budSection=h('div',{class:'sidebar-section'});
+  budSection.append(h('span',{class:'sidebar-section-label'},'Presupuesto máx.'));
+  const budgetSel=h('select',{class:'sidebar-select'+(f.budgetMax?' active':'')});
+  [['','Todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);if(f.budgetMax===v)o.selected=true;budgetSel.append(o);
+  });
+  budgetSel.addEventListener('change',e=>setState({filters:{...f,budgetMax:e.target.value}}));
+  budSection.append(budgetSel);
+  sidebar.append(budSection);
 
   // Etiqueta
   const tagSection=h('div',{class:'sidebar-section'});
@@ -1563,16 +1599,17 @@ function renderList() {
   tagSection.append(tagSel);
   sidebar.append(tagSection);
 
-  // Presupuesto
-  const budSection=h('div',{class:'sidebar-section'});
-  budSection.append(h('span',{class:'sidebar-section-label'},'Presupuesto máx.'));
-  const budgetSel=h('select',{class:'sidebar-select'+(f.budgetMax?' active':'')});
-  [['','Todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
-    const o=h('option',{value:v},l);if(f.budgetMax===v)o.selected=true;budgetSel.append(o);
-  });
-  budgetSel.addEventListener('change',e=>setState({filters:{...f,budgetMax:e.target.value}}));
-  budSection.append(budgetSel);
-  sidebar.append(budSection);
+  // Urgencia
+  const urgSection=h('div',{class:'sidebar-section'});
+  urgSection.append(h('span',{class:'sidebar-section-label'},'Urgencia'));
+  const urgSel=h('select',{class:'sidebar-select'+(f.urgencyMin>0?' active':'')},
+    h('option',{value:'0'},'Todas'),
+    ...[1,2,3].map(v=>h('option',{value:String(v)},URGENCY[v].l+' o más'))
+  );
+  urgSel.value=String(f.urgencyMin);
+  urgSel.addEventListener('change',e=>setState({filters:{...f,urgencyMin:Number(e.target.value)}}));
+  urgSection.append(urgSel);
+  sidebar.append(urgSection);
 
   // Limpiar
   if(af>0){
