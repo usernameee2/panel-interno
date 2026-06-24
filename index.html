@@ -194,9 +194,9 @@
 
   /* Multi-toggle */
   .multi-toggle { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-  .toggle-btn { font-family: var(--font); font-size: 12px; padding: 4px 11px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text2); transition: all .15s; font-weight: 500; }
+  .toggle-btn { font-family: var(--font); font-size: 12px; padding: 5px 13px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text3); transition: all .15s; font-weight: 500; }
   .toggle-btn:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
-  .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; box-shadow: 0 1px 4px rgba(24,95,165,.3); }
   .field > label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; display: block; }
 
   /* Urgency selector */
@@ -416,7 +416,7 @@ const URGENCY = {
 const PROP_TYPES=['Apartamento','Casa','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Reunión','Referido'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
 const ZONE_SUGG=['Toda la Costa','Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const NOTE_TYPES=[
@@ -663,6 +663,7 @@ function getFiltered() {
   if (f.hasEfectivo) list = list.filter(c=>c.tags?.includes('Tiene efectivo'));
   if (f.hasNIE) list = list.filter(c=>c.tags?.includes('Tiene NIE'));
   if (f.noNIE) list = list.filter(c=>c.tags?.includes('Sin NIE'));
+  if (f.wantsPool) list = list.filter(c=>c.tags?.includes('Piscina') || c.wantsPool);
   if (f.bedroomsMin) list = list.filter(c=>c.bedroomsMin && Number(c.bedroomsMin) >= Number(f.bedroomsMin));
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
@@ -898,20 +899,38 @@ function renderForm() {
     h('div',{class:'field',style:{marginTop:'4px'}},h('label',{},'Etiquetas'),tagInp)
   ));
 
+  // Toggle helper visual (reemplaza mkCb)
+  const mkToggle=(field,label,val,colorActive='var(--accent)')=>{
+    const wrap=h('div',{
+      style:{display:'flex',alignItems:'center',gap:'10px',padding:'9px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(val?colorActive:'var(--border)'),background:val?'var(--accent-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s',userSelect:'none'},
+    });
+    const dot=h('div',{style:{width:'16px',height:'16px',borderRadius:'50%',background:val?colorActive:'var(--border)',transition:'all .15s',flexShrink:'0'}});
+    const lbl=h('span',{style:{fontSize:'13px',fontWeight:val?'600':'400',color:val?colorActive:'var(--text2)',transition:'all .15s'}},label);
+    wrap.append(dot,lbl);
+    wrap.addEventListener('click',()=>{
+      const newVal=!form[field];
+      set(field,newVal);
+      wrap.style.borderColor=newVal?colorActive:'var(--border)';
+      wrap.style.background=newVal?'var(--accent-bg)':'var(--surface2)';
+      dot.style.background=newVal?colorActive:'var(--border)';
+      lbl.style.fontWeight=newVal?'600':'400';
+      lbl.style.color=newVal?colorActive:'var(--text2)';
+    });
+    return wrap;
+  };
+
   // Section 3: Budget
   sections.append(sectionEl('Presupuesto y financiación',
     fieldEl('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)),
-    mkCb('needsMortgage','Necesita financiación / hipoteca',form.needsMortgage)
+    h('div',{style:{marginTop:'8px'}}),
+    mkToggle('needsMortgage','Necesita financiación / hipoteca',form.needsMortgage,'var(--warn)')
   ));
 
   // Section 4: Requirements
   sections.append(sectionEl('Requisitos del inmueble',
     h('div',{class:'field'},h('label',{},'Zonas de búsqueda (seleccioná una o varias)'),zoneToggle),
     h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle),
-    h('div',{class:'grid-2',style:{alignItems:'end'}},
-      fieldEl('Dormitorios mínimos', bedsEl),
-      mkCb('wantsPool','Requiere piscina',form.wantsPool)
-    )
+    fieldEl('Dormitorios mínimos', bedsEl)
   ));
 
   // Section 5: Notes — se gestionan desde la vista de detalle
@@ -1555,14 +1574,6 @@ function renderList() {
     const c=h('button',{class:'filter-chip'+(f[field]?' '+cls:''),onClick:()=>setState({filters:{...f,[field]:!f[field]}})},label);
     fp.append(c);
   });
-  // Dormitorios como select rápido
-  const bedsSel=h('select',{class:'filter-select'+(f.bedroomsMin?' active':'')},
-    h('option',{value:''},'Dorm.: todos'),
-    ...[1,2,3,4].map(v=>h('option',{value:String(v)},v+'+ hab.'))
-  );
-  bedsSel.value=f.bedroomsMin||'';
-  bedsSel.addEventListener('change',e=>setState({filters:{...f,bedroomsMin:e.target.value}}));
-  fp.append(bedsSel);
   wrap.append(fp);
 
   // Layout: sidebar izquierda + contenido principal
@@ -1618,6 +1629,18 @@ function renderList() {
   urgSel.addEventListener('change',e=>setState({filters:{...f,urgencyMin:Number(e.target.value)}}));
   urgSection.append(urgSel);
   sidebar.append(urgSection);
+
+  // Dormitorios
+  const bedsSection=h('div',{class:'sidebar-section'});
+  bedsSection.append(h('span',{class:'sidebar-section-label'},'Dormitorios mín.'));
+  const bedsSideSel=h('select',{class:'sidebar-select'+(f.bedroomsMin?' active':'')},
+    h('option',{value:''},'Todos'),
+    ...[1,2,3,4].map(v=>h('option',{value:String(v)},v+'+ hab.'))
+  );
+  bedsSideSel.value=f.bedroomsMin||'';
+  bedsSideSel.addEventListener('change',e=>setState({filters:{...f,bedroomsMin:e.target.value}}));
+  bedsSection.append(bedsSideSel);
+  sidebar.append(bedsSection);
 
   // Limpiar
   if(af>0){
