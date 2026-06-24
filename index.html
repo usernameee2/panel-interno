@@ -193,9 +193,11 @@
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
   /* Multi-toggle */
-  .multi-toggle { display: flex; flex-wrap: wrap; gap: 6px; }
-  .toggle-btn { font-family: var(--font); font-size: 12px; padding: 4px 11px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); transition: all .15s; }
-  .toggle-btn.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
+  .multi-toggle { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .toggle-btn { font-family: var(--font); font-size: 12px; padding: 4px 11px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text2); transition: all .15s; font-weight: 500; }
+  .toggle-btn:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
+  .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .field > label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; display: block; }
 
   /* Urgency selector */
   .urgency-row { display: flex; gap: 6px; }
@@ -559,7 +561,7 @@ let state = {
   editContact: null,
   detailContact: null,
   search: '',
-  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false },
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'' },
   showFilters: false,
   sort: 'date_desc',
   toast: null,
@@ -661,6 +663,7 @@ function getFiltered() {
   if (f.hasEfectivo) list = list.filter(c=>c.tags?.includes('Tiene efectivo'));
   if (f.hasNIE) list = list.filter(c=>c.tags?.includes('Tiene NIE'));
   if (f.noNIE) list = list.filter(c=>c.tags?.includes('Sin NIE'));
+  if (f.bedroomsMin) list = list.filter(c=>c.bedroomsMin && Number(c.bedroomsMin) >= Number(f.bedroomsMin));
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
     if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
@@ -844,7 +847,7 @@ function renderForm() {
   const zoneToggle=makeMultiToggle(ZONE_SUGG,zoneVals,v=>{form.searchZones=v;zoneVals=v;});
 
   // bedrooms select
-  const bedsOpts=[['','Sin preferencia'],...[1,2,3,4,5,6].map(n=>[String(n),n+'+ hab.'])];
+  const bedsOpts=[['','Sin preferencia'],...[1,2,3,4].map(n=>[String(n),n+'+ hab.'])];
   const bedsEl=sel('bedroomsMin',bedsOpts,form.bedroomsMin);
 
   // investment type
@@ -897,10 +900,7 @@ function renderForm() {
 
   // Section 3: Budget
   sections.append(sectionEl('Presupuesto y financiación',
-    h('div',{class:'grid-2'},
-      fieldEl('Presupuesto mínimo (€)', sel('budgetMin',BUDGET_OPTS,form.budgetMin)),
-      fieldEl('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))
-    ),
+    fieldEl('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)),
     mkCb('needsMortgage','Necesita financiación / hipoteca',form.needsMortgage)
   ));
 
@@ -1545,8 +1545,8 @@ function renderList() {
   fp.append(h('div',{class:'filter-panel-title'},'Filtros rápidos'));
   const chips=[
     ['★ Solo VIP','isVIP','active-vip'],
-    ['Hipoteca','needsMortgage','active-warn'],
     ['🏊 Piscina','wantsPool','active'],
+    ['Hipoteca','needsMortgage','active-warn'],
     ['💰 Tiene efectivo','hasEfectivo','active'],
     ['✅ Tiene NIE','hasNIE','active'],
     ['❌ Sin NIE','noNIE','active-warn'],
@@ -1555,6 +1555,14 @@ function renderList() {
     const c=h('button',{class:'filter-chip'+(f[field]?' '+cls:''),onClick:()=>setState({filters:{...f,[field]:!f[field]}})},label);
     fp.append(c);
   });
+  // Dormitorios como select rápido
+  const bedsSel=h('select',{class:'filter-select'+(f.bedroomsMin?' active':'')},
+    h('option',{value:''},'Dorm.: todos'),
+    ...[1,2,3,4].map(v=>h('option',{value:String(v)},v+'+ hab.'))
+  );
+  bedsSel.value=f.bedroomsMin||'';
+  bedsSel.addEventListener('change',e=>setState({filters:{...f,bedroomsMin:e.target.value}}));
+  fp.append(bedsSel);
   wrap.append(fp);
 
   // Layout: sidebar izquierda + contenido principal
@@ -1615,7 +1623,7 @@ function renderList() {
   if(af>0){
     sidebar.append(h('hr',{class:'sidebar-divider'}));
     sidebar.append(h('button',{class:'sidebar-clear',
-      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false}})
+      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:''}})
     },'✕ Limpiar filtros ('+af+')'));
   }
   layout.append(sidebar);
