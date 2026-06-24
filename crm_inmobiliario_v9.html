@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Inmobiliario</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f1;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #ddd9d2;
+    --border2: #e8e4de;
+    --text: #1a1916;
+    --text2: #6b6760;
+    --text3: #9e9b96;
+    --accent: #1e5c8a;
+    --accent-bg: #e8f0f7;
+    --accent-border: #b8d0e8;
+    --success: #1a7a52;
+    --success-bg: #e6f4ee;
+    --success-border: #a8d8c0;
+    --warn: #8a5e00;
+    --warn-bg: #fdf3dc;
+    --warn-border: #e8d090;
+    --danger: #8a1e1e;
+    --danger-bg: #faeaea;
+    --danger-border: #e8b0b0;
+    --vip: #7a4800;
+    --vip-bg: #fdf2e0;
+    --vip-border: #e8c880;
+    --radius: 10px;
+    --radius-sm: 7px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+  #app { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
+
+  /* Login screen */
+  .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 20px; }
+  .login-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+  .login-logo { font-size: 32px; margin-bottom: 6px; text-align: center; }
+  .login-title { font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 4px; }
+  .login-subtitle { font-size: 13px; color: var(--text3); text-align: center; margin-bottom: 24px; }
+  .login-error { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; margin-bottom: 12px; display: none; }
+  .login-footer { font-size: 11px; color: var(--text3); text-align: center; margin-top: 16px; }
+
+  /* Typography */
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.2px; }
+  h3 { font-size: 14px; font-weight: 500; }
+  label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
+
+  /* Inputs */
+  input, select, textarea {
+    width: 100%; font-family: var(--font); font-size: 13px; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 8px 10px; outline: none; transition: border-color .15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  input[type=checkbox] { width: auto; margin: 0; cursor: pointer; accent-color: var(--accent); }
+
+  /* Buttons */
+  .btn { font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; border-radius: var(--radius-sm); padding: 7px 14px; transition: all .15s; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 5px; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #174d78; }
+  .btn-secondary { background: var(--surface); color: var(--text2); border-color: var(--border); }
+  .btn-secondary:hover { background: var(--surface2); }
+  .btn-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+  .btn-danger:hover { background: #f0d0d0; }
+  .btn-sm { font-size: 12px; padding: 5px 10px; }
+  .btn-icon { padding: 6px 8px; }
+  button:disabled { opacity: 0.5; cursor: default; }
+
+  /* Card / Surface */
+  .card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+  .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
+  .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
+  .section-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .flex { display: flex; align-items: center; gap: 8px; }
+  .flex-wrap { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .gap-4 { gap: 4px; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .gap-16 { gap: 16px; }
+  .grid-stack { display: grid; gap: 12px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+
+  /* Chip */
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); white-space: nowrap; }
+  .chip-accent { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
+  .chip-success { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+  .chip-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); }
+  .chip-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+  .chip-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 600; }
+  .chip-remove { cursor: pointer; opacity: .5; font-size: 14px; line-height: 1; }
+  .chip-remove:hover { opacity: 1; }
+
+  /* Avatar */
+  .avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: #fff; flex-shrink: 0; position: relative; }
+  .avatar-sm { width: 30px; height: 30px; font-size: 11px; }
+  .vip-star { position: absolute; top: -3px; right: -3px; width: 15px; height: 15px; border-radius: 50%; background: #e6a817; font-size: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; }
+
+  /* Urgency badges */
+  .urgency-badge { font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 20px; }
+
+  /* Header */
+  .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+  .top-bar-right { display: flex; gap: 8px; flex-wrap: wrap; }
+  .subtitle { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  /* Filter bar */
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .filter-bar input { flex: 1; min-width: 180px; }
+  .filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .filter-panel-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
+  .filter-chip { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); transition: all .15s; white-space: nowrap; }
+  .filter-chip:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
+  .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .filter-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
+  .filter-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
+  .filter-select { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; transition: all .15s; }
+  .filter-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
+  .filter-clear { font-family: var(--font); font-size: 12px; color: var(--danger); background: none; border: none; cursor: pointer; padding: 5px 8px; border-radius: 20px; margin-left: 4px; }
+  .filter-clear:hover { background: var(--danger-bg); }
+
+  /* Contact list */
+  .contact-list { display: grid; gap: 8px; }
+  .contact-card { cursor: pointer; transition: box-shadow .15s, transform .1s; }
+  .contact-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .contact-card-inner { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+  .contact-info-row { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 12px; color: var(--text2); margin: 3px 0 6px; }
+  .contact-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  /* Detail view */
+  .detail-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .detail-header-right { margin-left: auto; display: flex; gap: 8px; }
+  .detail-hero { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); margin-bottom: 12px; }
+  .detail-hero-info h2 { margin-bottom: 4px; }
+  .detail-grid { display: grid; gap: 10px; }
+  .detail-row { display: flex; gap: 10px; font-size: 13px; }
+  .detail-label { font-size: 12px; color: var(--text2); min-width: 130px; flex-shrink: 0; padding-top: 1px; }
+  .actions-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* Form */
+  .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+  .form-sections { display: grid; gap: 14px; }
+  .field { display: grid; gap: 4px; }
+  .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+  /* Multi-toggle */
+  .multi-toggle { display: flex; flex-wrap: wrap; gap: 6px; }
+  .toggle-btn { font-family: var(--font); font-size: 12px; padding: 4px 11px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); transition: all .15s; }
+  .toggle-btn.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
+
+  /* Urgency selector */
+  .urgency-row { display: flex; gap: 6px; }
+  .urgency-btn { flex: 1; padding: 6px 4px; font-family: var(--font); font-size: 12px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); text-align: center; transition: all .15s; }
+
+  /* Tag input */
+  .tag-input-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 8px; display: flex; flex-wrap: wrap; gap: 4px; min-height: 38px; align-items: center; background: var(--surface); cursor: text; transition: border-color .15s; }
+  .tag-input-wrap:focus-within { border-color: var(--accent); }
+  .tag-input-wrap input { border: none; outline: none; background: transparent; font-size: 13px; flex: 1; min-width: 80px; padding: 0; color: var(--text); font-family: var(--font); }
+  .tag-suggs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; }
+  .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 600; line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; }
+  .bar-label { font-size: 12px; color: var(--text2); min-width: 80px; }
+  .bar-track { flex: 1; height: 8px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+  .bar-num { font-size: 12px; font-weight: 500; min-width: 20px; text-align: right; }
+
+  /* Merge panel */
+  .merge-panel { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; }
+  .merge-list { max-height: 200px; overflow-y: auto; display: grid; gap: 6px; margin: 10px 0; }
+  .merge-item { padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all .12s; }
+  .merge-item:hover, .merge-item.selected { border-color: var(--accent-border); background: var(--accent-bg); }
+  .merge-item-info { min-width: 0; }
+  .merge-item-name { font-size: 13px; font-weight: 500; }
+  .merge-item-sub { font-size: 11px; color: var(--text2); }
+
+  /* Files */
+  .files-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .file-thumb { position: relative; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .file-thumb img { width: 80px; height: 70px; object-fit: cover; display: block; cursor: pointer; }
+  .file-doc { padding: 8px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-width: 130px; }
+  .file-doc:hover { background: var(--surface2); }
+  .file-name { font-size: 11px; font-weight: 500; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-size { font-size: 10px; color: var(--text3); }
+  .file-del { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; border: none; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+
+  /* Toast */
+  .toast { padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; margin-bottom: 12px; border: 1px solid; }
+  .toast-success { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+  .toast-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); }
+  .empty strong { display: block; font-size: 15px; color: var(--text2); margin-bottom: 6px; }
+
+  /* Confirm inline */
+  .confirm-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding: 8px 12px; background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: var(--radius-sm); margin-top: 8px; }
+  .confirm-row span { font-size: 13px; color: var(--danger); flex: 1; }
+
+  /* Nav tabs */
+  .nav-tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+  .nav-tab { font-family: var(--font); font-size: 13px; font-weight: 500; padding: 8px 14px; cursor: pointer; border: none; background: none; color: var(--text2); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-tab:hover:not(.active) { color: var(--text); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Notes history */
+  .note-entry { border-left: 3px solid var(--border); padding: 8px 12px; margin-bottom: 6px; background: var(--surface); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .note-entry:last-child { margin-bottom: 0; }
+  .note-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+  .note-date { font-size: 11px; color: var(--text3); }
+  .note-text { font-size: 13px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+  .note-add-form { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; display: grid; gap: 8px; }
+  .note-type-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .note-type-btn { font-family: var(--font); font-size: 11px; padding: 3px 10px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text2); transition: all .12s; }
+  .note-type-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* Copy button */
+  .copy-btn { font-size: 11px; padding: 1px 7px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--text3); cursor: pointer; font-family: var(--font); transition: all .12s; }
+  .copy-btn:hover { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
+  .copy-btn.copied { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+
+  /* Loader */
+  .loader { text-align: center; padding: 3rem; color: var(--text3); font-size: 13px; }
+
+  @media (max-width: 600px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .top-bar { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div id="app"><div class="loader">Cargando CRM...</div></div>
+<script>
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+const AUTH = {
+  // Credenciales por defecto — se cambian desde Ajustes dentro del CRM
+  DEFAULT_USER: 'admin',
+  DEFAULT_PASS: 'crm2024',
+
+  getCredentials() {
+    return {
+      user: localStorage.getItem('crm_auth_user') || this.DEFAULT_USER,
+      pass: localStorage.getItem('crm_auth_pass') || this.DEFAULT_PASS,
+    };
+  },
+  setCredentials(user, pass) {
+    localStorage.setItem('crm_auth_user', user);
+    localStorage.setItem('crm_auth_pass', pass);
+  },
+  isLoggedIn() {
+    // Sesión guardada con "recordarme"
+    if (localStorage.getItem('crm_session') === 'ok') return true;
+    // Sesión temporal (solo esta pestaña)
+    if (sessionStorage.getItem('crm_session') === 'ok') return true;
+    return false;
+  },
+  login(user, pass, remember) {
+    const creds = this.getCredentials();
+    if (user === creds.user && pass === creds.pass) {
+      if (remember) localStorage.setItem('crm_session', 'ok');
+      else sessionStorage.setItem('crm_session', 'ok');
+      return true;
+    }
+    return false;
+  },
+  logout() {
+    localStorage.removeItem('crm_session');
+    sessionStorage.removeItem('crm_session');
+  }
+};
+
+// Mostrar login si no está autenticado
+function showLoginScreen() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  app.style.maxWidth = 'none';
+  app.style.padding = '0';
+
+  const screen = document.createElement('div');
+  screen.className = 'login-screen';
+
+  const card = document.createElement('div');
+  card.className = 'login-card';
+  card.innerHTML = `
+    <div class="login-logo">🏠</div>
+    <div class="login-title">CRM Inmobiliario</div>
+    <div class="login-subtitle">Ingresá tus credenciales para continuar</div>
+    <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Usuario</label>
+      <input type="text" id="loginUser" placeholder="usuario" autocomplete="username" />
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:18px">
+      <input type="checkbox" id="loginRemember" checked /> Recordarme en este dispositivo
+    </label>
+    <button class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center;padding:10px">Entrar</button>
+    <div class="login-footer">Acceso privado · Solo para uso interno</div>
+  `;
+
+  screen.appendChild(card);
+  app.appendChild(screen);
+
+  const doLogin = () => {
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    const remember = document.getElementById('loginRemember').checked;
+    if (AUTH.login(user, pass, remember)) {
+      app.style.maxWidth = '';
+      app.style.padding = '';
+      render();
+      if (SHEETS_URL) syncFromSheets();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  };
+
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
+
+  // Foco automático
+  setTimeout(() => document.getElementById('loginUser').focus(), 100);
+}
+
+// ─── CONSTANTS ──────────────────────────────────────────────────────────────
+const URGENCY = {
+  1:{l:'Baja',c:'#1D9E75'},
+  2:{l:'Media',c:'#EF9F27'},
+  3:{l:'Alta',c:'#E24B4A'}
+};
+const PROP_TYPES=['Apartamento','Casa','Villa','Solar','Local','Nave'];
+const CONTACT_METHODS=['Llamada','WhatsApp','Email','Reunión','Referido'];
+const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE'];
+const NOTE_TYPES=[
+  {v:'llamada',   l:'📞 Llamada',    c:'chip-accent'},
+  {v:'whatsapp',  l:'💬 WhatsApp',   c:'chip-success'},
+  {v:'reunion',   l:'🤝 Reunión',    c:'chip-warn'},
+  {v:'visita',    l:'🏠 Visita',     c:'chip-warn'},
+  {v:'email',     l:'✉️ Email',      c:'chip-accent'},
+  {v:'otro',      l:'📝 Nota',       c:''},
+];
+const BUDGET_OPTS=[
+  ['','—'],
+  ['50000','50.000€'],['70000','70.000€'],['80000','80.000€'],['90000','90.000€'],
+  ['100000','100.000€'],['110000','110.000€'],['120000','120.000€'],['130000','130.000€'],
+  ['140000','140.000€'],['150000','150.000€'],['160000','160.000€'],['180000','180.000€'],
+  ['200000','200.000€'],['220000','220.000€'],['250000','250.000€'],['300000','300.000€'],
+  ['350000','350.000€'],['400000','400.000€'],['450000','450.000€'],['500000','500.000€'],
+  ['1000000','1.000.000€'],
+];
+const ZONE_SUGG=['Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
+const AVATAR_COLORS=['#185FA5','#0F6E56','#993C1D','#534AB7','#993556','#3B6D11','#854F0B'];
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const avatarColor = n => AVATAR_COLORS[(n?.charCodeAt(0)||65) % AVATAR_COLORS.length];
+const initials = n => (n||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
+const fmt = n => n ? '€' + Number(n).toLocaleString('es-ES') : '';
+const cleanPhone = p => (p||'').replace(/[\s\-\(\)]/g,'');
+
+// ─── GOOGLE SHEETS CONFIG ────────────────────────────────────────────────────
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.warn('LS error',e); } },
+  del: k => localStorage.removeItem(k)
+};
+
+// URL de tu Web App — se guarda en localStorage al configurar
+let SHEETS_URL = LS.get('crm_sheets_url') || '';
+
+// Detectar si estamos corriendo DENTRO de Apps Script
+const IS_APPS_SCRIPT = typeof google !== 'undefined' && typeof google.script !== 'undefined';
+
+// Si estamos en Apps Script, la URL somos nosotros mismos
+if (IS_APPS_SCRIPT) SHEETS_URL = 'self';
+
+const API = {
+  async call(action, body={}) {
+    // Modo Apps Script: usa google.script.run (sin fetch, sin CORS)
+    if (IS_APPS_SCRIPT) {
+      return new Promise((resolve) => {
+        google.script.run
+          .withSuccessHandler(r => resolve(r && r.ok ? r.data : null))
+          .withFailureHandler(() => resolve(null))
+          .handleApiCall(JSON.stringify({ action, ...body }));
+      });
+    }
+    // Modo externo: fetch normal a la URL configurada
+    if (!SHEETS_URL) return null;
+    try {
+      const res = await fetch(SHEETS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action, ...body }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const json = await res.json();
+      return json.ok ? json.data : null;
+    } catch(e) {
+      console.warn('Sheets API error:', e);
+      return null;
+    }
+  },
+  async getAll()          { return await this.call('getAll'); },
+  async saveContact(c)    { return await this.call('saveContact',   { contact: c }); },
+  async deleteContact(id) { return await this.call('deleteContact', { id }); },
+  async saveNote(note)    { return await this.call('saveNote',      { note }); },
+  async deleteNote(nId)   { return await this.call('deleteNote',    { noteId: nId }); },
+};
+
+// ─── STORAGE (localStorage como caché y fallback) ─────────────────────────────
+const loadContacts = () => LS.get('crm_contacts') || [];
+const saveContacts = cs => LS.set('crm_contacts', cs);
+const loadFiles = id => LS.get('crm_files_idx_'+id) || [];
+const saveFiles = (id, fs) => LS.set('crm_files_idx_'+id, fs);
+const loadFile = (cid,fid) => LS.get('crm_file_'+cid+'_'+fid);
+const saveFile = (cid,fid,d) => LS.set('crm_file_'+cid+'_'+fid, d);
+const delFile = (cid,fid) => { LS.del('crm_file_'+cid+'_'+fid); };
+
+// Sincronización con Sheets al abrir
+async function syncFromSheets() {
+  if (!SHEETS_URL) return;
+  setState({ syncing: true });
+  const data = await API.getAll();
+  if (data && Array.isArray(data)) {
+    saveContacts(data);
+    setState({ contacts: data, syncing: false });
+  } else {
+    setState({ syncing: false });
+  }
+}
+
+// ─── EMPTY CONTACT ────────────────────────────────────────────────────────────
+const emptyContact = () => ({
+  id: genId(), name:'', phone:'', email:'', whatsapp:'',
+  contactMethods:[], isVIP:false, tags:[],
+  budgetMin:'', budgetMax:'', searchZones:[], urgency:2,
+  needsMortgage:false, bedroomsMin:'', wantsPool:false,
+  propertyTypes:[], investmentType:'', notes:[], createdBy:'',
+  driveLink:'', reminders:[],
+  createdAt: new Date().toISOString(),
+  lastContact: new Date().toISOString().split('T')[0]
+});
+
+// ─── CSV EXPORT ───────────────────────────────────────────────────────────────
+function exportCSV(contacts) {
+  const cols = ['Nombre','Teléfono','Email','WhatsApp','VIP','Urgencia','Pres.Min','Pres.Max','Hipoteca','Zonas','Tipos','Dormitorios','Piscina','Etiquetas','Inversión','Agente','Notas','Último contacto','Creado'];
+  const esc = v => '"' + (v||'').toString().replace(/"/g,'""') + '"';
+  const rows = contacts.map(c => [
+    c.name,c.phone,c.email,c.whatsapp,c.isVIP?'Sí':'No',
+    URGENCY[c.urgency]?.l||'',c.budgetMin,c.budgetMax,
+    c.needsMortgage?'Sí':'No',(c.searchZones||[]).join('; '),
+    (c.propertyTypes||[]).join('; '),c.bedroomsMin||'',
+    c.wantsPool?'Sí':'No',(c.tags||[]).join('; '),
+    c.investmentType||'',c.createdBy||'',
+    Array.isArray(c.notes)?(c.notes.map(n=>n.date+' ['+n.v+']: '+n.text).join(' | ')):((c.notes||'').replace(/\n/g,' ')),
+    c.lastContact||'',(c.createdAt||'').split('T')[0]
+  ].map(esc));
+  const csv = [cols.map(esc).join(','), ...rows.map(r=>r.join(','))].join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='contactos_crm.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let state = {
+  view: 'list',
+  contacts: loadContacts(),
+  editContact: null,
+  detailContact: null,
+  search: '',
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'' },
+  showFilters: false,
+  sort: 'date_desc',
+  toast: null,
+  confirmDelete: null,
+  showMerge: false,
+  mergeSearch: '',
+  mergeSelected: null,
+  syncing: false,
+  sheetsConfigured: !!LS.get('crm_sheets_url'),
+};
+let toastTimer = null;
+
+function setState(patch) {
+  state = {...state, ...patch};
+  render();
+}
+
+function showToast(msg, type='success') {
+  if (toastTimer) clearTimeout(toastTimer);
+  setState({toast:{msg,type}});
+  toastTimer = setTimeout(()=>setState({toast:null}), 2800);
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────────────────────────
+async function saveContact(c) {
+  const exists = state.contacts.find(x=>x.id===c.id);
+  let contacts;
+  if (exists) contacts = state.contacts.map(x=>x.id===c.id?c:x);
+  else contacts = [c, ...state.contacts];
+  saveContacts(contacts);
+  setState({contacts, view: state.detailContact ? 'detail' : 'list', editContact:null, detailContact: exists ? c : state.detailContact});
+  // Sync a Sheets en segundo plano
+  if (SHEETS_URL) {
+    const res = await API.saveContact(c);
+    showToast((exists ? 'Actualizado' : 'Guardado') + (res ? ' ✓ (Sheets)' : ' ✓ (local)'));
+  } else {
+    showToast(exists ? 'Contacto actualizado ✓' : 'Contacto añadido ✓');
+  }
+}
+
+async function deleteContact(id) {
+  const contacts = state.contacts.filter(c=>c.id!==id);
+  saveContacts(contacts);
+  setState({contacts, view:'list', detailContact:null, confirmDelete:null});
+  if (SHEETS_URL) await API.deleteContact(id);
+  showToast('Contacto eliminado','danger');
+}
+
+function mergeContacts(base, other) {
+  const merged = {
+    ...base,
+    phone: base.phone||other.phone,
+    email: base.email||other.email,
+    whatsapp: base.whatsapp||other.whatsapp,
+    contactMethods: [...new Set([...base.contactMethods,...other.contactMethods])],
+    isVIP: base.isVIP||other.isVIP,
+    tags: [...new Set([...base.tags,...other.tags])],
+    budgetMin: base.budgetMin||other.budgetMin,
+    budgetMax: base.budgetMax&&other.budgetMax ? String(Math.max(Number(base.budgetMax),Number(other.budgetMax))) : base.budgetMax||other.budgetMax,
+    searchZones: [...new Set([...base.searchZones,...other.searchZones])],
+    urgency: Math.max(base.urgency, other.urgency),
+    needsMortgage: base.needsMortgage||other.needsMortgage,
+    bedroomsMin: base.bedroomsMin||other.bedroomsMin,
+    wantsPool: base.wantsPool||other.wantsPool,
+    propertyTypes: [...new Set([...base.propertyTypes,...other.propertyTypes])],
+    investmentType: base.investmentType||other.investmentType,
+    createdBy: base.createdBy||other.createdBy,
+    notes: [base.notes, other.notes].filter(Boolean).join('\n---\n'),
+  };
+  const contacts = state.contacts.filter(c=>c.id!==other.id).map(c=>c.id===merged.id?merged:c);
+  saveContacts(contacts);
+  showToast('Contactos fusionados ✓');
+  setState({contacts, detailContact:merged, showMerge:false, mergeSelected:null, mergeSearch:''});
+}
+
+// ─── FILTERED CONTACTS ────────────────────────────────────────────────────────
+function getFiltered() {
+  let list = [...state.contacts];
+  const q = state.search.toLowerCase();
+  if (q) list = list.filter(c =>
+    c.name?.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q) ||
+    c.phone?.includes(q) || c.tags?.some(t=>t.toLowerCase().includes(q)) ||
+    c.searchZones?.some(z=>z.toLowerCase().includes(q)) || c.createdBy?.toLowerCase().includes(q)
+  );
+  const f = state.filters;
+  if (f.isVIP) list = list.filter(c=>c.isVIP);
+  if (f.needsMortgage) list = list.filter(c=>c.needsMortgage);
+  if (f.wantsPool) list = list.filter(c=>c.wantsPool);
+  if (f.urgencyMin>0) list = list.filter(c=>c.urgency>=f.urgencyMin);
+  if (f.zone) list = list.filter(c=>c.searchZones?.some(z=>z.toLowerCase().includes(f.zone.toLowerCase())));
+  if (f.tag) list = list.filter(c=>c.tags?.some(t=>t.toLowerCase()===f.tag.toLowerCase()));
+  if (f.budgetMax) list = list.filter(c=>!c.budgetMax || Number(c.budgetMax) <= Number(f.budgetMax));
+  list.sort((a,b) => {
+    if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
+    if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
+    if (state.sort==='urgency') return b.urgency-a.urgency;
+    if (state.sort==='budget') return (Number(b.budgetMax)||0)-(Number(a.budgetMax)||0);
+    return 0;
+  });
+  return list;
+}
+
+// ─── HTML HELPERS ─────────────────────────────────────────────────────────────
+const h = (tag,attrs,...children) => {
+  const el = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs||{})) {
+    if (k==='style'&&typeof v==='object') Object.assign(el.style, v);
+    else if (k.startsWith('on')&&typeof v==='function') el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k==='html') el.innerHTML = v;
+    else el.setAttribute(k, v);
+  }
+  for (const c of children) { if (c==null||c===false) continue; if (typeof c==='string'||typeof c==='number') el.append(document.createTextNode(c)); else if (c instanceof Node) el.append(c); }
+  return el;
+};
+
+function chip(text, cls, onRemove) {
+  const c = h('span',{class:'chip'+(cls?' '+cls:'')}, text);
+  if (onRemove) {
+    const x = h('span',{class:'chip-remove',html:'&times;'});
+    x.addEventListener('click',e=>{e.stopPropagation();onRemove();});
+    c.append(x);
+  }
+  return c;
+}
+
+function avatar(name, size='') {
+  const el = h('div',{class:'avatar'+(size?' avatar-'+size:''),style:{background:avatarColor(name||'?')}}, initials(name||'?'));
+  return el;
+}
+
+function urgencyBadge(u) {
+  const urg = URGENCY[u]||URGENCY[3];
+  return h('span',{class:'urgency-badge',style:{background:urg.c+'22',color:urg.c,border:`1px solid ${urg.c}55`}}, urg.l);
+}
+
+function sectionEl(title, ...children) {
+  const el = h('div',{class:'section'});
+  el.append(h('div',{class:'section-title'},title));
+  for (const c of children) { if(c) el.append(c); }
+  return el;
+}
+
+function fieldEl(label, input) {
+  return h('div',{class:'field'}, h('label',{},label), input);
+}
+
+// ─── TAG INPUT ────────────────────────────────────────────────────────────────
+function makeTagInput(values, onChange, suggestions, placeholder) {
+  let vals = [...values];
+  const wrap = h('div',{class:'tag-input-wrap'});
+  const input = h('input',{type:'text',placeholder:vals.length===0?(placeholder||'Añadir...'):'',style:{border:'none',outline:'none',background:'transparent',fontSize:'13px',flex:'1',minWidth:'80px',padding:'0',fontFamily:"'DM Sans',sans-serif"}});
+  const suggs = h('div',{class:'tag-suggs'});
+  const el = h('div',{},wrap,suggs);
+
+  function refresh() {
+    wrap.innerHTML='';
+    vals.forEach(v => {
+      const c = chip(v,'',()=>{vals=vals.filter(x=>x!==v);onChange(vals);refresh();});
+      wrap.append(c);
+    });
+    wrap.append(input);
+    input.placeholder = vals.length===0?(placeholder||'Añadir...'):'';
+    // suggestions
+    suggs.innerHTML='';
+    const shown = (suggestions||[]).filter(s=>!vals.includes(s)&&s.toLowerCase().includes(input.value.toLowerCase())).slice(0,7);
+    shown.forEach(s=>{
+      const btn = h('button',{class:'toggle-btn active',style:{fontSize:'11px',padding:'2px 8px',cursor:'pointer'}}, '+ '+s);
+      btn.addEventListener('click',()=>{if(!vals.includes(s))vals=[...vals,s];onChange(vals);refresh();});
+      suggs.append(btn);
+    });
+  }
+  function add(v) { const t=v.trim(); if(t&&!vals.includes(t)){vals=[...vals,t];onChange(vals);} input.value=''; refresh(); }
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){e.preventDefault();add(input.value);}
+    else if(e.key==='Backspace'&&!input.value&&vals.length){vals=vals.slice(0,-1);onChange(vals);refresh();}
+  });
+  input.addEventListener('blur',()=>{if(input.value)add(input.value);});
+  input.addEventListener('input',refresh);
+  wrap.addEventListener('click',e=>{if(e.target===wrap)input.focus();});
+  refresh();
+  return el;
+}
+
+// ─── MULTI TOGGLE ────────────────────────────────────────────────────────────
+function makeMultiToggle(options, values, onChange, label) {
+  let vals = [...values];
+  const el = h('div',{class:'grid-stack',style:{gap:'6px'}});
+  if(label) el.append(h('label',{},label));
+  const row = h('div',{class:'multi-toggle'});
+  el.append(row);
+  function refresh() {
+    row.innerHTML='';
+    options.forEach(o=>{
+      const btn = h('button',{class:'toggle-btn'+(vals.includes(o)?' active':'')},o);
+      btn.addEventListener('click',()=>{vals=vals.includes(o)?vals.filter(x=>x!==o):[...vals,o];onChange(vals);refresh();});
+      row.append(btn);
+    });
+  }
+  refresh();
+  return el;
+}
+
+// ─── VIEWS ───────────────────────────────────────────────────────────────────
+
+// FORM VIEW
+function renderForm() {
+  let form = {...(state.editContact || emptyContact())};
+  const set = (k,v) => { form[k]=v; };
+
+  const wrap = h('div',{});
+
+  const hdr = h('div',{class:'form-header'},
+    h('h2',{}, form.name ? 'Editar: '+form.name : 'Nuevo contacto'),
+    h('div',{class:'flex'},
+      h('button',{class:'btn btn-secondary', onClick:()=>setState({view: state.detailContact?'detail':'list', editContact:null})},'Cancelar'),
+      h('button',{class:'btn btn-primary', onClick:saveForm},'Guardar')
+    )
+  );
+  wrap.append(hdr);
+
+  const errDiv = h('div',{style:{display:'none',color:'var(--danger)',fontSize:'13px',marginBottom:'12px',padding:'8px 12px',background:'var(--danger-bg)',borderRadius:'var(--radius-sm)',border:'1px solid var(--danger-border)'}});
+  wrap.append(errDiv);
+
+  // Helper to bind input
+  const inp = (type,field,placeholder,val) => {
+    const el = h('input',{type,placeholder,value:val||''});
+    el.addEventListener('input',e=>set(field,e.target.value));
+    return el;
+  };
+  const sel = (field,options,val) => {
+    const el = h('select',{});
+    options.forEach(([v,l])=>{const o=h('option',{value:v},l);if(val===v)o.selected=true;el.append(o);});
+    el.addEventListener('change',e=>set(field,e.target.value));
+    return el;
+  };
+
+  // Urgency
+  const urgRow = h('div',{class:'urgency-row'});
+  function refreshUrg() {
+    urgRow.innerHTML='';
+    [1,2,3].forEach(v=>{
+      const urg=URGENCY[v];
+      const btn=h('button',{class:'urgency-btn'},urg.l);
+      if(form.urgency===v){btn.style.background=urg.c;btn.style.color='#fff';btn.style.borderColor=urg.c;}
+      btn.addEventListener('click',()=>{form.urgency=v;refreshUrg();});
+      urgRow.append(btn);
+    });
+  }
+  refreshUrg();
+
+  // Checkboxes helper
+  const mkCb=(field,label,val)=>{
+    const cb=h('input',{type:'checkbox'});
+    cb.checked=!!val;
+    cb.addEventListener('change',e=>set(field,e.target.checked));
+    return h('label',{class:'flex',style:{alignItems:'center',gap:'8px',fontSize:'13px',cursor:'pointer',margin:'0'}},cb,label);
+  };
+
+  // Methods multi
+  let methodVals=[...form.contactMethods];
+  const methodToggle=makeMultiToggle(CONTACT_METHODS,methodVals,v=>{form.contactMethods=v;methodVals=v;},'');
+
+  // Property types
+  let propVals=[...form.propertyTypes];
+  const propToggle=makeMultiToggle(PROP_TYPES,propVals,v=>{form.propertyTypes=v;propVals=v;},'');
+
+  // Tags
+  let tagVals=[...form.tags];
+  const tagInp=makeTagInput(tagVals,v=>{form.tags=v;tagVals=v;},TAG_SUGG,'Escribe y pulsa Enter...');
+
+  // Zones — multi-toggle con zonas predefinidas
+  let zoneVals=[...form.searchZones];
+  const zoneToggle=makeMultiToggle(ZONE_SUGG,zoneVals,v=>{form.searchZones=v;zoneVals=v;});
+
+  // bedrooms select
+  const bedsOpts=[['','Sin preferencia'],...[1,2,3,4,5,6].map(n=>[String(n),n+'+ hab.'])];
+  const bedsEl=sel('bedroomsMin',bedsOpts,form.bedroomsMin);
+
+  // investment type
+  const invOpts=INV_TYPES.map(t=>[t,t||'Seleccionar...']);
+  const invEl=sel('investmentType',invOpts,form.investmentType);
+
+  const sections = h('div',{class:'form-sections'});
+
+  // Section 1: Personal
+  sections.append(sectionEl('Datos personales',
+    h('div',{class:'grid-2'},
+      fieldEl('Nombre *', inp('text','name','Nombre completo',form.name)),
+      fieldEl('Agente responsable', inp('text','createdBy','Tu nombre / equipo',form.createdBy)),
+      fieldEl('Teléfono', inp('tel','phone','+34 600 000 000',form.phone)),
+      fieldEl('Email', inp('email','email','correo@ejemplo.com',form.email)),
+      fieldEl('WhatsApp (si es distinto al tel.)', inp('tel','whatsapp','+34 600 000 000',form.whatsapp)),
+      fieldEl('Último contacto', inp('date','lastContact','',form.lastContact))
+    ),
+    h('div',{class:'field',style:{marginTop:'8px'}},
+      h('label',{},'Enlace carpeta Google Drive (del cliente)'),
+      inp('url','driveLink','https://drive.google.com/...',form.driveLink)
+    ),
+    h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle)
+  ));
+
+  // VIP toggle visual
+  const vipToggleWrap = h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'10px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(form.isVIP?'var(--vip-border)':'var(--border)'),background:form.isVIP?'var(--vip-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s'}});
+  const vipLabel = h('span',{style:{fontSize:'13px',fontWeight:'600',color:form.isVIP?'var(--vip)':'var(--text2)'}}, form.isVIP?'★ Cliente VIP':'☆ Cliente VIP');
+  const vipStatus = h('span',{style:{marginLeft:'auto',fontSize:'12px',fontWeight:'700',color:form.isVIP?'var(--vip)':'var(--text3)'}}, form.isVIP?'SÍ':'NO');
+  vipToggleWrap.append(vipLabel, vipStatus);
+  vipToggleWrap.addEventListener('click',()=>{
+    form.isVIP=!form.isVIP;
+    vipLabel.textContent=form.isVIP?'★ Cliente VIP':'☆ Cliente VIP';
+    vipLabel.style.color=form.isVIP?'var(--vip)':'var(--text2)';
+    vipStatus.textContent=form.isVIP?'SÍ':'NO';
+    vipStatus.style.color=form.isVIP?'var(--vip)':'var(--text3)';
+    vipToggleWrap.style.borderColor=form.isVIP?'var(--vip-border)':'var(--border)';
+    vipToggleWrap.style.background=form.isVIP?'var(--vip-bg)':'var(--surface2)';
+  });
+
+  const urgDiv=h('div',{class:'field'},h('label',{id:'urgLabel'},'Urgencia'),urgRow);
+  sections.append(sectionEl('Clasificación',
+    vipToggleWrap,
+    h('div',{class:'grid-2',style:{alignItems:'start',marginTop:'10px'}},
+      urgDiv,
+      fieldEl('Tipo de inversión', invEl)
+    ),
+    h('div',{class:'field',style:{marginTop:'4px'}},h('label',{},'Etiquetas'),tagInp)
+  ));
+
+  // Section 3: Budget
+  sections.append(sectionEl('Presupuesto y financiación',
+    h('div',{class:'grid-2'},
+      fieldEl('Presupuesto mínimo (€)', sel('budgetMin',BUDGET_OPTS,form.budgetMin)),
+      fieldEl('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))
+    ),
+    mkCb('needsMortgage','Necesita financiación / hipoteca',form.needsMortgage)
+  ));
+
+  // Section 4: Requirements
+  sections.append(sectionEl('Requisitos del inmueble',
+    h('div',{class:'field'},h('label',{},'Zonas de búsqueda (seleccioná una o varias)'),zoneToggle),
+    h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle),
+    h('div',{class:'grid-2',style:{alignItems:'end'}},
+      fieldEl('Dormitorios mínimos', bedsEl),
+      mkCb('wantsPool','Requiere piscina',form.wantsPool)
+    )
+  ));
+
+  // Section 5: Notes — se gestionan desde la vista de detalle
+  sections.append(sectionEl('Notas',
+    h('div',{style:{fontSize:'13px',color:'var(--text2)',padding:'4px 0'}},
+      'Las notas se agregan desde la ficha del contacto, una vez guardado. Podés anotar llamadas, reuniones, visitas y más.'
+    )
+  ));
+
+  wrap.append(sections);
+
+  const footer = h('div',{class:'form-footer'},
+    h('button',{class:'btn btn-secondary',onClick:()=>setState({view: state.detailContact?'detail':'list',editContact:null})},'Cancelar'),
+    h('button',{class:'btn btn-primary',onClick:saveForm},'Guardar contacto')
+  );
+  wrap.append(footer);
+
+  function saveForm() {
+    if(!form.name.trim()){errDiv.textContent='El nombre es obligatorio';errDiv.style.display='block';return;}
+    errDiv.style.display='none';
+    saveContact(form);
+  }
+
+  return wrap;
+}
+
+// CONTACT CARD (list item)
+function renderCard(c, filtered) {
+  const u = URGENCY[c.urgency]||URGENCY[3];
+  const card = h('div',{class:'card contact-card'+(c.isVIP?' vip':'')});
+  card.addEventListener('click',()=>setState({view:'detail',detailContact:c}));
+
+  const inner = h('div',{class:'contact-card-inner'});
+  const av = avatar(c.name);
+  if(c.isVIP) { const star=h('div',{class:'vip-star'},'★'); av.append(star); }
+  inner.append(av);
+
+  const info = h('div',{});
+  const nameRow = h('div',{class:'flex-wrap gap-4',style:{marginBottom:'2px'}});
+  nameRow.append(h('span',{style:{fontSize:'14px',fontWeight:'600'}},c.name||'Sin nombre'));
+  if(c.isVIP) nameRow.append(chip('VIP','chip-vip'));
+  nameRow.append(urgencyBadge(c.urgency));
+  info.append(nameRow);
+
+  const metaRow = h('div',{class:'contact-info-row'});
+  if(c.createdBy) metaRow.append(h('span',{},'Agente: '+c.createdBy));
+  if(c.phone) {
+    const waNum = cleanPhone(c.whatsapp||c.phone).replace('+','');
+    const phoneWrap = h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px'}});
+    phoneWrap.append(h('span',{},c.phone));
+    const copyBtn = h('button',{class:'copy-btn',onClick:e=>{
+      e.stopPropagation();
+      navigator.clipboard.writeText(c.phone).then(()=>{
+        copyBtn.textContent='✓ Copiado';
+        copyBtn.classList.add('copied');
+        setTimeout(()=>{copyBtn.textContent='Copiar';copyBtn.classList.remove('copied');},1500);
+      });
+    }},'Copiar');
+    phoneWrap.append(copyBtn);
+    metaRow.append(phoneWrap);
+  }
+  if(c.email) metaRow.append(h('span',{},c.email));
+  if(c.lastContact) metaRow.append(h('span',{},'Contacto: '+c.lastContact));
+  info.append(metaRow);
+
+  const chips = h('div',{class:'contact-chips'});
+  if(c.budgetMin||c.budgetMax) chips.append(chip((c.budgetMin&&c.budgetMax?fmt(c.budgetMin)+' – '+fmt(c.budgetMax):fmt(c.budgetMin||c.budgetMax)),'chip-success'));
+
+  // Zonas clickeables → activan filtro de zona
+  (c.searchZones||[]).slice(0,2).forEach(z=>{
+    const isActive = state.filters.zone===z;
+    const zc=chip(z, isActive?'chip-accent':'chip-accent');
+    zc.style.cursor='pointer';
+    zc.style.fontWeight = isActive?'700':'400';
+    zc.style.boxShadow = isActive?'0 0 0 2px var(--accent)':'none';
+    zc.title= isActive?'Quitar filtro de '+z:'Filtrar por '+z;
+    zc.addEventListener('click',e=>{
+      e.stopPropagation();
+      setState({filters:{...state.filters,zone:isActive?'':z}});
+    });
+    chips.append(zc);
+  });
+  if((c.searchZones||[]).length>2) chips.append(h('span',{style:{fontSize:'11px',color:'var(--text3)'}},'+'+(c.searchZones.length-2)));
+
+  if(c.bedroomsMin) chips.append(chip(c.bedroomsMin+'+ hab.',''));
+  if(c.wantsPool) chips.append(chip('Piscina',''));
+  if(c.needsMortgage) chips.append(chip('Hipoteca','chip-warn'));
+  if(c.investmentType) chips.append(chip(c.investmentType,''));
+
+  // Tags clickeables → activan filtro de etiqueta
+  (c.tags||[]).slice(0,3).forEach(t=>{
+    const isActive = state.filters.tag===t;
+    const tc=chip(t,'');
+    tc.style.cursor='pointer';
+    tc.style.fontWeight = isActive?'700':'400';
+    tc.style.boxShadow = isActive?'0 0 0 2px var(--accent)':'none';
+    tc.style.borderColor = isActive?'var(--accent)':'';
+    tc.style.color = isActive?'var(--accent)':'';
+    tc.title= isActive?'Quitar filtro de '+t:'Filtrar por '+t;
+    tc.addEventListener('click',e=>{
+      e.stopPropagation();
+      setState({filters:{...state.filters,tag:isActive?'':t}});
+    });
+    chips.append(tc);
+  });
+
+  // Recordatorio pendiente hoy o pasado
+  const today=new Date().toISOString().split('T')[0];
+  const pendingR=(c.reminders||[]).filter(r=>r.date<=today);
+  if(pendingR.length>0) chips.append(chip('🔔 '+pendingR.length+' recordatorio'+(pendingR.length>1?'s':''),'chip-warn'));
+  info.append(chips);
+  inner.append(info);
+  card.append(inner);
+  return card;
+}
+
+// DETAIL VIEW
+function renderDetail() {
+  const c = state.detailContact;
+  if(!c) return h('div',{},'No hay contacto seleccionado');
+  const u = URGENCY[c.urgency]||URGENCY[3];
+  const wrap = h('div',{});
+
+  // Header
+  const hdr = h('div',{class:'detail-header'});
+  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'list',detailContact:null,showMerge:false})},'← Lista'));
+  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>{setState({view:'form',editContact:{...c}});}},'Editar'));
+  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({showMerge:!state.showMerge,mergeSearch:'',mergeSelected:null})},state.showMerge?'Cancelar fusión':'Fusionar'));
+  const rightBtns = h('div',{class:'flex',style:{marginLeft:'auto'}});
+  rightBtns.append(h('button',{class:'btn btn-danger btn-sm',onClick:()=>setState({confirmDelete:c.id})},'Eliminar'));
+  hdr.append(rightBtns);
+  wrap.append(hdr);
+
+  // Confirm delete
+  if(state.confirmDelete===c.id) {
+    const conf = h('div',{class:'confirm-row'},
+      h('span',{},`¿Eliminar a "${c.name}"? Esta acción no se puede deshacer.`),
+      h('button',{class:'btn btn-danger btn-sm',onClick:()=>deleteContact(c.id)},'Sí, eliminar'),
+      h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({confirmDelete:null})},'Cancelar')
+    );
+    wrap.append(conf);
+  }
+
+  // Merge panel
+  if(state.showMerge) {
+    wrap.append(renderMergePanel(c));
+  }
+
+  // Hero
+  const hero = h('div',{class:'detail-hero'});
+  const av = avatar(c.name,'');
+  if(c.isVIP){const star=h('div',{class:'vip-star'},'★');av.append(star);}
+  hero.append(av);
+  const heroInfo = h('div',{class:'detail-hero-info',style:{flex:'1',minWidth:'0'}});
+  const heroName = h('div',{class:'flex-wrap gap-4',style:{marginBottom:'4px'}});
+  heroName.append(h('h2',{},c.name||'Sin nombre'));
+  if(c.isVIP) heroName.append(chip('VIP','chip-vip'));
+  heroName.append(urgencyBadge(c.urgency));
+  heroInfo.append(heroName);
+  if(c.createdBy) heroInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Agente: '+c.createdBy));
+  if(c.lastContact) heroInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Último contacto: '+c.lastContact));
+  hero.append(heroInfo);
+  wrap.append(hero);
+
+  // Quick actions
+  const actions = h('div',{class:'actions-row',style:{marginBottom:'12px'}});
+  if(c.phone||c.whatsapp) {
+    const waBtn = h('button',{class:'btn btn-secondary btn-sm',onClick:()=>{
+      let p = cleanPhone(c.whatsapp||c.phone);
+      if(!p.startsWith('34')&&!p.startsWith('+34')) p='34'+p.replace('+','');
+      p=p.replace('+','');
+      window.open(`https://wa.me/${p}?text=Hola+${encodeURIComponent(c.name)}%2C+me+pongo+en+contacto+desde+nuestra+inmobiliaria.`,'_blank');
+    }},'💬 WhatsApp');
+    actions.append(waBtn);
+  }
+  if(c.phone) actions.append(h('a',{href:'tel:'+c.phone,class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📞 Llamar'));
+  if(c.email) actions.append(h('a',{href:'mailto:'+c.email,class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'✉️ Email'));
+  if(c.driveLink) actions.append(h('a',{href:c.driveLink,target:'_blank',class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📁 Drive'));
+  // Google Calendar — abre nueva cita con el nombre del cliente
+  const calUrl='https://calendar.google.com/calendar/r/eventedit?text=Reunión+con+'+encodeURIComponent(c.name||'')+'&details='+encodeURIComponent('Cliente CRM\nTeléfono: '+(c.phone||'')+(c.email?'\nEmail: '+c.email:''));
+  actions.append(h('a',{href:calUrl,target:'_blank',class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📅 Calendar'));
+  wrap.append(actions);
+
+  // Info grid
+  const grid = h('div',{class:'detail-grid'});
+
+  const row=(label,value)=>{
+    if(!value||value==='No'&&label==='Piscina') return null;
+    if(Array.isArray(value)&&value.length===0) return null;
+    return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{},Array.isArray(value)?value.join(', '):value));
+  };
+
+  // Helper para campo copiable
+  const copyField=(label,value)=>{
+    if(!value) return null;
+    const wrap=h('div',{class:'detail-row'});
+    wrap.append(h('div',{class:'detail-label'},label));
+    const valWrap=h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}});
+    valWrap.append(h('span',{},value));
+    const cb=h('button',{class:'copy-btn',onClick:()=>{
+      navigator.clipboard.writeText(value).then(()=>{
+        cb.textContent='✓ Copiado';cb.classList.add('copied');
+        setTimeout(()=>{cb.textContent='Copiar';cb.classList.remove('copied');},1500);
+      });
+    }},'Copiar');
+    valWrap.append(cb);
+    wrap.append(valWrap);
+    return wrap;
+  };
+
+  grid.append(sectionEl('Datos de contacto',
+    h('div',{class:'grid-stack',style:{gap:'7px'}},
+      ...[
+        copyField('Teléfono',c.phone),
+        copyField('Email',c.email),
+        c.whatsapp?copyField('WhatsApp',c.whatsapp):null,
+        c.contactMethods?.length?row('Vía preferida',c.contactMethods):null
+      ].filter(Boolean)
+    )
+  ));
+
+  grid.append(sectionEl('Financiero',
+    h('div',{class:'grid-stack',style:{gap:'7px'}},
+      ...[
+        (c.budgetMin||c.budgetMax)?row('Presupuesto',(fmt(c.budgetMin)||'—')+' – '+(fmt(c.budgetMax)||'—')):null,
+        row('Hipoteca',c.needsMortgage?'Sí':'No'),
+        c.investmentType?row('Tipo inversión',c.investmentType):null
+      ].filter(Boolean)
+    )
+  ));
+
+  grid.append(sectionEl('Requisitos',
+    h('div',{class:'grid-stack',style:{gap:'7px'}},
+      ...[
+        c.searchZones?.length?row('Zonas',c.searchZones):null,
+        c.propertyTypes?.length?row('Tipo inmueble',c.propertyTypes):null,
+        c.bedroomsMin?row('Dormitorios min.',c.bedroomsMin+'+'):null,
+        row('Piscina',c.wantsPool?'Sí':'No')
+      ].filter(Boolean)
+    )
+  ));
+
+  if(c.tags?.length) {
+    const tagEl = h('div',{class:'flex-wrap gap-4'});
+    c.tags.forEach(t=>tagEl.append(chip(t,'')));
+    grid.append(sectionEl('Etiquetas',tagEl));
+  }
+
+  if(c.driveLink) {
+    grid.append(sectionEl('Google Drive',
+      h('a',{href:c.driveLink,target:'_blank',style:{fontSize:'13px',color:'var(--accent)',display:'inline-flex',alignItems:'center',gap:'5px',textDecoration:'none'}},
+        '📁 Abrir carpeta del cliente en Drive')
+    ));
+  }
+
+  // Recordatorios internos
+  grid.append(renderRemindersSection(c));
+
+  // Historial de notas
+  grid.append(renderNotesSection(c));
+
+  // Files
+  grid.append(sectionEl('Archivos y fotos',renderFilesSection(c.id)));
+
+  wrap.append(grid);
+  return wrap;
+}
+
+// NOTES HISTORY SECTION
+function renderNotesSection(c) {
+  const notes = Array.isArray(c.notes) ? [...c.notes] : (c.notes ? [{v:'otro',text:c.notes,date:c.lastContact||new Date().toISOString().split('T')[0]}] : []);
+  const wrap = h('div',{class:'grid-stack',style:{gap:'4px'}});
+
+  // Lista de notas existentes (más recientes primero)
+  const sorted = [...notes].sort((a,b)=>b.date>a.date?1:-1);
+  if(sorted.length===0) {
+    wrap.append(h('div',{style:{fontSize:'12px',color:'var(--text3)',fontStyle:'italic'}},'Sin notas todavía. Añadí la primera abajo.'));
+  } else {
+    sorted.forEach((n,origIdx)=>{
+      const nt = NOTE_TYPES.find(t=>t.v===n.v)||NOTE_TYPES[5];
+      const entry = h('div',{class:'note-entry'});
+      entry.style.borderLeftColor = n.v==='llamada'?'var(--accent)':n.v==='reunion'||n.v==='visita'?'var(--warn)':n.v==='whatsapp'?'var(--success)':'var(--border)';
+      const meta = h('div',{class:'note-meta'});
+      meta.append(h('span',{class:'chip '+nt.c,style:{fontSize:'10px',padding:'1px 7px'}},nt.l));
+      meta.append(h('span',{class:'note-date'},n.date));
+      if(n.createdBy) meta.append(h('span',{style:{fontSize:'11px',color:'var(--text3)'}},n.createdBy));
+      // Botón eliminar nota
+      const delBtn = h('button',{
+        style:{marginLeft:'auto',fontSize:'11px',color:'var(--text3)',border:'none',background:'none',cursor:'pointer',padding:'0 2px'},
+        onClick:()=>{
+          const updated={...c,notes:notes.filter((_,i)=>i!==notes.indexOf(n))};
+          saveContact(updated);
+        }
+      },'✕');
+      meta.append(delBtn);
+      entry.append(meta);
+      entry.append(h('div',{class:'note-text'},n.text));
+      wrap.append(entry);
+    });
+  }
+
+  // Formulario para nueva nota
+  let newType='otro', newText='';
+  const form = h('div',{class:'note-add-form'});
+
+  // Selector de tipo
+  const typeRow = h('div',{class:'note-type-row'});
+  NOTE_TYPES.forEach(nt=>{
+    const btn = h('button',{class:'note-type-btn'+(newType===nt.v?' active':'')},nt.l);
+    btn.addEventListener('click',()=>{
+      newType=nt.v;
+      typeRow.querySelectorAll('.note-type-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    typeRow.append(btn);
+  });
+  // Activar "otro" por defecto visualmente
+  typeRow.querySelector('.note-type-btn:last-child').classList.add('active');
+
+  const textarea = h('textarea',{placeholder:'Escribí tu nota aquí...',style:{minHeight:'70px',fontSize:'13px',resize:'vertical'}});
+  textarea.addEventListener('input',e=>newText=e.target.value);
+
+  const addRow2 = h('div',{style:{display:'flex',justifyContent:'flex-end'}});
+  const addBtn = h('button',{class:'btn btn-primary btn-sm',onClick:()=>{
+    if(!newText.trim()) return;
+    const newNote = {
+      v: newType,
+      text: newText.trim(),
+      date: new Date().toISOString().split('T')[0],
+      createdBy: c.createdBy||''
+    };
+    const updated={...c,notes:[...notes,newNote]};
+    saveContact(updated);
+  }},'Guardar nota');
+  addRow2.append(addBtn);
+
+  form.append(typeRow, textarea, addRow2);
+  wrap.append(form);
+
+  return sectionEl('Historial de notas', wrap);
+}
+
+// REMINDERS SECTION
+function renderRemindersSection(c) {
+  const reminders = c.reminders || [];
+  const today = new Date().toISOString().split('T')[0];
+  const wrap = h('div',{class:'grid-stack',style:{gap:'8px'}});
+
+  // Lista de recordatorios existentes
+  if(reminders.length>0) {
+    reminders.forEach((r,i)=>{
+      const isPast = r.date < today;
+      const isToday = r.date === today;
+      const rowStyle = {
+        display:'flex', alignItems:'center', gap:'8px',
+        padding:'8px 10px', borderRadius:'var(--radius-sm)',
+        border:'1px solid '+(isToday?'var(--warn-border)':isPast?'var(--danger-border)':'var(--border)'),
+        background: isToday?'var(--warn-bg)':isPast?'var(--danger-bg)':'var(--surface)',
+        fontSize:'13px'
+      };
+      const icon = isToday?'🔔':isPast?'⚠️':'🗓️';
+      const dateLabel = isToday?'HOY':isPast?r.date+' (pasado)':r.date;
+      const row = h('div',{style:rowStyle},
+        h('span',{},icon),
+        h('span',{style:{flex:'1'}},r.text),
+        h('span',{style:{fontSize:'11px',color:isToday?'var(--warn)':isPast?'var(--danger)':'var(--text3)',fontWeight:isToday||isPast?'600':'400'}},dateLabel),
+        h('button',{
+          class:'btn btn-sm',
+          style:{padding:'2px 8px',fontSize:'11px',color:'var(--text3)',border:'1px solid var(--border)',background:'var(--surface)'},
+          onClick:()=>{
+            const updated={...c,reminders:reminders.filter((_,j)=>j!==i)};
+            saveContact(updated);
+          }
+        },'✕')
+      );
+      wrap.append(row);
+    });
+  }
+
+  // Formulario para nuevo recordatorio
+  let newText='', newDate='';
+  const addRow = h('div',{style:{display:'flex',gap:'6px',flexWrap:'wrap',alignItems:'center'}});
+  const textInp = h('input',{type:'text',placeholder:'Ej: Llamar para ver oferta...',style:{flex:'2',minWidth:'140px',fontSize:'13px'}});
+  textInp.addEventListener('input',e=>newText=e.target.value);
+  const dateInp = h('input',{type:'date',style:{flex:'1',minWidth:'130px',fontSize:'13px'}});
+  dateInp.addEventListener('change',e=>newDate=e.target.value);
+  const addBtn = h('button',{
+    class:'btn btn-secondary btn-sm',
+    onClick:()=>{
+      if(!newText.trim()||!newDate){return;}
+      const updated={...c,reminders:[...(c.reminders||[]),{text:newText.trim(),date:newDate}].sort((a,b)=>a.date>b.date?1:-1)};
+      saveContact(updated);
+    }
+  },'+ Añadir');
+  addRow.append(textInp, dateInp, addBtn);
+  wrap.append(addRow);
+
+  return sectionEl('Recordatorios', wrap);
+}
+
+// FILES SECTION
+function renderFilesSection(cid) {
+  const wrap = h('div',{class:'grid-stack'});
+  let files = loadFiles(cid);
+
+  function refresh() {
+    wrap.innerHTML='';
+    const topRow = h('div',{class:'flex',style:{justifyContent:'space-between',alignItems:'center'}});
+    topRow.append(h('span',{style:{fontSize:'12px',color:'var(--text2)'}},files.length+' archivo'+(files.length!==1?'s':'')));
+    const fileInput = h('input',{type:'file',style:{display:'none'},accept:'image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx'});
+    fileInput.addEventListener('change',e=>{
+      const file=e.target.files?.[0];if(!file)return;
+      if(file.size>3*1024*1024){alert('Máximo 3MB por archivo');return;}
+      const reader=new FileReader();
+      reader.onload=ev=>{
+        const fid=genId();
+        const meta={id:fid,name:file.name,type:file.type,size:Math.round(file.size/1024),uploadedAt:new Date().toISOString()};
+        try{saveFile(cid,fid,ev.target.result);}catch(er){alert('Sin espacio para guardar el archivo. Intenta con uno más pequeño.');return;}
+        files=[...files,meta];saveFiles(cid,files);refresh();
+      };
+      reader.readAsDataURL(file);
+    });
+    const addBtn=h('button',{class:'btn btn-primary btn-sm',onClick:()=>fileInput.click()},'+ Adjuntar');
+    topRow.append(fileInput,addBtn);
+    wrap.append(topRow);
+
+    if(files.length>0) {
+      const grid=h('div',{class:'files-grid'});
+      files.forEach(f=>{
+        const isImg=f.type?.startsWith('image/');
+        const thumb=h('div',{class:'file-thumb'});
+        if(isImg){
+          const data=loadFile(cid,f.id);
+          if(data){const img=h('img',{src:data,alt:f.name,title:f.name});img.addEventListener('click',()=>window.open(data,'_blank'));thumb.append(img);}
+        } else {
+          const doc=h('div',{class:'file-doc',title:f.name,onClick:()=>{const d=loadFile(cid,f.id);if(d){const a=document.createElement('a');a.href=d;a.download=f.name;a.click();}}});
+          const icon=f.type?.includes('pdf')?'📄':f.type?.includes('word')||f.type?.includes('doc')?'📝':f.type?.includes('sheet')||f.type?.includes('excel')?'📊':'📎';
+          doc.append(h('span',{style:{fontSize:'20px'}},icon));
+          const info2=h('div',{});info2.append(h('div',{class:'file-name'},f.name));info2.append(h('div',{class:'file-size'},f.size+'kb'));
+          doc.append(info2);thumb.append(doc);
+        }
+        const delBtn=h('button',{class:'file-del',title:'Eliminar',onClick:e=>{e.stopPropagation();delFile(cid,f.id);files=files.filter(x=>x.id!==f.id);saveFiles(cid,files);refresh();}},'×');
+        thumb.append(delBtn);
+        grid.append(thumb);
+      });
+      wrap.append(grid);
+    }
+  }
+  refresh();
+  return wrap;
+}
+
+// MERGE PANEL
+function renderMergePanel(base) {
+  const panel = h('div',{class:'merge-panel'});
+  const hdr=h('div',{class:'flex',style:{justifyContent:'space-between',marginBottom:'10px'}});
+  hdr.append(h('div',{},h('div',{style:{fontSize:'14px',fontWeight:'600'}},'Fusionar contacto'),h('div',{style:{fontSize:'12px',color:'var(--text2)'}},'Se combinarán los datos de ambos contactos')));
+  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({showMerge:false,mergeSelected:null,mergeSearch:''})},'Cancelar'));
+  panel.append(hdr);
+  const searchInp=h('input',{type:'text',value:state.mergeSearch,placeholder:'Buscar contacto para fusionar...'});
+  panel.append(searchInp);
+
+  const list=h('div',{class:'merge-list'});
+  panel.append(list);
+
+  const footer=h('div',{class:'flex',style:{justifyContent:'flex-end',gap:'8px',marginTop:'8px'}});
+  const mergeBtn=h('button',{class:'btn btn-primary btn-sm',disabled:!state.mergeSelected,onClick:()=>{if(state.mergeSelected)mergeContacts(base,state.mergeSelected);}},'Fusionar →');
+  footer.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({showMerge:false,mergeSelected:null,mergeSearch:''})},'Cancelar'),mergeBtn);
+  panel.append(footer);
+
+  function refreshList() {
+    list.innerHTML='';
+    const q=state.mergeSearch.toLowerCase();
+    const others=state.contacts.filter(c=>c.id!==base.id&&(!q||c.name?.toLowerCase().includes(q)||c.phone?.includes(q)));
+    if(others.length===0){list.append(h('div',{style:{fontSize:'12px',color:'var(--text3)',padding:'8px 0'}},'Sin resultados'));return;}
+    others.forEach(c=>{
+      const item=h('div',{class:'merge-item'+(state.mergeSelected?.id===c.id?' selected':'')});
+      item.addEventListener('click',()=>{state.mergeSelected=state.mergeSelected?.id===c.id?null:c;mergeBtn.disabled=!state.mergeSelected;refreshList();});
+      const av2=avatar(c.name,'sm');
+      item.append(av2);
+      const info=h('div',{class:'merge-item-info'});
+      info.append(h('div',{class:'merge-item-name'},c.name||'Sin nombre'));
+      info.append(h('div',{class:'merge-item-sub'},(c.phone||c.email||'Sin contacto')));
+      item.append(info);
+      list.append(item);
+    });
+  }
+  searchInp.addEventListener('input',e=>{state.mergeSearch=e.target.value;refreshList();});
+  refreshList();
+  return panel;
+}
+
+// STATS VIEW
+function renderStats() {
+  const cs = state.contacts;
+  const total=cs.length;
+  const wrap=h('div',{});
+  wrap.append(h('div',{class:'flex',style:{marginBottom:'16px'}},
+    h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'list'})},'← Volver'),
+    h('h2',{style:{marginLeft:'8px'}},'Estadísticas del CRM')
+  ));
+
+  const vip=cs.filter(c=>c.isVIP).length;
+  const urgent=cs.filter(c=>c.urgency>=4).length;
+  const mortgage=cs.filter(c=>c.needsMortgage).length;
+  const pool=cs.filter(c=>c.wantsPool).length;
+  const budgets=cs.filter(c=>c.budgetMax).map(c=>Number(c.budgetMax));
+  const avgB=budgets.length?Math.round(budgets.reduce((a,b)=>a+b,0)/budgets.length):0;
+
+  const sGrid=h('div',{class:'stats-grid'});
+  const sc=(label,value,sub,color)=>{
+    const el=h('div',{class:'stat-card'});
+    el.append(h('div',{class:'stat-label'},label));
+    el.append(h('div',{class:'stat-value',style:{color:color||'var(--text)'}},value||'0'));
+    if(sub)el.append(h('div',{class:'stat-sub'},sub));
+    return el;
+  };
+  sGrid.append(
+    sc('Total contactos',total),
+    sc('Clientes VIP',vip,total?Math.round(vip/total*100)+'% del total':'','var(--vip)'),
+    sc('Alta urgencia',urgent,'','var(--danger)'),
+    sc('Con hipoteca',mortgage),
+    sc('Con piscina',pool),
+    sc('Presup. medio',avgB?'€'+Math.round(avgB/1000)+'k':'—')
+  );
+  wrap.append(sGrid);
+
+  const g2=h('div',{class:'grid-2',style:{gap:'12px'}});
+
+  // By urgency
+  const urgSec=sectionEl('Distribución por urgencia');
+  [1,2,3,4,5].forEach(v=>{
+    const n=cs.filter(c=>c.urgency===v).length;
+    const urg=URGENCY[v];
+    const row=h('div',{class:'bar-row'});
+    row.append(h('div',{class:'bar-label'},urg.l));
+    const track=h('div',{class:'bar-track'});
+    const fill=h('div',{class:'bar-fill',style:{width:(total?n/total*100:0)+'%',background:urg.c}});
+    track.append(fill);row.append(track);row.append(h('div',{class:'bar-num'},n));
+    urgSec.append(row);
+  });
+  g2.append(urgSec);
+
+  // Top zones
+  const zoneCnt={};cs.forEach(c=>(c.searchZones||[]).forEach(z=>{zoneCnt[z]=(zoneCnt[z]||0)+1;}));
+  const topZ=Object.entries(zoneCnt).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const zoneSec=sectionEl('Top zonas de búsqueda');
+  if(topZ.length===0) zoneSec.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Sin datos'));
+  const maxZ=topZ[0]?.[1]||1;
+  topZ.forEach(([z,n])=>{
+    const row=h('div',{class:'bar-row'});
+    row.append(h('div',{class:'bar-label',style:{minWidth:'90px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},z));
+    const track=h('div',{class:'bar-track'});
+    const fill=h('div',{class:'bar-fill',style:{width:(n/maxZ*100)+'%',background:'var(--accent)'}});
+    track.append(fill);row.append(track);row.append(h('div',{class:'bar-num'},n));
+    zoneSec.append(row);
+  });
+  g2.append(zoneSec);
+
+  // Tags
+  const tagCnt={};cs.forEach(c=>(c.tags||[]).forEach(t=>{tagCnt[t]=(tagCnt[t]||0)+1;}));
+  const topT=Object.entries(tagCnt).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const tagSec=sectionEl('Etiquetas frecuentes');
+  const tagWrap=h('div',{class:'flex-wrap gap-4'});
+  if(topT.length===0)tagSec.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Sin etiquetas'));
+  topT.forEach(([t,n])=>tagWrap.append(chip(t+' ('+n+')','')));
+  tagSec.append(tagWrap);
+  g2.append(tagSec);
+
+  // By agent
+  const agentCnt={};cs.forEach(c=>{const a=c.createdBy||'Sin asignar';agentCnt[a]=(agentCnt[a]||0)+1;});
+  const agentSec=sectionEl('Contactos por agente');
+  Object.entries(agentCnt).sort((a,b)=>b[1]-a[1]).forEach(([a,n])=>{
+    const row=h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:'13px',gap:'8px'}});
+    row.append(h('span',{style:{color:'var(--text2)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},a));
+    row.append(h('span',{style:{fontWeight:'600'}},n));
+    agentSec.append(row);
+  });
+  g2.append(agentSec);
+
+  wrap.append(g2);
+  return wrap;
+}
+
+// LIST VIEW
+function renderList() {
+  const wrap=h('div',{});
+  const filtered=getFiltered();
+  const f=state.filters;
+  const af=Object.entries(f).filter(([k,v])=>(k==='isVIP'||k==='needsMortgage'||k==='wantsPool')?v:(k==='urgencyMin')?v>0:!!v).length;
+
+  // Top bar
+  const top=h('div',{class:'top-bar'});
+  const titleWrap=h('div',{});
+  titleWrap.append(h('h1',{},'CRM Inmobiliario'));
+  const syncLabel = state.syncing ? '⟳ Sincronizando...' : (state.sheetsConfigured ? '🟢 Google Sheets conectado' : '');
+  titleWrap.append(h('div',{class:'subtitle'},state.contacts.length+' contacto'+(state.contacts.length!==1?'s':'')+' en total · '+filtered.length+' visible'+(filtered.length!==1?'s':'')+(syncLabel?' · '+syncLabel:'')));
+  top.append(titleWrap);
+  const topRight=h('div',{class:'top-bar-right'});
+  // Botón configurar / sincronizar Sheets
+  const sheetsBtn = h('button',{
+    class:'btn btn-secondary',
+    style: state.sheetsConfigured ? 'color:var(--success);border-color:var(--success-border)' : '',
+    onClick: ()=>setState({view:'sheets_config'})
+  }, state.sheetsConfigured ? '📊 Sheets' : '📊 Conectar Sheets');
+  topRight.append(sheetsBtn);
+  if(state.sheetsConfigured) {
+    topRight.append(h('button',{class:'btn btn-secondary',onClick:()=>syncFromSheets()},'↻ Sync'));
+  }
+  topRight.append(h('button',{class:'btn btn-secondary',onClick:()=>setState({view:'stats'})},'Estadísticas'));
+  topRight.append(h('button',{class:'btn btn-secondary',onClick:()=>exportCSV(state.contacts)},'Exportar CSV'));
+  topRight.append(h('button',{class:'btn btn-primary',onClick:()=>setState({view:'form',editContact:emptyContact(),detailContact:null})},'+ Nuevo contacto'));
+  top.append(topRight);
+  wrap.append(top);
+
+  // Search row
+  const fbar=h('div',{class:'filter-bar'});
+  const sinp=h('input',{type:'text',value:state.search,placeholder:'Buscar por nombre, zona, email, agente, etiqueta...'});
+  sinp.addEventListener('input',e=>setState({search:e.target.value}));
+  fbar.append(sinp);
+  const sortSel=h('select',{style:{fontSize:'13px',minWidth:'150px'}},
+    h('option',{value:'date_desc'},'Más recientes'),
+    h('option',{value:'name'},'Nombre A–Z'),
+    h('option',{value:'urgency'},'Mayor urgencia'),
+    h('option',{value:'budget'},'Mayor presupuesto')
+  );
+  sortSel.value=state.sort;
+  sortSel.addEventListener('change',e=>setState({sort:e.target.value}));
+  fbar.append(sortSel);
+  wrap.append(fbar);
+
+  // Filter chips panel — siempre visible
+  const fp=h('div',{class:'filter-panel'});
+  fp.append(h('div',{class:'filter-panel-title'},'Filtros rápidos'));
+
+  // VIP chip
+  const vipChip=h('button',{
+    class:'filter-chip'+(f.isVIP?' active-vip':''),
+    onClick:()=>setState({filters:{...f,isVIP:!f.isVIP}})
+  },'★ Solo VIP');
+  fp.append(vipChip);
+
+  // Hipoteca chip
+  const mortChip=h('button',{
+    class:'filter-chip'+(f.needsMortgage?' active-warn':''),
+    onClick:()=>setState({filters:{...f,needsMortgage:!f.needsMortgage}})
+  },'Necesita hipoteca');
+  fp.append(mortChip);
+
+  // Piscina chip
+  const poolChip=h('button',{
+    class:'filter-chip'+(f.wantsPool?' active':''),
+    onClick:()=>setState({filters:{...f,wantsPool:!f.wantsPool}})
+  },'🏊 Con piscina');
+  fp.append(poolChip);
+
+  // Urgencia select
+  const urgSel=h('select',{class:'filter-select'+(f.urgencyMin>0?' active':'')},
+    h('option',{value:'0'},'Urgencia: todas'),
+    ...[1,2,3].map(v=>h('option',{value:String(v)},'Urgencia: '+URGENCY[v].l+'+'))
+  );
+  urgSel.value=String(f.urgencyMin);
+  urgSel.addEventListener('change',e=>setState({filters:{...f,urgencyMin:Number(e.target.value)}}));
+  fp.append(urgSel);
+
+  // Zona select
+  const zoneSel=h('select',{class:'filter-select'+(f.zone?' active':'')},
+    h('option',{value:''},'Zona: todas'),
+    ...ZONE_SUGG.map(z=>h('option',{value:z},z))
+  );
+  zoneSel.value=f.zone||'';
+  zoneSel.addEventListener('change',e=>setState({filters:{...f,zone:e.target.value}}));
+  fp.append(zoneSel);
+
+  // Etiqueta select
+  const tagSel=h('select',{class:'filter-select'+(f.tag?' active':'')},
+    h('option',{value:''},'Etiqueta: todas'),
+    ...TAG_SUGG.map(t=>h('option',{value:t},t))
+  );
+  tagSel.value=f.tag||'';
+  tagSel.addEventListener('change',e=>setState({filters:{...f,tag:e.target.value}}));
+  fp.append(tagSel);
+
+  // Presupuesto máx select
+  const budgetSel=h('select',{class:'filter-select'+(f.budgetMax?' active':'')});
+  [['','Presupuesto: todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);if(f.budgetMax===v)o.selected=true;budgetSel.append(o);
+  });
+  budgetSel.addEventListener('change',e=>setState({filters:{...f,budgetMax:e.target.value}}));
+  fp.append(budgetSel);
+
+  // Limpiar filtros
+  if(af>0){
+    const clr=h('button',{class:'filter-clear',onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:''}})},
+      '✕ Limpiar ('+af+')');
+    fp.append(clr);
+  }
+  wrap.append(fp);
+
+  // Contact list
+  if(filtered.length===0) {
+    const empty=h('div',{class:'empty'});
+    if(state.contacts.length===0){
+      empty.append(h('strong',{},'Aún no hay contactos'));
+      empty.append(h('p',{style:{fontSize:'13px'}},'Pulsa "+ Nuevo contacto" para empezar a gestionar tus leads.'));
+    } else {
+      empty.append(h('strong',{},'Sin resultados'));
+      empty.append(h('p',{style:{fontSize:'13px'}},'Prueba con otros términos o filtros.'));
+    }
+    wrap.append(empty);
+  } else {
+    const list=h('div',{class:'contact-list'});
+    filtered.forEach(c=>list.append(renderCard(c)));
+    wrap.append(list);
+  }
+  return wrap;
+}
+
+// ─── SHEETS CONFIG VIEW ───────────────────────────────────────────────────────
+function renderSheetsConfig() {
+  const wrap = h('div',{});
+  wrap.append(h('div',{class:'flex',style:{marginBottom:'16px'}},
+    h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'list'})},'← Volver'),
+    h('h2',{style:{marginLeft:'8px'}},'Conectar Google Sheets')
+  ));
+
+  const currentUrl = LS.get('crm_sheets_url') || '';
+
+  const card = h('div',{class:'card',style:{maxWidth:'600px'}});
+
+  if(currentUrl) {
+    card.append(h('div',{style:{padding:'10px 14px',background:'var(--success-bg)',border:'1px solid var(--success-border)',borderRadius:'var(--radius-sm)',marginBottom:'14px',fontSize:'13px',color:'var(--success)'}},
+      '🟢 Google Sheets conectado y funcionando. Los cambios se sincronizan automáticamente.'
+    ));
+  }
+
+  card.append(h('div',{class:'section-title'},'URL de tu Web App'));
+
+  if(IS_APPS_SCRIPT) {
+    card.append(h('div',{style:{padding:'10px 14px',background:'var(--success-bg)',border:'1px solid var(--success-border)',borderRadius:'var(--radius-sm)',fontSize:'13px',color:'var(--success)'}},
+      '✅ Estás usando el CRM directamente desde Google Apps Script. La conexión con Sheets es automática, no necesitás configurar nada.'
+    ));
+  } else {
+
+  const urlInp = h('input',{type:'url', value:currentUrl, placeholder:'https://script.google.com/macros/s/AKfycb.../exec', style:{marginBottom:'10px'}});
+
+  const saveBtn = h('button',{class:'btn btn-primary', onClick:async()=>{
+    const url = urlInp.value.trim();
+    if(!url){ showToast('Pegá la URL primero','danger'); return; }
+    LS.set('crm_sheets_url', url);
+    SHEETS_URL = url;
+    saveBtn.textContent = 'Probando conexión...';
+    saveBtn.disabled = true;
+    const data = await API.getAll();
+    if(data && Array.isArray(data)) {
+      saveContacts(data);
+      setState({ contacts: data, sheetsConfigured: true, view:'list' });
+      showToast('✅ Sheets conectado — '+data.length+' contactos cargados');
+    } else {
+      saveBtn.textContent = 'Guardar URL';
+      saveBtn.disabled = false;
+      showToast('❌ No se pudo conectar. Revisá la URL y que esté publicada como "Cualquiera"','danger');
+    }
+  }},'Guardar y probar conexión');
+
+  card.append(urlInp, saveBtn);
+
+  if(currentUrl) {
+    const disconnectBtn = h('button',{class:'btn btn-danger btn-sm',style:{marginLeft:'8px'},onClick:()=>{
+      LS.del('crm_sheets_url');
+      SHEETS_URL='';
+      setState({sheetsConfigured:false, view:'list'});
+      showToast('Sheets desconectado','danger');
+    }},'Desconectar');
+    card.append(disconnectBtn);
+  }
+
+  } // fin else IS_APPS_SCRIPT
+
+  // Instrucciones paso a paso
+  card.append(h('div',{class:'section-title',style:{marginTop:'20px'}},'Cómo configurarlo (5 pasos)'));
+  const steps = [
+    ['1. Crear la Sheet','Abrí Google Drive → Nuevo → Google Sheets. Ponele el nombre "CRM Inmobiliario" (o el que quieras).'],
+    ['2. Abrir Apps Script','Dentro de la Sheet: menú Extensiones → Apps Script. Se abre el editor de código.'],
+    ['3. Pegar el script','Borrá todo lo que hay en el editor y pegá el contenido del archivo crm_apps_script.js que descargaste junto a este HTML.'],
+    ['4. Ejecutar setup()','En el editor, seleccioná la función "setup" en el desplegable y hacé clic en ▶ Ejecutar. Te va a pedir permisos — aceptá todos. Esto crea las pestañas y la carpeta en Drive.'],
+    ['5. Publicar como Web App','En el editor: Implementar → Nueva implementación → Tipo: "Aplicación web" → Ejecutar como: "Yo" → Quién tiene acceso: "Cualquiera". Hacé clic en Implementar. Copiá la URL que termina en /exec y pegala arriba.'],
+  ];
+  steps.forEach(([title, desc])=>{
+    const step = h('div',{style:{marginBottom:'12px',fontSize:'13px'}});
+    step.append(h('div',{style:{fontWeight:'600',marginBottom:'3px'}},title));
+    step.append(h('div',{style:{color:'var(--text2)',lineHeight:'1.6'}},desc));
+    card.append(step);
+  });
+
+  card.append(h('div',{style:{marginTop:'14px',padding:'10px 12px',background:'var(--warn-bg)',border:'1px solid var(--warn-border)',borderRadius:'var(--radius-sm)',fontSize:'12px',color:'var(--warn)'}},
+    '⚠️ Importante: en el paso 5, "Quién tiene acceso" debe ser "Cualquiera" (sin iniciar sesión) para que el CRM pueda comunicarse con la Sheet. Los datos no son públicos — la URL actúa como contraseña.'
+  ));
+
+  // ── Sección cambio de contraseña ──
+  card.append(h('div',{class:'section-title',style:{marginTop:'24px'}},'Cambiar credenciales de acceso'));
+  card.append(h('p',{style:{fontSize:'13px',color:'var(--text2)',marginBottom:'10px'}},
+    'Cambiá el usuario y contraseña con los que entrás al CRM. Se guarda en este dispositivo.'
+  ));
+  const creds = AUTH.getCredentials();
+  const newUserInp = h('input',{type:'text', value:creds.user, placeholder:'Nuevo usuario', style:{marginBottom:'8px'}});
+  const newPassInp = h('input',{type:'password', value:'', placeholder:'Nueva contraseña', style:{marginBottom:'8px'}});
+  const newPass2Inp = h('input',{type:'password', value:'', placeholder:'Repetir contraseña', style:{marginBottom:'10px'}});
+  const saveCredsBtn = h('button',{class:'btn btn-secondary', onClick:()=>{
+    const u = newUserInp.value.trim();
+    const p = newPassInp.value;
+    const p2 = newPass2Inp.value;
+    if(!u) { showToast('El usuario no puede estar vacío','danger'); return; }
+    if(p.length < 4) { showToast('La contraseña debe tener al menos 4 caracteres','danger'); return; }
+    if(p !== p2) { showToast('Las contraseñas no coinciden','danger'); return; }
+    AUTH.setCredentials(u, p);
+    showToast('Credenciales actualizadas ✓');
+  }},'Guardar credenciales');
+  card.append(newUserInp, newPassInp, newPass2Inp, saveCredsBtn);
+
+  // ── Cerrar sesión ──
+  card.append(h('div',{class:'section-title',style:{marginTop:'24px'}},'Sesión'));
+  const logoutBtn = h('button',{class:'btn btn-danger btn-sm', onClick:()=>{
+    AUTH.logout();
+    showLoginScreen();
+  }},'Cerrar sesión');
+  card.append(logoutBtn);
+
+  wrap.append(card);
+  return wrap;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const app=document.getElementById('app');
+  app.innerHTML='';
+  if(state.toast) {
+    app.append(h('div',{class:'toast toast-'+state.toast.type},state.toast.msg));
+  }
+  if(state.view==='list') app.append(renderList());
+  else if(state.view==='form') app.append(renderForm());
+  else if(state.view==='detail') app.append(renderDetail());
+  else if(state.view==='stats') app.append(renderStats());
+  else if(state.view==='sheets_config') app.append(renderSheetsConfig());
+}
+
+// ─── ARRANQUE ─────────────────────────────────────────────────────────────────
+function init() {
+  if (AUTH.isLoggedIn()) {
+    render();
+    if (SHEETS_URL) syncFromSheets();
+  } else {
+    showLoginScreen();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+
+</script>
+</body>
+</html>
