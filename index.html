@@ -414,13 +414,15 @@ const API = {
           .handleApiCall(JSON.stringify({ action, ...body }));
       });
     }
-    // Modo externo: fetch normal a la URL configurada
+    // Modo externo: fetch con GET para evitar CORS
     if (!SHEETS_URL) return null;
     try {
-      const res = await fetch(SHEETS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action, ...body }),
-        headers: { 'Content-Type': 'application/json' }
+      const params = new URLSearchParams({ action, ...Object.fromEntries(
+        Object.entries(body).map(([k,v]) => [k, typeof v === 'object' ? JSON.stringify(v) : v])
+      )});
+      const res = await fetch(SHEETS_URL + '?' + params.toString(), {
+        method: 'GET',
+        redirect: 'follow',
       });
       const json = await res.json();
       return json.ok ? json.data : null;
