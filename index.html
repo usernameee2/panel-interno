@@ -223,8 +223,29 @@
   .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .nav-tab:hover:not(.active) { color: var(--text); }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  /* Layout con sidebar */
+  .crm-layout { display: flex; gap: 0; align-items: flex-start; }
+  .sidebar { width: 220px; min-width: 220px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; }
+  .sidebar-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+  .sidebar-section { margin-bottom: 14px; }
+  .sidebar-section-label { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+  .sidebar-chip { display: block; width: 100%; text-align: left; font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text2); transition: all .12s; margin-bottom: 2px; }
+  .sidebar-chip:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-chip.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .sidebar-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
+  .sidebar-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
+  .sidebar-select { width: 100%; font-family: var(--font); font-size: 12px; padding: 5px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; margin-bottom: 4px; }
+  .sidebar-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
+  .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+  .sidebar-clear { width: 100%; font-family: var(--font); font-size: 11px; color: var(--danger); background: none; border: none; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); text-align: left; }
+  .sidebar-clear:hover { background: var(--danger-bg); }
+  .main-content { flex: 1; min-width: 0; padding-left: 14px; }
+
+  /* Scroll visible */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--surface2); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
   /* Notes history */
   .note-entry { border-left: 3px solid var(--border); padding: 8px 12px; margin-bottom: 6px; background: var(--surface); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
@@ -358,8 +379,10 @@ const URGENCY = {
 };
 const PROP_TYPES=['Apartamento','Casa','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Reunión','Referido'];
-const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE'];
+const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo'];
+const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
+const ZONE_SUGG=['Toda la Costa','Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const NOTE_TYPES=[
   {v:'llamada',   l:'📞 Llamada',    c:'chip-accent'},
   {v:'whatsapp',  l:'💬 WhatsApp',   c:'chip-success'},
@@ -377,7 +400,6 @@ const BUDGET_OPTS=[
   ['350000','350.000€'],['400000','400.000€'],['450000','450.000€'],['500000','500.000€'],
   ['1000000','1.000.000€'],
 ];
-const ZONE_SUGG=['Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const AVATAR_COLORS=['#185FA5','#0F6E56','#993C1D','#534AB7','#993556','#3B6D11','#854F0B'];
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
@@ -500,7 +522,7 @@ let state = {
   editContact: null,
   detailContact: null,
   search: '',
-  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'' },
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false },
   showFilters: false,
   sort: 'date_desc',
   toast: null,
@@ -590,9 +612,18 @@ function getFiltered() {
   if (f.needsMortgage) list = list.filter(c=>c.needsMortgage);
   if (f.wantsPool) list = list.filter(c=>c.wantsPool);
   if (f.urgencyMin>0) list = list.filter(c=>c.urgency>=f.urgencyMin);
-  if (f.zone) list = list.filter(c=>c.searchZones?.some(z=>z.toLowerCase().includes(f.zone.toLowerCase())));
+  if (f.zone) {
+    if (f.zone === 'Toda la Costa') {
+      list = list.filter(c => c.searchZones?.some(z => COAST_ZONES.includes(z) || z === 'Toda la Costa'));
+    } else {
+      list = list.filter(c => c.searchZones?.some(z => z.toLowerCase().includes(f.zone.toLowerCase()) || z === 'Toda la Costa'));
+    }
+  }
   if (f.tag) list = list.filter(c=>c.tags?.some(t=>t.toLowerCase()===f.tag.toLowerCase()));
   if (f.budgetMax) list = list.filter(c=>!c.budgetMax || Number(c.budgetMax) <= Number(f.budgetMax));
+  if (f.hasEfectivo) list = list.filter(c=>c.tags?.includes('Tiene efectivo'));
+  if (f.hasNIE) list = list.filter(c=>c.tags?.includes('Tiene NIE'));
+  if (f.noNIE) list = list.filter(c=>c.tags?.includes('Sin NIE'));
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
     if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
@@ -1433,7 +1464,7 @@ function renderList() {
   const wrap=h('div',{});
   const filtered=getFiltered();
   const f=state.filters;
-  const af=Object.entries(f).filter(([k,v])=>(k==='isVIP'||k==='needsMortgage'||k==='wantsPool')?v:(k==='urgencyMin')?v>0:!!v).length;
+  const af=Object.entries(f).filter(([k,v])=>typeof v==='boolean'?v:(k==='urgencyMin')?v>0:!!v).length;
 
   // Top bar
   const top=h('div',{class:'top-bar'});
@@ -1443,23 +1474,20 @@ function renderList() {
   titleWrap.append(h('div',{class:'subtitle'},state.contacts.length+' contacto'+(state.contacts.length!==1?'s':'')+' en total · '+filtered.length+' visible'+(filtered.length!==1?'s':'')+(syncLabel?' · '+syncLabel:'')));
   top.append(titleWrap);
   const topRight=h('div',{class:'top-bar-right'});
-  // Botón configurar / sincronizar Sheets
   const sheetsBtn = h('button',{
     class:'btn btn-secondary',
     style: state.sheetsConfigured ? 'color:var(--success);border-color:var(--success-border)' : '',
     onClick: ()=>setState({view:'sheets_config'})
   }, state.sheetsConfigured ? '📊 Sheets' : '📊 Conectar Sheets');
   topRight.append(sheetsBtn);
-  if(state.sheetsConfigured) {
-    topRight.append(h('button',{class:'btn btn-secondary',onClick:()=>syncFromSheets()},'↻ Sync'));
-  }
+  if(state.sheetsConfigured) topRight.append(h('button',{class:'btn btn-secondary',onClick:()=>syncFromSheets()},'↻ Sync'));
   topRight.append(h('button',{class:'btn btn-secondary',onClick:()=>setState({view:'stats'})},'Estadísticas'));
   topRight.append(h('button',{class:'btn btn-secondary',onClick:()=>exportCSV(state.contacts)},'Exportar CSV'));
   topRight.append(h('button',{class:'btn btn-primary',onClick:()=>setState({view:'form',editContact:emptyContact(),detailContact:null})},'+ Nuevo contacto'));
   top.append(topRight);
   wrap.append(top);
 
-  // Search row
+  // Search + sort row
   const fbar=h('div',{class:'filter-bar'});
   const sinp=h('input',{type:'text',value:state.search,placeholder:'Buscar por nombre, zona, email, agente, etiqueta...'});
   sinp.addEventListener('input',e=>setState({search:e.target.value}));
@@ -1475,90 +1503,105 @@ function renderList() {
   fbar.append(sortSel);
   wrap.append(fbar);
 
-  // Filter chips panel — siempre visible
+  // Filtros rápidos (chips horizontales arriba)
   const fp=h('div',{class:'filter-panel'});
   fp.append(h('div',{class:'filter-panel-title'},'Filtros rápidos'));
+  const chips=[
+    ['★ Solo VIP','isVIP','active-vip'],
+    ['Hipoteca','needsMortgage','active-warn'],
+    ['🏊 Piscina','wantsPool','active'],
+    ['💰 Tiene efectivo','hasEfectivo','active'],
+    ['✅ Tiene NIE','hasNIE','active'],
+    ['❌ Sin NIE','noNIE','active-warn'],
+  ];
+  chips.forEach(([label,field,cls])=>{
+    const c=h('button',{class:'filter-chip'+(f[field]?' '+cls:''),onClick:()=>setState({filters:{...f,[field]:!f[field]}})},label);
+    fp.append(c);
+  });
+  wrap.append(fp);
 
-  // VIP chip
-  const vipChip=h('button',{
-    class:'filter-chip'+(f.isVIP?' active-vip':''),
-    onClick:()=>setState({filters:{...f,isVIP:!f.isVIP}})
-  },'★ Solo VIP');
-  fp.append(vipChip);
+  // Layout: sidebar izquierda + contenido principal
+  const layout=h('div',{class:'crm-layout'});
 
-  // Hipoteca chip
-  const mortChip=h('button',{
-    class:'filter-chip'+(f.needsMortgage?' active-warn':''),
-    onClick:()=>setState({filters:{...f,needsMortgage:!f.needsMortgage}})
-  },'Necesita hipoteca');
-  fp.append(mortChip);
+  // SIDEBAR
+  const sidebar=h('div',{class:'sidebar'});
+  sidebar.append(h('div',{class:'sidebar-title'},'Filtros'));
 
-  // Piscina chip
-  const poolChip=h('button',{
-    class:'filter-chip'+(f.wantsPool?' active':''),
-    onClick:()=>setState({filters:{...f,wantsPool:!f.wantsPool}})
-  },'🏊 Con piscina');
-  fp.append(poolChip);
-
-  // Urgencia select
-  const urgSel=h('select',{class:'filter-select'+(f.urgencyMin>0?' active':'')},
-    h('option',{value:'0'},'Urgencia: todas'),
-    ...[1,2,3].map(v=>h('option',{value:String(v)},'Urgencia: '+URGENCY[v].l+'+'))
+  // Urgencia
+  const urgSection=h('div',{class:'sidebar-section'});
+  urgSection.append(h('span',{class:'sidebar-section-label'},'Urgencia'));
+  const urgSel=h('select',{class:'sidebar-select'+(f.urgencyMin>0?' active':'')},
+    h('option',{value:'0'},'Todas'),
+    ...[1,2,3].map(v=>h('option',{value:String(v)},URGENCY[v].l+' o más'))
   );
   urgSel.value=String(f.urgencyMin);
   urgSel.addEventListener('change',e=>setState({filters:{...f,urgencyMin:Number(e.target.value)}}));
-  fp.append(urgSel);
+  urgSection.append(urgSel);
+  sidebar.append(urgSection);
 
-  // Zona select
-  const zoneSel=h('select',{class:'filter-select'+(f.zone?' active':'')},
-    h('option',{value:''},'Zona: todas'),
+  // Zona
+  const zoneSection=h('div',{class:'sidebar-section'});
+  zoneSection.append(h('span',{class:'sidebar-section-label'},'Zona'));
+  const zoneSel=h('select',{class:'sidebar-select'+(f.zone?' active':'')},
+    h('option',{value:''},'Todas las zonas'),
     ...ZONE_SUGG.map(z=>h('option',{value:z},z))
   );
   zoneSel.value=f.zone||'';
   zoneSel.addEventListener('change',e=>setState({filters:{...f,zone:e.target.value}}));
-  fp.append(zoneSel);
+  zoneSection.append(zoneSel);
+  sidebar.append(zoneSection);
 
-  // Etiqueta select
-  const tagSel=h('select',{class:'filter-select'+(f.tag?' active':'')},
-    h('option',{value:''},'Etiqueta: todas'),
+  // Etiqueta
+  const tagSection=h('div',{class:'sidebar-section'});
+  tagSection.append(h('span',{class:'sidebar-section-label'},'Etiqueta'));
+  const tagSel=h('select',{class:'sidebar-select'+(f.tag?' active':'')},
+    h('option',{value:''},'Todas'),
     ...TAG_SUGG.map(t=>h('option',{value:t},t))
   );
   tagSel.value=f.tag||'';
   tagSel.addEventListener('change',e=>setState({filters:{...f,tag:e.target.value}}));
-  fp.append(tagSel);
+  tagSection.append(tagSel);
+  sidebar.append(tagSection);
 
-  // Presupuesto máx select
-  const budgetSel=h('select',{class:'filter-select'+(f.budgetMax?' active':'')});
-  [['','Presupuesto: todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
+  // Presupuesto
+  const budSection=h('div',{class:'sidebar-section'});
+  budSection.append(h('span',{class:'sidebar-section-label'},'Presupuesto máx.'));
+  const budgetSel=h('select',{class:'sidebar-select'+(f.budgetMax?' active':'')});
+  [['','Todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
     const o=h('option',{value:v},l);if(f.budgetMax===v)o.selected=true;budgetSel.append(o);
   });
   budgetSel.addEventListener('change',e=>setState({filters:{...f,budgetMax:e.target.value}}));
-  fp.append(budgetSel);
+  budSection.append(budgetSel);
+  sidebar.append(budSection);
 
-  // Limpiar filtros
+  // Limpiar
   if(af>0){
-    const clr=h('button',{class:'filter-clear',onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:''}})},
-      '✕ Limpiar ('+af+')');
-    fp.append(clr);
+    sidebar.append(h('hr',{class:'sidebar-divider'}));
+    sidebar.append(h('button',{class:'sidebar-clear',
+      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false}})
+    },'✕ Limpiar filtros ('+af+')'));
   }
-  wrap.append(fp);
+  layout.append(sidebar);
 
-  // Contact list
+  // CONTENIDO PRINCIPAL
+  const main=h('div',{class:'main-content'});
   if(filtered.length===0) {
     const empty=h('div',{class:'empty'});
     if(state.contacts.length===0){
       empty.append(h('strong',{},'Aún no hay contactos'));
-      empty.append(h('p',{style:{fontSize:'13px'}},'Pulsa "+ Nuevo contacto" para empezar a gestionar tus leads.'));
+      empty.append(h('p',{style:{fontSize:'13px'}},'Pulsa "+ Nuevo contacto" para empezar.'));
     } else {
       empty.append(h('strong',{},'Sin resultados'));
-      empty.append(h('p',{style:{fontSize:'13px'}},'Prueba con otros términos o filtros.'));
+      empty.append(h('p',{style:{fontSize:'13px'}},'Probá con otros términos o filtros.'));
     }
-    wrap.append(empty);
+    main.append(empty);
   } else {
     const list=h('div',{class:'contact-list'});
     filtered.forEach(c=>list.append(renderCard(c)));
-    wrap.append(list);
+    main.append(list);
   }
+  layout.append(main);
+  wrap.append(layout);
   return wrap;
 }
 
