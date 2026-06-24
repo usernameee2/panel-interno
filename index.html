@@ -38,7 +38,7 @@
     --mono: 'DM Mono', monospace;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; min-height: 100vh; }
   #app { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
 
   /* ── MOBILE ── */
@@ -418,6 +418,22 @@ const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
 const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina','Planta Baja'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
+const TAG_COLORS={
+  'Premium':          'chip-vip',
+  'Extranjero':       'chip-accent',
+  'Inversor':         'chip-success',
+  'Primera vivienda': 'chip-accent',
+  'Segunda vivienda': 'chip-accent',
+  'No Inversor':      'chip-warn',
+  'Vivienda propia':  'chip-success',
+  'Habla inglés':     'chip-accent',
+  'Tiene NIE':        'chip-success',
+  'Sin NIE':          'chip-warn',
+  'Tiene efectivo':   'chip-success',
+  'Abierto a reformar':'chip-warn',
+  'Piscina':          'chip-accent',
+  'Planta Baja':      'chip-accent',
+};
 const ZONE_SUGG=['Toda la Costa','Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const NOTE_TYPES=[
   {v:'llamada',   l:'📞 Llamada',    c:'chip-accent'},
@@ -1022,14 +1038,13 @@ function renderCard(c, filtered) {
   if(c.investmentType) chips.append(chip(c.investmentType,''));
 
   // Tags clickeables → activan filtro de etiqueta
-  (c.tags||[]).slice(0,3).forEach(t=>{
+  (c.tags||[]).slice(0,4).forEach(t=>{
     const isActive = state.filters.tag===t;
-    const tc=chip(t,'');
+    const colorClass = TAG_COLORS[t] || 'chip-accent';
+    const tc=chip(t, colorClass);
     tc.style.cursor='pointer';
-    tc.style.fontWeight = isActive?'700':'400';
+    tc.style.fontWeight = isActive?'700':'500';
     tc.style.boxShadow = isActive?'0 0 0 2px var(--accent)':'none';
-    tc.style.borderColor = isActive?'var(--accent)':'';
-    tc.style.color = isActive?'var(--accent)':'';
     tc.title= isActive?'Quitar filtro de '+t:'Filtrar por '+t;
     tc.addEventListener('click',e=>{
       e.stopPropagation();
