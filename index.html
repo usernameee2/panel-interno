@@ -419,20 +419,26 @@ const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera',
 const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina','Planta Baja'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
 const TAG_COLORS={
-  'Premium':          'chip-vip',
-  'Extranjero':       'chip-accent',
-  'Inversor':         'chip-success',
-  'Primera vivienda': 'chip-accent',
-  'Segunda vivienda': 'chip-accent',
-  'No Inversor':      'chip-warn',
-  'Vivienda propia':  'chip-success',
-  'Habla inglés':     'chip-accent',
-  'Tiene NIE':        'chip-success',
-  'Sin NIE':          'chip-warn',
-  'Tiene efectivo':   'chip-success',
-  'Abierto a reformar':'chip-warn',
-  'Piscina':          'chip-accent',
-  'Planta Baja':      'chip-accent',
+  'Premium':            'chip-vip',
+  'Extranjero':         'chip-accent',
+  'Inversor':           'chip-success',
+  'Primera vivienda':   'chip-accent',
+  'Segunda vivienda':   'chip-accent',
+  'No Inversor':        'chip-warn',
+  'Vivienda propia':    'chip-success',
+  'Habla inglés':       'chip-accent',
+  'Tiene NIE':          'chip-success',
+  'Sin NIE':            'chip-warn',
+  'Tiene efectivo':     'chip-success',
+  'Abierto a reformar': 'chip-warn',
+  'Piscina':            'chip-accent',
+  'Planta Baja':        'chip-accent',
+  // Tipos de inversión
+  'Uso propio':         'chip-accent',
+  'Inversión alquiler': 'chip-success',
+  'Compra-venta':       'chip-accent',
+  'Cartera':            'chip-vip',
+  'Inversor':           'chip-success',
 };
 const ZONE_SUGG=['Toda la Costa','Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const NOTE_TYPES=[
@@ -891,9 +897,9 @@ function renderForm() {
   ));
 
   // VIP toggle visual
-  const vipToggleWrap = h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'10px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(form.isVIP?'var(--vip-border)':'var(--border)'),background:form.isVIP?'var(--vip-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s'}});
+  const vipToggleWrap = h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'10px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(form.isVIP?'var(--vip-border)':'var(--border)'),background:form.isVIP?'var(--vip-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s',width:'fit-content'}});
   const vipLabel = h('span',{style:{fontSize:'13px',fontWeight:'600',color:form.isVIP?'var(--vip)':'var(--text2)'}}, form.isVIP?'★ Cliente VIP':'☆ Cliente VIP');
-  const vipStatus = h('span',{style:{marginLeft:'auto',fontSize:'12px',fontWeight:'700',color:form.isVIP?'var(--vip)':'var(--text3)'}}, form.isVIP?'SÍ':'NO');
+  const vipStatus = h('span',{style:{marginLeft:'8px',fontSize:'12px',fontWeight:'700',color:form.isVIP?'var(--vip)':'var(--text3)'}}, form.isVIP?'SÍ':'NO');
   vipToggleWrap.append(vipLabel, vipStatus);
   vipToggleWrap.addEventListener('click',()=>{
     form.isVIP=!form.isVIP;
@@ -1032,10 +1038,10 @@ function renderCard(c, filtered) {
   });
   if((c.searchZones||[]).length>2) chips.append(h('span',{style:{fontSize:'11px',color:'var(--text3)'}},'+'+(c.searchZones.length-2)));
 
-  if(c.bedroomsMin) chips.append(chip(c.bedroomsMin+'+ hab.',''));
-  if(c.wantsPool) chips.append(chip('Piscina',''));
+  if(c.bedroomsMin) chips.append(chip(c.bedroomsMin+'+ hab.','chip-accent'));
+  if(c.wantsPool||c.tags?.includes('Piscina')) {} // ya aparece como tag
   if(c.needsMortgage) chips.append(chip('Hipoteca','chip-warn'));
-  if(c.investmentType) chips.append(chip(c.investmentType,''));
+  if(c.investmentType) chips.append(chip(c.investmentType, TAG_COLORS[c.investmentType]||'chip-accent'));
 
   // Tags clickeables → activan filtro de etiqueta
   (c.tags||[]).slice(0,4).forEach(t=>{
