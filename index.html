@@ -414,9 +414,9 @@ const URGENCY = {
   3:{l:'Alta',c:'#E24B4A'}
 };
 const PROP_TYPES=['Apartamento','Casa','Villa','Solar','Local','Nave'];
-const CONTACT_METHODS=['Llamada','WhatsApp','Email','Reunión','Referido'];
+const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina','Planta Baja'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
 const ZONE_SUGG=['Toda la Costa','Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const NOTE_TYPES=[
@@ -839,9 +839,9 @@ function renderForm() {
   let propVals=[...form.propertyTypes];
   const propToggle=makeMultiToggle(PROP_TYPES,propVals,v=>{form.propertyTypes=v;propVals=v;},'');
 
-  // Tags
+  // Tags — multi-toggle con etiquetas predefinidas
   let tagVals=[...form.tags];
-  const tagInp=makeTagInput(tagVals,v=>{form.tags=v;tagVals=v;},TAG_SUGG,'Escribe y pulsa Enter...');
+  const tagToggle=makeMultiToggle(TAG_SUGG,tagVals,v=>{form.tags=v;tagVals=v;});
 
   // Zones — multi-toggle con zonas predefinidas
   let zoneVals=[...form.searchZones];
@@ -896,23 +896,22 @@ function renderForm() {
       urgDiv,
       fieldEl('Tipo de inversión', invEl)
     ),
-    h('div',{class:'field',style:{marginTop:'4px'}},h('label',{},'Etiquetas'),tagInp)
+    h('div',{class:'field',style:{marginTop:'4px'}},h('label',{},'Etiquetas'),tagToggle)
   ));
 
   // Toggle helper visual (reemplaza mkCb)
   const mkToggle=(field,label,val,colorActive='var(--accent)')=>{
     const wrap=h('div',{
-      style:{display:'flex',alignItems:'center',gap:'10px',padding:'9px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(val?colorActive:'var(--border)'),background:val?'var(--accent-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s',userSelect:'none'},
+      style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 14px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(val?colorActive:'var(--border)'),background:'var(--surface)',cursor:'pointer',transition:'all .15s',userSelect:'none',width:'fit-content'},
     });
-    const dot=h('div',{style:{width:'16px',height:'16px',borderRadius:'50%',background:val?colorActive:'var(--border)',transition:'all .15s',flexShrink:'0'}});
+    const dot=h('div',{style:{width:'14px',height:'14px',borderRadius:'50%',background:val?colorActive:'var(--border2)',transition:'all .15s',flexShrink:'0'}});
     const lbl=h('span',{style:{fontSize:'13px',fontWeight:val?'600':'400',color:val?colorActive:'var(--text2)',transition:'all .15s'}},label);
     wrap.append(dot,lbl);
     wrap.addEventListener('click',()=>{
       const newVal=!form[field];
       set(field,newVal);
       wrap.style.borderColor=newVal?colorActive:'var(--border)';
-      wrap.style.background=newVal?'var(--accent-bg)':'var(--surface2)';
-      dot.style.background=newVal?colorActive:'var(--border)';
+      dot.style.background=newVal?colorActive:'var(--border2)';
       lbl.style.fontWeight=newVal?'600':'400';
       lbl.style.color=newVal?colorActive:'var(--text2)';
     });
@@ -921,7 +920,9 @@ function renderForm() {
 
   // Section 3: Budget
   sections.append(sectionEl('Presupuesto y financiación',
-    fieldEl('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)),
+    h('div',{style:{maxWidth:'280px'}},
+      fieldEl('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))
+    ),
     h('div',{style:{marginTop:'8px'}}),
     mkToggle('needsMortgage','Necesita financiación / hipoteca',form.needsMortgage,'var(--warn)')
   ));
