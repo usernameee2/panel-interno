@@ -39,7 +39,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; min-height: 100vh; }
-  #app { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
+  #app { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
 
   /* ── MOBILE ── */
   @media (max-width: 600px) {
@@ -179,11 +179,12 @@
   /* Detail view */
   .detail-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
   .detail-header-right { margin-left: auto; display: flex; gap: 8px; }
-  .detail-hero { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); margin-bottom: 12px; }
-  .detail-hero-info h2 { margin-bottom: 4px; }
-  .detail-grid { display: grid; gap: 10px; }
-  .detail-row { display: flex; gap: 10px; font-size: 13px; }
-  .detail-label { font-size: 12px; color: var(--text2); min-width: 130px; flex-shrink: 0; padding-top: 1px; }
+  .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+  .detail-card-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+  .detail-row { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { font-size: 11px; color: var(--text3); min-width: 100px; flex-shrink: 0; padding-top: 2px; font-weight: 500; }
+  @media (max-width: 600px) { .detail-panel-grid { grid-template-columns: 1fr !important; } }
   .actions-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
   /* Form */
@@ -1020,14 +1021,14 @@ function renderCard(c, filtered) {
   info.append(metaRow);
 
   const chips = h('div',{class:'contact-chips'});
-  if(c.budgetMin||c.budgetMax) chips.append(chip((c.budgetMin&&c.budgetMax?fmt(c.budgetMin)+' – '+fmt(c.budgetMax):fmt(c.budgetMin||c.budgetMax)),'chip-success'));
+  if(c.budgetMax) chips.append(chip(fmt(c.budgetMax),'chip-success'));
 
-  // Zonas clickeables → activan filtro de zona
-  (c.searchZones||[]).slice(0,2).forEach(z=>{
+  // Zonas — todas visibles, clickeables
+  (c.searchZones||[]).forEach(z=>{
     const isActive = state.filters.zone===z;
-    const zc=chip(z, isActive?'chip-accent':'chip-accent');
+    const zc=chip(z,'chip-accent');
     zc.style.cursor='pointer';
-    zc.style.fontWeight = isActive?'700':'400';
+    zc.style.fontWeight = isActive?'700':'500';
     zc.style.boxShadow = isActive?'0 0 0 2px var(--accent)':'none';
     zc.title= isActive?'Quitar filtro de '+z:'Filtrar por '+z;
     zc.addEventListener('click',e=>{
@@ -1036,15 +1037,13 @@ function renderCard(c, filtered) {
     });
     chips.append(zc);
   });
-  if((c.searchZones||[]).length>2) chips.append(h('span',{style:{fontSize:'11px',color:'var(--text3)'}},'+'+(c.searchZones.length-2)));
 
   if(c.bedroomsMin) chips.append(chip(c.bedroomsMin+'+ hab.','chip-accent'));
-  if(c.wantsPool||c.tags?.includes('Piscina')) {} // ya aparece como tag
   if(c.needsMortgage) chips.append(chip('Hipoteca','chip-warn'));
   if(c.investmentType) chips.append(chip(c.investmentType, TAG_COLORS[c.investmentType]||'chip-accent'));
 
-  // Tags clickeables → activan filtro de etiqueta
-  (c.tags||[]).slice(0,4).forEach(t=>{
+  // Tags — todas visibles, clickeables
+  (c.tags||[]).forEach(t=>{
     const isActive = state.filters.tag===t;
     const colorClass = TAG_COLORS[t] || 'chip-accent';
     const tc=chip(t, colorClass);
@@ -1059,7 +1058,7 @@ function renderCard(c, filtered) {
     chips.append(tc);
   });
 
-  // Recordatorio pendiente hoy o pasado
+  // Recordatorio pendiente
   const today=new Date().toISOString().split('T')[0];
   const pendingR=(c.reminders||[]).filter(r=>r.date<=today);
   if(pendingR.length>0) chips.append(chip('🔔 '+pendingR.length+' recordatorio'+(pendingR.length>1?'s':''),'chip-warn'));
@@ -1076,7 +1075,7 @@ function renderDetail() {
   const u = URGENCY[c.urgency]||URGENCY[2];
   const wrap = h('div',{});
 
-  // Header
+  // Header botones
   const hdr = h('div',{class:'detail-header'});
   hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'list',detailContact:null,showMerge:false})},'← Lista'));
   hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>{setState({view:'form',editContact:{...c}});}},'Editar'));
@@ -1086,39 +1085,39 @@ function renderDetail() {
   hdr.append(rightBtns);
   wrap.append(hdr);
 
-  // Confirm delete
   if(state.confirmDelete===c.id) {
-    const conf = h('div',{class:'confirm-row'},
+    wrap.append(h('div',{class:'confirm-row'},
       h('span',{},`¿Eliminar a "${c.name}"? Esta acción no se puede deshacer.`),
       h('button',{class:'btn btn-danger btn-sm',onClick:()=>deleteContact(c.id)},'Sí, eliminar'),
       h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({confirmDelete:null})},'Cancelar')
-    );
-    wrap.append(conf);
+    ));
   }
+  if(state.showMerge) wrap.append(renderMergePanel(c));
 
-  // Merge panel
-  if(state.showMerge) {
-    wrap.append(renderMergePanel(c));
-  }
+  // ── PANEL PRINCIPAL ── dos columnas
+  const panel = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px',marginBottom:'14px'}});
 
-  // Hero
-  const hero = h('div',{class:'detail-hero'});
+  // ── COLUMNA IZQUIERDA ──
+  const left = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+
+  // Nombre + VIP + urgencia
+  const nameRow = h('div',{style:{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}});
   const av = avatar(c.name,'');
   if(c.isVIP){const star=h('div',{class:'vip-star'},'★');av.append(star);}
-  hero.append(av);
-  const heroInfo = h('div',{class:'detail-hero-info',style:{flex:'1',minWidth:'0'}});
-  const heroName = h('div',{class:'flex-wrap gap-4',style:{marginBottom:'4px'}});
-  heroName.append(h('h2',{},c.name||'Sin nombre'));
-  if(c.isVIP) heroName.append(chip('VIP','chip-vip'));
-  heroName.append(urgencyBadge(c.urgency));
-  heroInfo.append(heroName);
-  if(c.createdBy) heroInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Agente: '+c.createdBy));
-  if(c.lastContact) heroInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Último contacto: '+c.lastContact));
-  hero.append(heroInfo);
-  wrap.append(hero);
+  nameRow.append(av);
+  const nameInfo = h('div',{});
+  nameInfo.append(h('div',{style:{display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}},
+    h('h2',{style:{fontSize:'18px',margin:'0'}},c.name||'Sin nombre'),
+    c.isVIP?chip('VIP','chip-vip'):null,
+    urgencyBadge(c.urgency)
+  ));
+  if(c.createdBy) nameInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)',marginTop:'2px'}},'Agente: '+c.createdBy));
+  if(c.lastContact) nameInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Último contacto: '+fmtDate(c.lastContact)));
+  nameRow.append(nameInfo);
+  left.append(nameRow);
 
-  // Quick actions
-  const actions = h('div',{class:'actions-row',style:{marginBottom:'12px'}});
+  // Acciones rápidas
+  const actions = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
   if(c.phone||c.whatsapp) {
     const waBtn = h('button',{class:'btn btn-secondary btn-sm',onClick:()=>{
       let p = cleanPhone(c.whatsapp||c.phone);
@@ -1131,93 +1130,84 @@ function renderDetail() {
   if(c.phone) actions.append(h('a',{href:'tel:'+c.phone,class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📞 Llamar'));
   if(c.email) actions.append(h('a',{href:'mailto:'+c.email,class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'✉️ Email'));
   if(c.driveLink) actions.append(h('a',{href:c.driveLink,target:'_blank',class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📁 Drive'));
-  // Google Calendar — abre nueva cita con el nombre del cliente
   const calUrl='https://calendar.google.com/calendar/r/eventedit?text=Reunión+con+'+encodeURIComponent(c.name||'')+'&details='+encodeURIComponent('Cliente CRM\nTeléfono: '+(c.phone||'')+(c.email?'\nEmail: '+c.email:''));
   actions.append(h('a',{href:calUrl,target:'_blank',class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📅 Calendar'));
-  wrap.append(actions);
+  left.append(actions);
 
-  // Info grid
-  const grid = h('div',{class:'detail-grid'});
-
-  const row=(label,value)=>{
-    if(!value||value==='No'&&label==='Piscina') return null;
-    if(Array.isArray(value)&&value.length===0) return null;
-    return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{},Array.isArray(value)?value.join(', '):value));
-  };
-
-  // Helper para campo copiable
+  // Datos de contacto
+  const contactCard = h('div',{class:'detail-card'});
+  contactCard.append(h('div',{class:'detail-card-title'},'Contacto'));
   const copyField=(label,value)=>{
     if(!value) return null;
-    const wrap=h('div',{class:'detail-row'});
-    wrap.append(h('div',{class:'detail-label'},label));
+    const row=h('div',{class:'detail-row'});
+    row.append(h('div',{class:'detail-label'},label));
     const valWrap=h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}});
     valWrap.append(h('span',{},value));
     const cb=h('button',{class:'copy-btn',onClick:()=>{
       navigator.clipboard.writeText(value).then(()=>{
-        cb.textContent='✓ Copiado';cb.classList.add('copied');
+        cb.textContent='✓';cb.classList.add('copied');
         setTimeout(()=>{cb.textContent='Copiar';cb.classList.remove('copied');},1500);
       });
     }},'Copiar');
     valWrap.append(cb);
-    wrap.append(valWrap);
-    return wrap;
+    row.append(valWrap);
+    return row;
   };
+  const dataRow=(label,value)=>{
+    if(!value) return null;
+    return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{},value));
+  };
+  [copyField('Teléfono',c.phone),
+   copyField('Email',c.email),
+   c.whatsapp?copyField('WhatsApp',c.whatsapp):null,
+   c.contactMethods?.length?dataRow('Vía preferida',c.contactMethods.join(', ')):null
+  ].filter(Boolean).forEach(r=>contactCard.append(r));
+  left.append(contactCard);
 
-  grid.append(sectionEl('Datos de contacto',
-    h('div',{class:'grid-stack',style:{gap:'7px'}},
-      ...[
-        copyField('Teléfono',c.phone),
-        copyField('Email',c.email),
-        c.whatsapp?copyField('WhatsApp',c.whatsapp):null,
-        c.contactMethods?.length?row('Vía preferida',c.contactMethods):null
-      ].filter(Boolean)
-    )
-  ));
+  // Presupuesto y requisitos
+  const reqCard = h('div',{class:'detail-card'});
+  reqCard.append(h('div',{class:'detail-card-title'},'Presupuesto y requisitos'));
+  [
+    c.budgetMax?dataRow('Presupuesto máx.',fmt(c.budgetMax)):null,
+    c.needsMortgage?dataRow('Hipoteca','Sí'):null,
+    c.investmentType?dataRow('Tipo inversión',c.investmentType):null,
+    c.searchZones?.length?dataRow('Zonas',c.searchZones.join(', ')):null,
+    c.propertyTypes?.length?dataRow('Tipo inmueble',c.propertyTypes.join(', ')):null,
+    c.bedroomsMin?dataRow('Dormitorios mín.',c.bedroomsMin+'+'):null,
+  ].filter(Boolean).forEach(r=>reqCard.append(r));
+  left.append(reqCard);
 
-  grid.append(sectionEl('Financiero',
-    h('div',{class:'grid-stack',style:{gap:'7px'}},
-      ...[
-        (c.budgetMin||c.budgetMax)?row('Presupuesto',(fmt(c.budgetMin)||'—')+' – '+(fmt(c.budgetMax)||'—')):null,
-        row('Hipoteca',c.needsMortgage?'Sí':'No'),
-        c.investmentType?row('Tipo inversión',c.investmentType):null
-      ].filter(Boolean)
-    )
-  ));
+  panel.append(left);
 
-  grid.append(sectionEl('Requisitos',
-    h('div',{class:'grid-stack',style:{gap:'7px'}},
-      ...[
-        c.searchZones?.length?row('Zonas',c.searchZones):null,
-        c.propertyTypes?.length?row('Tipo inmueble',c.propertyTypes):null,
-        c.bedroomsMin?row('Dormitorios min.',c.bedroomsMin+'+'):null,
-        row('Piscina',c.wantsPool?'Sí':'No')
-      ].filter(Boolean)
-    )
-  ));
+  // ── COLUMNA DERECHA ── etiquetas + recordatorios
+  const right = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
 
+  // Etiquetas — todas coloreadas
+  const tagsCard = h('div',{class:'detail-card'});
+  tagsCard.append(h('div',{class:'detail-card-title'},'Etiquetas'));
+  const tagsWrap = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px',marginTop:'6px'}});
   if(c.tags?.length) {
-    const tagEl = h('div',{class:'flex-wrap gap-4'});
-    c.tags.forEach(t=>tagEl.append(chip(t,'')));
-    grid.append(sectionEl('Etiquetas',tagEl));
+    c.tags.forEach(t=>{
+      tagsWrap.append(chip(t, TAG_COLORS[t]||'chip-accent'));
+    });
+  } else {
+    tagsWrap.append(h('span',{style:{fontSize:'12px',color:'var(--text3)',fontStyle:'italic'}},'Sin etiquetas'));
   }
+  tagsCard.append(tagsWrap);
+  right.append(tagsCard);
 
-  if(c.driveLink) {
-    grid.append(sectionEl('Google Drive',
-      h('a',{href:c.driveLink,target:'_blank',style:{fontSize:'13px',color:'var(--accent)',display:'inline-flex',alignItems:'center',gap:'5px',textDecoration:'none'}},
-        '📁 Abrir carpeta del cliente en Drive')
-    ));
-  }
+  // Recordatorios
+  right.append(renderRemindersSection(c));
 
-  // Recordatorios internos
-  grid.append(renderRemindersSection(c));
+  panel.append(right);
+  wrap.append(panel);
 
-  // Historial de notas
-  grid.append(renderNotesSection(c));
+  // ── NOTAS — ancho completo debajo ──
+  wrap.append(renderNotesSection(c));
 
-  // Files
-  grid.append(sectionEl('Archivos y fotos',renderFilesSection(c.id)));
+  // Archivos
+  wrap.append(sectionEl('Archivos y fotos', renderFilesSection(c.id)));
 
-  wrap.append(grid);
   return wrap;
 }
 
