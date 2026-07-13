@@ -116,7 +116,7 @@
   .card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
-  .section-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }
+  .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .flex { display: flex; align-items: center; gap: 8px; }
@@ -180,7 +180,7 @@
   .detail-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
   .detail-header-right { margin-left: auto; display: flex; gap: 8px; }
   .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
-  .detail-card-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+  .detail-card-title { font-size: 10px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
   .detail-row { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .detail-row:last-child { border-bottom: none; }
   .detail-label { font-size: 11px; color: var(--text3); min-width: 100px; flex-shrink: 0; padding-top: 2px; font-weight: 500; }
@@ -548,7 +548,7 @@ async function syncFromSheets() {
 const emptyContact = () => ({
   id: genId(), name:'', phone:'', email:'', whatsapp:'',
   contactMethods:[], isVIP:false, tags:[],
-  budgetMin:'', budgetMax:'', searchZones:[], urgency:2,
+  budgetMin:'', budgetMax:'', searchZones:[], urgency:null,
   needsMortgage:false, bedroomsMin:'', wantsPool:false,
   propertyTypes:[], investmentType:'', notes:[], createdBy:'',
   driveLink:'', reminders:[],
@@ -1134,9 +1134,7 @@ function renderDetail() {
   actions.append(h('a',{href:calUrl,target:'_blank',class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📅 Calendar'));
   left.append(actions);
 
-  // Datos de contacto
-  const contactCard = h('div',{class:'detail-card'});
-  contactCard.append(h('div',{class:'detail-card-title'},'Contacto'));
+  // Helpers
   const copyField=(label,value)=>{
     if(!value) return null;
     const row=h('div',{class:'detail-row'});
@@ -1157,14 +1155,8 @@ function renderDetail() {
     if(!value) return null;
     return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{},value));
   };
-  [copyField('Teléfono',c.phone),
-   copyField('Email',c.email),
-   c.whatsapp?copyField('WhatsApp',c.whatsapp):null,
-   c.contactMethods?.length?dataRow('Vía preferida',c.contactMethods.join(', ')):null
-  ].filter(Boolean).forEach(r=>contactCard.append(r));
-  left.append(contactCard);
 
-  // Presupuesto y requisitos
+  // Presupuesto y requisitos — columna izquierda
   const reqCard = h('div',{class:'detail-card'});
   reqCard.append(h('div',{class:'detail-card-title'},'Presupuesto y requisitos'));
   [
@@ -1179,8 +1171,18 @@ function renderDetail() {
 
   panel.append(left);
 
-  // ── COLUMNA DERECHA ── etiquetas + recordatorios
+  // ── COLUMNA DERECHA ── contacto + etiquetas + recordatorios
   const right = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+
+  // Datos de contacto — columna derecha
+  const contactCard = h('div',{class:'detail-card'});
+  contactCard.append(h('div',{class:'detail-card-title'},'Contacto'));
+  [copyField('Teléfono',c.phone),
+   copyField('Email',c.email),
+   c.whatsapp?copyField('WhatsApp',c.whatsapp):null,
+   c.contactMethods?.length?dataRow('Vía preferida',c.contactMethods.join(', ')):null
+  ].filter(Boolean).forEach(r=>contactCard.append(r));
+  right.append(contactCard);
 
   // Etiquetas — todas coloreadas
   const tagsCard = h('div',{class:'detail-card'});
