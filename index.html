@@ -131,7 +131,7 @@
   .mt-16 { margin-top: 16px; }
 
   /* Chip */
-  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); white-space: nowrap; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); color: var(--text); border: 1px solid var(--border); white-space: nowrap; font-weight: 500; }
   .chip-accent { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
   .chip-success { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
   .chip-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); }
@@ -195,7 +195,7 @@
 
   /* Multi-toggle */
   .multi-toggle { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-  .toggle-btn { font-family: var(--font); font-size: 12px; padding: 5px 13px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text3); transition: all .15s; font-weight: 500; }
+  .toggle-btn { font-family: var(--font); font-size: 12px; padding: 5px 13px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text); transition: all .15s; font-weight: 500; }
   .toggle-btn:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
   .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; box-shadow: 0 1px 4px rgba(24,95,165,.3); }
   .field > label { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; display: block; }
@@ -594,6 +594,7 @@ let state = {
   mergeSelected: null,
   syncing: false,
   sheetsConfigured: !!LS.get('crm_sheets_url'),
+  focusNotes: false,
 };
 let toastTimer = null;
 
@@ -912,55 +913,55 @@ function renderForm() {
 
   const sections = h('div',{class:'form-sections'});
 
-  // ── SECCIÓN 1: layout 2 columnas compacto ──
-  const col1 = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
-  const col2 = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
-  col1.append(fld('Nombre *', inp('text','name','Nombre completo',form.name)));
-  col1.append(fld('Teléfono', inp('tel','phone','+34 600 000 000',form.phone)));
-  col1.append(fld('WhatsApp (si es distinto)', inp('tel','whatsapp','+34 600 000 000',form.whatsapp)));
-  col1.append(fld('Enlace Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
-  col2.append(fld('Email', inp('email','email','correo@ejemplo.com',form.email)));
-  col2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
-  col2.append(h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle));
+  // ── BLOQUE 1: Datos personales en 3 columnas ──
+  const g3 = (cols) => {
+    const g=h('div',{style:{display:'grid',gridTemplateColumns:cols||'1fr 1fr 1fr',gap:'10px 14px'}});
+    return g;
+  };
 
-  const personalGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}});
-  personalGrid.append(col1, col2);
-  sections.append(sectionEl('Datos personales', personalGrid));
+  const row1 = g3();
+  row1.append(fld('Nombre *', inp('text','name','Nombre completo',form.name)));
+  row1.append(fld('Teléfono', inp('tel','phone','+34 600...',form.phone)));
+  row1.append(fld('Email', inp('email','email','correo@ejemplo.com',form.email)));
 
-  // ── SECCIÓN 2: Clasificación + Presupuesto juntos ──
-  const clasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}});
+  const row2 = g3();
+  row2.append(fld('WhatsApp (si es distinto)', inp('tel','whatsapp','+34 600...',form.whatsapp)));
+  row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
+  row2.append(fld('Enlace Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
 
-  const clasLeft = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
-  clasLeft.append(vipToggleWrap);
-  clasLeft.append(h('div',{class:'field'},h('label',{},'Urgencia'),urgRow));
-  clasLeft.append(fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType)));
+  const row3 = h('div',{class:'field'});
+  row3.append(h('label',{},'Forma de contacto preferida'), methodToggle);
 
-  const clasRight = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
-  clasRight.append(h('div',{style:{maxWidth:'260px'}}, fld('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))));
-  clasRight.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)'));
+  sections.append(sectionEl('Datos personales', row1, row2, row3));
 
-  clasGrid.append(clasLeft, clasRight);
-  sections.append(sectionEl('Clasificación y presupuesto', clasGrid));
+  // ── BLOQUE 2: Clasificación + Presupuesto en 3 columnas ──
+  const rowClas = g3('auto auto 1fr');
+  rowClas.append(
+    h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
+      vipToggleWrap,
+      mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)')
+    ),
+    h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
+      h('div',{class:'field'},h('label',{},'Urgencia'),urgRow),
+      fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType))
+    ),
+    fld('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))
+  );
+  sections.append(sectionEl('Clasificación y presupuesto', rowClas));
 
-  // ── SECCIÓN 3: Etiquetas ──
+  // ── BLOQUE 3: Etiquetas ──
   sections.append(sectionEl('Etiquetas', h('div',{class:'field'},tagToggle)));
 
-  // ── SECCIÓN 4: Requisitos ──
-  const reqGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}});
-  const reqLeft = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
-  reqLeft.append(h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle));
-  const reqRight = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
-  reqRight.append(h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle));
-  reqRight.append(fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
-  reqGrid.append(reqLeft, reqRight);
-  sections.append(sectionEl('Requisitos del inmueble', reqGrid));
-
-  // Nota sobre notas
-  sections.append(sectionEl('Notas',
-    h('div',{style:{fontSize:'13px',color:'var(--text2)',padding:'4px 0'}},
-      'Las notas se agregan desde la ficha del contacto una vez guardado.'
+  // ── BLOQUE 4: Requisitos en 2 columnas ──
+  const rowReq = g3('1fr 1fr');
+  rowReq.append(
+    h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle),
+    h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
+      h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle),
+      fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin))
     )
-  ));
+  );
+  sections.append(sectionEl('Requisitos del inmueble', rowReq));
 
   wrap.append(sections);
 
@@ -973,7 +974,19 @@ function renderForm() {
   function saveForm() {
     if(!form.name.trim()){errDiv.textContent='El nombre es obligatorio';errDiv.style.display='block';return;}
     errDiv.style.display='none';
-    saveContact(form);
+    const isNew = !state.contacts.find(x=>x.id===form.id);
+    saveContact(form).then ? saveContact(form) : saveContact(form);
+    // Si es nuevo, ir al detalle con notas enfocadas
+    if(isNew) {
+      setTimeout(()=>{
+        const saved = state.contacts.find(x=>x.id===form.id)||form;
+        setState({view:'detail', detailContact:saved, editContact:null, focusNotes:true});
+        setTimeout(()=>{
+          const notesSection = document.querySelector('.note-add-form textarea');
+          if(notesSection) notesSection.focus();
+        }, 150);
+      }, 100);
+    }
   }
 
   return wrap;
@@ -1203,7 +1216,14 @@ function renderDetail() {
   wrap.append(panel);
 
   // ── NOTAS — ancho completo debajo ──
-  wrap.append(renderNotesSection(c));
+  const notesSection = renderNotesSection(c);
+  if(state.focusNotes) {
+    notesSection.style.border = '2px solid var(--accent)';
+    notesSection.style.borderRadius = 'var(--radius)';
+    notesSection.style.padding = '4px';
+    setState({focusNotes: false});
+  }
+  wrap.append(notesSection);
 
   // Archivos
   wrap.append(sectionEl('Archivos y fotos', renderFilesSection(c.id)));
