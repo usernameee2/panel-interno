@@ -439,7 +439,13 @@ const TAG_COLORS={
   'Inversión alquiler': 'chip-success',
   'Compra-venta':       'chip-accent',
   'Cartera':            'chip-vip',
-  'Inversor':           'chip-success',
+  // Tipos de inmueble
+  'Apartamento':        'chip-accent',
+  'Casa':               'chip-accent',
+  'Villa':              'chip-vip',
+  'Solar':              'chip-warn',
+  'Local':              'chip-warn',
+  'Nave':               'chip-warn',
 };
 const ZONE_SUGG=['Toda la Costa','Alicante','Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada','Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos'];
 const NOTE_TYPES=[
@@ -913,55 +919,59 @@ function renderForm() {
 
   const sections = h('div',{class:'form-sections'});
 
-  // ── BLOQUE 1: Datos personales en 3 columnas ──
-  const g3 = (cols) => {
-    const g=h('div',{style:{display:'grid',gridTemplateColumns:cols||'1fr 1fr 1fr',gap:'10px 14px'}});
-    return g;
-  };
-
-  const row1 = g3();
+  // ── BLOQUE 1: Datos personales — 3 columnas ──
+  const row1 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px 14px'}});
   row1.append(fld('Nombre *', inp('text','name','Nombre completo',form.name)));
-  row1.append(fld('Teléfono', inp('tel','phone','+34 600...',form.phone)));
+  row1.append(fld('Teléfono', inp('tel','phone','+34 600 000 000',form.phone)));
   row1.append(fld('Email', inp('email','email','correo@ejemplo.com',form.email)));
 
-  const row2 = g3();
+  const row2 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px 14px',marginTop:'10px'}});
   row2.append(fld('WhatsApp (si es distinto)', inp('tel','whatsapp','+34 600...',form.whatsapp)));
   row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
-  row2.append(fld('Enlace Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
+  row2.append(fld('Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
 
-  const row3 = h('div',{class:'field'});
-  row3.append(h('label',{},'Forma de contacto preferida'), methodToggle);
+  const row3 = h('div',{style:{marginTop:'10px'}});
+  row3.append(h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle));
 
   sections.append(sectionEl('Datos personales', row1, row2, row3));
 
-  // ── BLOQUE 2: Clasificación + Presupuesto en 3 columnas ──
-  const rowClas = g3('auto auto 1fr');
-  rowClas.append(
-    h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
-      vipToggleWrap,
-      mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)')
-    ),
-    h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
-      h('div',{class:'field'},h('label',{},'Urgencia'),urgRow),
-      fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType))
-    ),
-    fld('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))
-  );
-  sections.append(sectionEl('Clasificación y presupuesto', rowClas));
+  // ── BLOQUE 2: Etiquetas (izq) + Clasificación/Presupuesto (der) ──
+  const block2 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}});
 
-  // ── BLOQUE 3: Etiquetas ──
-  sections.append(sectionEl('Etiquetas', h('div',{class:'field'},tagToggle)));
+  // Izquierda: Etiquetas
+  const tagCol = h('div',{class:'field'});
+  tagCol.append(h('label',{},'Etiquetas'));
+  tagCol.append(tagToggle);
 
-  // ── BLOQUE 4: Requisitos en 2 columnas ──
-  const rowReq = g3('1fr 1fr');
-  rowReq.append(
-    h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle),
-    h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}},
-      h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle),
-      fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin))
-    )
-  );
-  sections.append(sectionEl('Requisitos del inmueble', rowReq));
+  // Derecha: Clasificación + Presupuesto
+  const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+
+  // VIP + hipoteca en fila
+  const vipRow = h('div',{style:{display:'flex',gap:'10px',flexWrap:'wrap',alignItems:'center'}});
+  vipRow.append(vipToggleWrap);
+  vipRow.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)'));
+  clasCol.append(vipRow);
+
+  // Urgencia
+  clasCol.append(h('div',{class:'field'},h('label',{},'Urgencia'),urgRow));
+
+  // Tipo inversión + presupuesto en fila
+  const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}});
+  invBudRow.append(fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType)));
+  invBudRow.append(fld('Presupuesto máx. (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
+  clasCol.append(invBudRow);
+
+  block2.append(tagCol, clasCol);
+  sections.append(sectionEl('Clasificación y etiquetas', block2));
+
+  // ── BLOQUE 3: Requisitos — 2 columnas ──
+  const block3 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}});
+  block3.append(h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle));
+  const reqRight = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  reqRight.append(h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle));
+  reqRight.append(fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
+  block3.append(reqRight);
+  sections.append(sectionEl('Requisitos del inmueble', block3));
 
   wrap.append(sections);
 
