@@ -10,8 +10,8 @@
     --bg: #f5f4f1;
     --surface: #ffffff;
     --surface2: #f0ede8;
-    --border: #ddd9d2;
-    --border2: #e8e4de;
+    --border: #c8c4bc;
+    --border2: #d8d4ce;
     --text: #1a1916;
     --text2: #6b6760;
     --text3: #9e9b96;
@@ -202,7 +202,7 @@
 
   /* Urgency selector */
   .urgency-row { display: flex; gap: 6px; }
-  .urgency-btn { flex: 1; padding: 6px 4px; font-family: var(--font); font-size: 12px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); text-align: center; transition: all .15s; }
+  .urgency-btn { flex: 1; padding: 6px 4px; font-family: var(--font); font-size: 12px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text); text-align: center; transition: all .15s; }
 
   /* Tag input */
   .tag-input-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 8px; display: flex; flex-wrap: wrap; gap: 4px; min-height: 38px; align-items: center; background: var(--surface); cursor: text; transition: border-color .15s; }
@@ -793,26 +793,24 @@ function makeMultiToggle(options, values, onChange, label) {
   if(label) el.append(h('label',{},label));
   const row = h('div',{class:'multi-toggle'});
   el.append(row);
+  const colorMap = {
+    'chip-vip':     {inact:{bg:'var(--vip-bg)',    border:'var(--vip-border)',    color:'var(--vip)'},    act:{bg:'var(--vip)',    border:'var(--vip)',    color:'#fff'}},
+    'chip-success': {inact:{bg:'var(--success-bg)', border:'var(--success-border)',color:'var(--success)'}, act:{bg:'var(--success)', border:'var(--success)', color:'#fff'}},
+    'chip-warn':    {inact:{bg:'var(--warn-bg)',    border:'var(--warn-border)',   color:'var(--warn)'},    act:{bg:'var(--warn)',    border:'var(--warn)',    color:'#fff'}},
+    'chip-accent':  {inact:{bg:'var(--accent-bg)', border:'var(--accent-border)', color:'var(--accent)'},  act:{bg:'var(--accent)',  border:'var(--accent)',  color:'#fff'}},
+  };
   function refresh() {
     row.innerHTML='';
     options.forEach(o=>{
       const isActive = vals.includes(o);
       const btn = h('button',{class:'toggle-btn'+(isActive?' active':'')},o);
-      // Si tiene color definido y está activo, aplicar el color de la etiqueta
-      if(isActive && typeof TAG_COLORS !== 'undefined' && TAG_COLORS[o]) {
-        const colorMap = {
-          'chip-vip':     {bg:'var(--vip-bg)',    border:'var(--vip-border)',    color:'var(--vip)'},
-          'chip-success': {bg:'var(--success-bg)', border:'var(--success-border)',color:'var(--success)'},
-          'chip-warn':    {bg:'var(--warn-bg)',    border:'var(--warn-border)',   color:'var(--warn)'},
-          'chip-accent':  {bg:'var(--accent-bg)', border:'var(--accent-border)', color:'var(--accent)'},
-        };
-        const cm = colorMap[TAG_COLORS[o]];
-        if(cm) {
-          btn.style.background = cm.bg;
-          btn.style.borderColor = cm.border;
-          btn.style.color = cm.color;
-          btn.style.fontWeight = '700';
-        }
+      const tagColor = typeof TAG_COLORS !== 'undefined' ? TAG_COLORS[o] : null;
+      if(tagColor && colorMap[tagColor]) {
+        const cm = isActive ? colorMap[tagColor].act : colorMap[tagColor].inact;
+        btn.style.background   = cm.bg;
+        btn.style.borderColor  = cm.border;
+        btn.style.color        = cm.color;
+        btn.style.fontWeight   = isActive ? '700' : '500';
       }
       btn.addEventListener('click',()=>{vals=vals.includes(o)?vals.filter(x=>x!==o):[...vals,o];onChange(vals);refresh();});
       row.append(btn);
@@ -859,19 +857,14 @@ function renderForm() {
     return d;
   };
 
-  // Urgencia
-  const urgRow = h('div',{class:'urgency-row'});
-  function refreshUrg() {
-    urgRow.innerHTML='';
-    [1,2,3].forEach(v=>{
-      const urg=URGENCY[v];
-      const btn=h('button',{class:'urgency-btn'},urg.l);
-      if(form.urgency===v){btn.style.background=urg.c;btn.style.color='#fff';btn.style.borderColor=urg.c;}
-      btn.addEventListener('click',()=>{form.urgency=v;refreshUrg();});
-      urgRow.append(btn);
-    });
-  }
-  refreshUrg();
+  // Urgencia como select
+  const urgSel = h('select',{});
+  [['','— Sin urgencia —'],['1','Baja'],['2','Media'],['3','Alta']].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);
+    if(String(form.urgency||'')=== v) o.selected=true;
+    urgSel.append(o);
+  });
+  urgSel.addEventListener('change',e=>{ form.urgency = e.target.value ? Number(e.target.value) : null; });
 
   // Toggles
   let methodVals=[...form.contactMethods];
@@ -930,7 +923,7 @@ function renderForm() {
   row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
   row2.append(fld('Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
 
-  const row3 = h('div',{style:{marginTop:'10px'}});
+  const row3 = h('div',{style:{marginTop:'10px',gridColumn:'1/-1'}});
   row3.append(h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle));
 
   sections.append(sectionEl('Datos personales', row1, row2, row3));
@@ -946,20 +939,29 @@ function renderForm() {
   // Derecha: Clasificación + Presupuesto
   const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
 
-  // VIP + hipoteca en fila
-  const vipRow = h('div',{style:{display:'flex',gap:'10px',flexWrap:'wrap',alignItems:'center'}});
-  vipRow.append(vipToggleWrap);
-  vipRow.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)'));
-  clasCol.append(vipRow);
-
-  // Urgencia
-  clasCol.append(h('div',{class:'field'},h('label',{},'Urgencia'),urgRow));
-
-  // Tipo inversión + presupuesto en fila
-  const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}});
+  // Urgencia + Tipo inversión + Presupuesto arriba
+  const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px'}});
+  invBudRow.append(fld('Urgencia', urgSel));
   invBudRow.append(fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType)));
   invBudRow.append(fld('Presupuesto máx. (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
   clasCol.append(invBudRow);
+
+  // VIP + Hipoteca + Tiene efectivo abajo como toggles
+  const togglesRow = h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap',alignItems:'center',marginTop:'4px'}});
+  togglesRow.append(vipToggleWrap);
+  togglesRow.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)'));
+
+  // Toggle "Tiene efectivo" vinculado a tags
+  const hasEfectivoVal = form.tags?.includes('Tiene efectivo');
+  const efecToggle = mkToggle('_efectivo','Tiene efectivo', hasEfectivoVal,'var(--success)');
+  efecToggle.addEventListener('click',()=>{
+    const has = form.tags?.includes('Tiene efectivo');
+    if(has) form.tags = form.tags.filter(t=>t!=='Tiene efectivo');
+    else form.tags = [...(form.tags||[]),'Tiene efectivo'];
+  }, {capture: true});
+  togglesRow.append(efecToggle);
+
+  clasCol.append(togglesRow);
 
   block2.append(tagCol, clasCol);
   sections.append(sectionEl('Clasificación y etiquetas', block2));
