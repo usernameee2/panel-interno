@@ -198,7 +198,7 @@
   .toggle-btn { font-family: var(--font); font-size: 12px; padding: 5px 13px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text3); transition: all .15s; font-weight: 500; }
   .toggle-btn:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
   .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; box-shadow: 0 1px 4px rgba(24,95,165,.3); }
-  .field > label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; display: block; }
+  .field > label { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; display: block; }
 
   /* Urgency selector */
   .urgency-row { display: flex; gap: 6px; }
@@ -789,7 +789,24 @@ function makeMultiToggle(options, values, onChange, label) {
   function refresh() {
     row.innerHTML='';
     options.forEach(o=>{
-      const btn = h('button',{class:'toggle-btn'+(vals.includes(o)?' active':'')},o);
+      const isActive = vals.includes(o);
+      const btn = h('button',{class:'toggle-btn'+(isActive?' active':'')},o);
+      // Si tiene color definido y está activo, aplicar el color de la etiqueta
+      if(isActive && typeof TAG_COLORS !== 'undefined' && TAG_COLORS[o]) {
+        const colorMap = {
+          'chip-vip':     {bg:'var(--vip-bg)',    border:'var(--vip-border)',    color:'var(--vip)'},
+          'chip-success': {bg:'var(--success-bg)', border:'var(--success-border)',color:'var(--success)'},
+          'chip-warn':    {bg:'var(--warn-bg)',    border:'var(--warn-border)',   color:'var(--warn)'},
+          'chip-accent':  {bg:'var(--accent-bg)', border:'var(--accent-border)', color:'var(--accent)'},
+        };
+        const cm = colorMap[TAG_COLORS[o]];
+        if(cm) {
+          btn.style.background = cm.bg;
+          btn.style.borderColor = cm.border;
+          btn.style.color = cm.color;
+          btn.style.fontWeight = '700';
+        }
+      }
       btn.addEventListener('click',()=>{vals=vals.includes(o)?vals.filter(x=>x!==o):[...vals,o];onChange(vals);refresh();});
       row.append(btn);
     });
@@ -804,7 +821,6 @@ function makeMultiToggle(options, values, onChange, label) {
 function renderForm() {
   let form = {...(state.editContact || emptyContact())};
   const set = (k,v) => { form[k]=v; };
-
   const wrap = h('div',{});
 
   const hdr = h('div',{class:'form-header'},
@@ -816,10 +832,9 @@ function renderForm() {
   );
   wrap.append(hdr);
 
-  const errDiv = h('div',{style:{display:'none',color:'var(--danger)',fontSize:'13px',marginBottom:'12px',padding:'8px 12px',background:'var(--danger-bg)',borderRadius:'var(--radius-sm)',border:'1px solid var(--danger-border)'}});
+  const errDiv = h('div',{style:{display:'none',color:'var(--danger)',fontSize:'13px',marginBottom:'10px',padding:'8px 12px',background:'var(--danger-bg)',borderRadius:'var(--radius-sm)',border:'1px solid var(--danger-border)'}});
   wrap.append(errDiv);
 
-  // Helper to bind input
   const inp = (type,field,placeholder,val) => {
     const el = h('input',{type,placeholder,value:val||''});
     el.addEventListener('input',e=>set(field,e.target.value));
@@ -831,8 +846,13 @@ function renderForm() {
     el.addEventListener('change',e=>set(field,e.target.value));
     return el;
   };
+  const fld = (label, el) => {
+    const d=h('div',{class:'field'});
+    d.append(h('label',{},label),el);
+    return d;
+  };
 
-  // Urgency
+  // Urgencia
   const urgRow = h('div',{class:'urgency-row'});
   function refreshUrg() {
     urgRow.innerHTML='';
@@ -846,59 +866,21 @@ function renderForm() {
   }
   refreshUrg();
 
-  // Checkboxes helper
-  const mkCb=(field,label,val)=>{
-    const cb=h('input',{type:'checkbox'});
-    cb.checked=!!val;
-    cb.addEventListener('change',e=>set(field,e.target.checked));
-    return h('label',{class:'flex',style:{alignItems:'center',gap:'8px',fontSize:'13px',cursor:'pointer',margin:'0'}},cb,label);
-  };
-
-  // Methods multi
+  // Toggles
   let methodVals=[...form.contactMethods];
   const methodToggle=makeMultiToggle(CONTACT_METHODS,methodVals,v=>{form.contactMethods=v;methodVals=v;},'');
-
-  // Property types
   let propVals=[...form.propertyTypes];
   const propToggle=makeMultiToggle(PROP_TYPES,propVals,v=>{form.propertyTypes=v;propVals=v;},'');
-
-  // Tags — multi-toggle con etiquetas predefinidas
   let tagVals=[...form.tags];
   const tagToggle=makeMultiToggle(TAG_SUGG,tagVals,v=>{form.tags=v;tagVals=v;});
-
-  // Zones — multi-toggle con zonas predefinidas
   let zoneVals=[...form.searchZones];
   const zoneToggle=makeMultiToggle(ZONE_SUGG,zoneVals,v=>{form.searchZones=v;zoneVals=v;});
 
-  // bedrooms select
-  const bedsOpts=[['','Sin preferencia'],...[1,2,3,4].map(n=>[String(n),n+'+ hab.'])];
-  const bedsEl=sel('bedroomsMin',bedsOpts,form.bedroomsMin);
+  const bedsOpts=[['','—'],...[1,2,3,4].map(n=>[String(n),n+'+ hab.'])];
+  const invOpts=INV_TYPES.map(t=>[t,t||'—']);
 
-  // investment type
-  const invOpts=INV_TYPES.map(t=>[t,t||'Seleccionar...']);
-  const invEl=sel('investmentType',invOpts,form.investmentType);
-
-  const sections = h('div',{class:'form-sections'});
-
-  // Section 1: Personal
-  sections.append(sectionEl('Datos personales',
-    h('div',{class:'grid-2'},
-      fieldEl('Nombre *', inp('text','name','Nombre completo',form.name)),
-      fieldEl('Agente responsable', inp('text','createdBy','Tu nombre / equipo',form.createdBy)),
-      fieldEl('Teléfono', inp('tel','phone','+34 600 000 000',form.phone)),
-      fieldEl('Email', inp('email','email','correo@ejemplo.com',form.email)),
-      fieldEl('WhatsApp (si es distinto al tel.)', inp('tel','whatsapp','+34 600 000 000',form.whatsapp)),
-      fieldEl('Último contacto', inp('date','lastContact','',form.lastContact))
-    ),
-    h('div',{class:'field',style:{marginTop:'8px'}},
-      h('label',{},'Enlace carpeta Google Drive (del cliente)'),
-      inp('url','driveLink','https://drive.google.com/...',form.driveLink)
-    ),
-    h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle)
-  ));
-
-  // VIP toggle visual
-  const vipToggleWrap = h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'10px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(form.isVIP?'var(--vip-border)':'var(--border)'),background:form.isVIP?'var(--vip-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s',width:'fit-content'}});
+  // VIP toggle
+  const vipToggleWrap = h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(form.isVIP?'var(--vip-border)':'var(--border)'),background:form.isVIP?'var(--vip-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s',width:'fit-content'}});
   const vipLabel = h('span',{style:{fontSize:'13px',fontWeight:'600',color:form.isVIP?'var(--vip)':'var(--text2)'}}, form.isVIP?'★ Cliente VIP':'☆ Cliente VIP');
   const vipStatus = h('span',{style:{marginLeft:'8px',fontSize:'12px',fontWeight:'700',color:form.isVIP?'var(--vip)':'var(--text3)'}}, form.isVIP?'SÍ':'NO');
   vipToggleWrap.append(vipLabel, vipStatus);
@@ -912,55 +894,71 @@ function renderForm() {
     vipToggleWrap.style.background=form.isVIP?'var(--vip-bg)':'var(--surface2)';
   });
 
-  const urgDiv=h('div',{class:'field'},h('label',{id:'urgLabel'},'Urgencia'),urgRow);
-  sections.append(sectionEl('Clasificación',
-    vipToggleWrap,
-    h('div',{class:'grid-2',style:{alignItems:'start',marginTop:'10px'}},
-      urgDiv,
-      fieldEl('Tipo de inversión', invEl)
-    ),
-    h('div',{class:'field',style:{marginTop:'4px'}},h('label',{},'Etiquetas'),tagToggle)
-  ));
-
-  // Toggle helper visual (reemplaza mkCb)
+  // Hipoteca toggle
   const mkToggle=(field,label,val,colorActive='var(--accent)')=>{
-    const wrap=h('div',{
-      style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 14px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(val?colorActive:'var(--border)'),background:'var(--surface)',cursor:'pointer',transition:'all .15s',userSelect:'none',width:'fit-content'},
-    });
-    const dot=h('div',{style:{width:'14px',height:'14px',borderRadius:'50%',background:val?colorActive:'var(--border2)',transition:'all .15s',flexShrink:'0'}});
+    const w=h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(val?colorActive:'var(--border)'),background:'var(--surface)',cursor:'pointer',transition:'all .15s',userSelect:'none',width:'fit-content'}});
+    const dot=h('div',{style:{width:'13px',height:'13px',borderRadius:'50%',background:val?colorActive:'var(--border2)',transition:'all .15s',flexShrink:'0'}});
     const lbl=h('span',{style:{fontSize:'13px',fontWeight:val?'600':'400',color:val?colorActive:'var(--text2)',transition:'all .15s'}},label);
-    wrap.append(dot,lbl);
-    wrap.addEventListener('click',()=>{
-      const newVal=!form[field];
-      set(field,newVal);
-      wrap.style.borderColor=newVal?colorActive:'var(--border)';
-      dot.style.background=newVal?colorActive:'var(--border2)';
-      lbl.style.fontWeight=newVal?'600':'400';
-      lbl.style.color=newVal?colorActive:'var(--text2)';
+    w.append(dot,lbl);
+    w.addEventListener('click',()=>{
+      const nv=!form[field]; set(field,nv);
+      w.style.borderColor=nv?colorActive:'var(--border)';
+      dot.style.background=nv?colorActive:'var(--border2)';
+      lbl.style.fontWeight=nv?'600':'400';
+      lbl.style.color=nv?colorActive:'var(--text2)';
     });
-    return wrap;
+    return w;
   };
 
-  // Section 3: Budget
-  sections.append(sectionEl('Presupuesto y financiación',
-    h('div',{style:{maxWidth:'280px'}},
-      fieldEl('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))
-    ),
-    h('div',{style:{marginTop:'8px'}}),
-    mkToggle('needsMortgage','Necesita financiación / hipoteca',form.needsMortgage,'var(--warn)')
-  ));
+  const sections = h('div',{class:'form-sections'});
 
-  // Section 4: Requirements
-  sections.append(sectionEl('Requisitos del inmueble',
-    h('div',{class:'field'},h('label',{},'Zonas de búsqueda (seleccioná una o varias)'),zoneToggle),
-    h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle),
-    fieldEl('Dormitorios mínimos', bedsEl)
-  ));
+  // ── SECCIÓN 1: layout 2 columnas compacto ──
+  const col1 = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  const col2 = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  col1.append(fld('Nombre *', inp('text','name','Nombre completo',form.name)));
+  col1.append(fld('Teléfono', inp('tel','phone','+34 600 000 000',form.phone)));
+  col1.append(fld('WhatsApp (si es distinto)', inp('tel','whatsapp','+34 600 000 000',form.whatsapp)));
+  col1.append(fld('Enlace Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
+  col2.append(fld('Email', inp('email','email','correo@ejemplo.com',form.email)));
+  col2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
+  col2.append(h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle));
 
-  // Section 5: Notes — se gestionan desde la vista de detalle
+  const personalGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}});
+  personalGrid.append(col1, col2);
+  sections.append(sectionEl('Datos personales', personalGrid));
+
+  // ── SECCIÓN 2: Clasificación + Presupuesto juntos ──
+  const clasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}});
+
+  const clasLeft = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  clasLeft.append(vipToggleWrap);
+  clasLeft.append(h('div',{class:'field'},h('label',{},'Urgencia'),urgRow));
+  clasLeft.append(fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType)));
+
+  const clasRight = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  clasRight.append(h('div',{style:{maxWidth:'260px'}}, fld('Presupuesto máximo (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax))));
+  clasRight.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)'));
+
+  clasGrid.append(clasLeft, clasRight);
+  sections.append(sectionEl('Clasificación y presupuesto', clasGrid));
+
+  // ── SECCIÓN 3: Etiquetas ──
+  sections.append(sectionEl('Etiquetas', h('div',{class:'field'},tagToggle)));
+
+  // ── SECCIÓN 4: Requisitos ──
+  const reqGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}});
+  const reqLeft = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  reqLeft.append(h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle));
+  const reqRight = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  reqRight.append(h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle));
+  reqRight.append(fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
+  reqGrid.append(reqLeft, reqRight);
+  sections.append(sectionEl('Requisitos del inmueble', reqGrid));
+
+  // Nota sobre notas
   sections.append(sectionEl('Notas',
     h('div',{style:{fontSize:'13px',color:'var(--text2)',padding:'4px 0'}},
-      'Las notas se agregan desde la ficha del contacto, una vez guardado. Podés anotar llamadas, reuniones, visitas y más.'
+      'Las notas se agregan desde la ficha del contacto una vez guardado.'
     )
   ));
 
