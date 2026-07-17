@@ -414,10 +414,10 @@ const URGENCY = {
   2:{l:'Media',c:'#EF9F27'},
   3:{l:'Alta',c:'#E24B4A'}
 };
-const PROP_TYPES=['Apartamento','Casa','Villa','Solar','Local','Nave'];
+const PROP_TYPES=['Piso','Casa','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina','Planta Baja','Okupa OK'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Planta Baja','Okupa OK'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
 const TAG_COLORS={
   'Premium':            'chip-vip',
@@ -431,6 +431,7 @@ const TAG_COLORS={
   'Tiene NIE':          'chip-success',
   'Sin NIE':            'chip-warn',
   'Tiene efectivo':     'chip-success',
+  'Necesita hipoteca':  'chip-warn',
   'Abierto a reformar': 'chip-warn',
   'Piscina':            'chip-accent',
   'Planta Baja':        'chip-accent',
@@ -441,7 +442,7 @@ const TAG_COLORS={
   'Compra-venta':       'chip-accent',
   'Cartera':            'chip-vip',
   // Tipos de inmueble
-  'Apartamento':        'chip-accent',
+  'Piso':               'chip-accent',
   'Casa':               'chip-accent',
   'Villa':              'chip-vip',
   'Solar':              'chip-warn',
@@ -926,52 +927,31 @@ function renderForm() {
 
   sections.append(sectionEl('Datos personales', row1, row2, row3));
 
-  // ── BLOQUE 2: Etiquetas (izq) + Clasificación/Presupuesto (der) ──
-  const block2 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}});
+  // ── BLOQUE 2+3: Todo junto — 3 columnas (Opción B) ──
+  const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'14px'}});
 
-  // Izquierda: Etiquetas
+  // Columna 1: Etiquetas — flex-wrap sin columnas visibles
   const tagCol = h('div',{class:'field'});
   tagCol.append(h('label',{},'Etiquetas'));
   tagCol.append(tagToggle);
 
-  // Derecha: Clasificación + Presupuesto
-  const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  // Columna 2: Zonas + Tipo inmueble
+  const zonaCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  zonaCol.append(h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle));
+  zonaCol.append(h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle));
 
-  // Urgencia + Tipo inversión + Presupuesto arriba
-  const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px'}});
+  // Columna 3: Clasificación + Presupuesto + VIP + Dormitorios
+  const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}});
   invBudRow.append(fld('Urgencia', urgSel));
   invBudRow.append(fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType)));
-  invBudRow.append(fld('Presupuesto máx. (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
   clasCol.append(invBudRow);
+  clasCol.append(fld('Presupuesto máx. (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
+  clasCol.append(fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
+  clasCol.append(vipToggleWrap);
 
-  // VIP + Hipoteca + Tiene efectivo abajo como toggles
-  const togglesRow = h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap',alignItems:'center',marginTop:'4px'}});
-  togglesRow.append(vipToggleWrap);
-  togglesRow.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)','var(--warn-bg)','var(--warn-border)'));
-
-  // Toggle "Tiene efectivo" vinculado a tags
-  const hasEfectivoVal = form.tags?.includes('Tiene efectivo');
-  const efecToggle = mkToggle('_efectivo','Tiene efectivo', hasEfectivoVal,'var(--success)','var(--success-bg)','var(--success-border)');
-  efecToggle.addEventListener('click',()=>{
-    const has = form.tags?.includes('Tiene efectivo');
-    if(has) form.tags = form.tags.filter(t=>t!=='Tiene efectivo');
-    else form.tags = [...(form.tags||[]),'Tiene efectivo'];
-  }, {capture: true});
-  togglesRow.append(efecToggle);
-
-  clasCol.append(togglesRow);
-
-  block2.append(tagCol, clasCol);
-  sections.append(sectionEl('Clasificación y etiquetas', block2));
-
-  // ── BLOQUE 3: Requisitos — 2 columnas ──
-  const block3 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}});
-  block3.append(h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle));
-  const reqRight = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
-  reqRight.append(h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle));
-  reqRight.append(fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
-  block3.append(reqRight);
-  sections.append(sectionEl('Requisitos del inmueble', block3));
+  block23.append(tagCol, zonaCol, clasCol);
+  sections.append(sectionEl('Etiquetas, zonas y clasificación', block23));
 
   wrap.append(sections);
 
