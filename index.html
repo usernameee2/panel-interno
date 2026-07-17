@@ -116,7 +116,7 @@
   .card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
-  .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }
+  .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 8px 14px; margin: -14px -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .flex { display: flex; align-items: center; gap: 8px; }
@@ -417,7 +417,7 @@ const URGENCY = {
 const PROP_TYPES=['Apartamento','Casa','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina','Planta Baja'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Abierto a reformar','Piscina','Planta Baja','Okupa OK'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Benidorm','Jávea','Calpe','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos'];
 const TAG_COLORS={
   'Premium':            'chip-vip',
@@ -434,6 +434,7 @@ const TAG_COLORS={
   'Abierto a reformar': 'chip-warn',
   'Piscina':            'chip-accent',
   'Planta Baja':        'chip-accent',
+  'Okupa OK':           'chip-warn',
   // Tipos de inversión
   'Uso propio':         'chip-accent',
   'Inversión alquiler': 'chip-success',
@@ -880,32 +881,29 @@ function renderForm() {
   const invOpts=INV_TYPES.map(t=>[t,t||'—']);
 
   // VIP toggle
-  const vipToggleWrap = h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(form.isVIP?'var(--vip-border)':'var(--border)'),background:form.isVIP?'var(--vip-bg)':'var(--surface2)',cursor:'pointer',transition:'all .15s',width:'fit-content'}});
-  const vipLabel = h('span',{style:{fontSize:'13px',fontWeight:'600',color:form.isVIP?'var(--vip)':'var(--text2)'}}, form.isVIP?'★ Cliente VIP':'☆ Cliente VIP');
-  const vipStatus = h('span',{style:{marginLeft:'8px',fontSize:'12px',fontWeight:'700',color:form.isVIP?'var(--vip)':'var(--text3)'}}, form.isVIP?'SÍ':'NO');
-  vipToggleWrap.append(vipLabel, vipStatus);
+  const vipToggleWrap = h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(form.isVIP?'var(--vip-border)':'var(--border)'),background:form.isVIP?'var(--vip-bg)':'var(--surface)',cursor:'pointer',transition:'all .15s',width:'fit-content'}});
+  const vipLabel = h('span',{style:{fontSize:'13px',fontWeight:'700',color:form.isVIP?'var(--vip)':'var(--text)'}}, form.isVIP?'★ Cliente VIP':'☆ Cliente VIP');
+  vipToggleWrap.append(vipLabel);
   vipToggleWrap.addEventListener('click',()=>{
     form.isVIP=!form.isVIP;
     vipLabel.textContent=form.isVIP?'★ Cliente VIP':'☆ Cliente VIP';
-    vipLabel.style.color=form.isVIP?'var(--vip)':'var(--text2)';
-    vipStatus.textContent=form.isVIP?'SÍ':'NO';
-    vipStatus.style.color=form.isVIP?'var(--vip)':'var(--text3)';
+    vipLabel.style.color=form.isVIP?'var(--vip)':'var(--text)';
     vipToggleWrap.style.borderColor=form.isVIP?'var(--vip-border)':'var(--border)';
-    vipToggleWrap.style.background=form.isVIP?'var(--vip-bg)':'var(--surface2)';
+    vipToggleWrap.style.background=form.isVIP?'var(--vip-bg)':'var(--surface)';
   });
 
   // Hipoteca toggle
-  const mkToggle=(field,label,val,colorActive='var(--accent)')=>{
-    const w=h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(val?colorActive:'var(--border)'),background:'var(--surface)',cursor:'pointer',transition:'all .15s',userSelect:'none',width:'fit-content'}});
-    const dot=h('div',{style:{width:'13px',height:'13px',borderRadius:'50%',background:val?colorActive:'var(--border2)',transition:'all .15s',flexShrink:'0'}});
-    const lbl=h('span',{style:{fontSize:'13px',fontWeight:val?'600':'400',color:val?colorActive:'var(--text2)',transition:'all .15s'}},label);
+  const mkToggle=(field,label,val,colorActive='var(--accent)',bgActive='var(--accent-bg)',borderActive='var(--accent-border)')=>{
+    const w=h('div',{style:{display:'inline-flex',alignItems:'center',gap:'8px',padding:'7px 12px',borderRadius:'var(--radius-sm)',border:'1.5px solid '+(val?borderActive:'var(--border)'),background:val?bgActive:'var(--surface)',cursor:'pointer',transition:'all .15s',userSelect:'none',width:'fit-content'}});
+    const dot=h('div',{style:{width:'10px',height:'10px',borderRadius:'50%',background:val?colorActive:'var(--border2)',transition:'all .15s',flexShrink:'0'}});
+    const lbl=h('span',{style:{fontSize:'13px',fontWeight:'700',color:val?colorActive:'var(--text)',transition:'all .15s'}},label);
     w.append(dot,lbl);
     w.addEventListener('click',()=>{
       const nv=!form[field]; set(field,nv);
-      w.style.borderColor=nv?colorActive:'var(--border)';
+      w.style.borderColor=nv?borderActive:'var(--border)';
+      w.style.background=nv?bgActive:'var(--surface)';
       dot.style.background=nv?colorActive:'var(--border2)';
-      lbl.style.fontWeight=nv?'600':'400';
-      lbl.style.color=nv?colorActive:'var(--text2)';
+      lbl.style.color=nv?colorActive:'var(--text)';
     });
     return w;
   };
@@ -921,10 +919,11 @@ function renderForm() {
   const row2 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px 14px',marginTop:'10px'}});
   row2.append(fld('WhatsApp (si es distinto)', inp('tel','whatsapp','+34 600...',form.whatsapp)));
   row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
-  row2.append(fld('Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
+  row2.append(h('div',{})); // espacio vacío
 
-  const row3 = h('div',{style:{marginTop:'10px',gridColumn:'1/-1'}});
+  const row3 = h('div',{style:{marginTop:'10px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px 14px'}});
   row3.append(h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle));
+  row3.append(fld('Enlace Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
 
   sections.append(sectionEl('Datos personales', row1, row2, row3));
 
@@ -949,7 +948,7 @@ function renderForm() {
   // VIP + Hipoteca + Tiene efectivo abajo como toggles
   const togglesRow = h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap',alignItems:'center',marginTop:'4px'}});
   togglesRow.append(vipToggleWrap);
-  togglesRow.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)'));
+  togglesRow.append(mkToggle('needsMortgage','Necesita hipoteca',form.needsMortgage,'var(--warn)','var(--warn-bg)','var(--warn-border)'));
 
   // Toggle "Tiene efectivo" vinculado a tags
   const hasEfectivoVal = form.tags?.includes('Tiene efectivo');
