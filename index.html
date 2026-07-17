@@ -113,10 +113,10 @@
   button:disabled { opacity: 0.5; cursor: default; }
 
   /* Card / Surface */
-  .card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: var(--shadow); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
-  .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 8px 14px; margin: -14px -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
+  .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .flex { display: flex; align-items: center; gap: 8px; }
@@ -919,11 +919,10 @@ function renderForm() {
   const row2 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px 14px',marginTop:'10px'}});
   row2.append(fld('WhatsApp (si es distinto)', inp('tel','whatsapp','+34 600...',form.whatsapp)));
   row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
-  row2.append(h('div',{})); // espacio vacío
+  row2.append(fld('Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
 
-  const row3 = h('div',{style:{marginTop:'10px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px 14px'}});
+  const row3 = h('div',{style:{marginTop:'10px'}});
   row3.append(h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle));
-  row3.append(fld('Enlace Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
 
   sections.append(sectionEl('Datos personales', row1, row2, row3));
 
@@ -952,7 +951,7 @@ function renderForm() {
 
   // Toggle "Tiene efectivo" vinculado a tags
   const hasEfectivoVal = form.tags?.includes('Tiene efectivo');
-  const efecToggle = mkToggle('_efectivo','Tiene efectivo', hasEfectivoVal,'var(--success)');
+  const efecToggle = mkToggle('_efectivo','Tiene efectivo', hasEfectivoVal,'var(--success)','var(--success-bg)','var(--success-border)');
   efecToggle.addEventListener('click',()=>{
     const has = form.tags?.includes('Tiene efectivo');
     if(has) form.tags = form.tags.filter(t=>t!=='Tiene efectivo');
