@@ -120,8 +120,8 @@
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: var(--radius); padding: 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #dbeafe; border-bottom: 1px solid #93c5fd; border-radius: var(--radius) var(--radius) 0 0; }
-  .section-form { background: #fff0eb; border: 1px solid #f9b99a; border-radius: var(--radius); padding: 14px 16px; }
-  .section-form .section-title { background: #e8623a; border-bottom-color: #e8623a; color: #ffffff; font-weight: 800; }
+  .section-form { background: #e8f5ee; border: 1px solid #90c4a0; border-radius: var(--radius); padding: 14px 16px; }
+  .section-form .section-title { background: #2d5a3d; border-bottom-color: #2d5a3d; color: #ffffff; font-weight: 800; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .flex { display: flex; align-items: center; gap: 8px; }
@@ -195,7 +195,7 @@
 
   /* Form */
   .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .form-sections { display: grid; gap: 14px; background: #fde8de; padding: 8px; border-radius: var(--radius); }
+  .form-sections { display: grid; gap: 14px; background: #d8ede0; padding: 8px; border-radius: var(--radius); }
   .field { display: grid; gap: 4px; }
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
@@ -808,7 +808,7 @@ function makeTagInput(values, onChange, suggestions, placeholder) {
 }
 
 // ─── MULTI TOGGLE ────────────────────────────────────────────────────────────
-function makeToggleRow(options, values, onChange, defaultColor) {
+function makeToggleRow(options, values, onChange, defaultColor, compact) {
   let vals = [...values];
   const colorMap = {
     'chip-vip':     {inact:{bg:'var(--vip-bg)',    border:'var(--vip-border)',    color:'var(--vip)'},    act:{bg:'var(--vip)',    border:'var(--vip)',    color:'#fff'}},
@@ -823,6 +823,7 @@ function makeToggleRow(options, values, onChange, defaultColor) {
     options.forEach(o=>{
       const isActive = vals.includes(o);
       const btn = h('button',{class:'toggle-btn'+(isActive?' active':'')},o);
+      if(compact) { btn.style.fontSize='11px'; btn.style.padding='3px 8px'; }
       const tagColor = (typeof TAG_COLORS !== 'undefined' && TAG_COLORS[o]) || defaultColor;
       if(tagColor && colorMap[tagColor]) {
         const cm = isActive ? colorMap[tagColor].act : colorMap[tagColor].inact;
@@ -857,6 +858,7 @@ function makeMultiToggle(options, values, onChange, label, defaultColor) {
     options.forEach(o=>{
       const isActive = vals.includes(o);
       const btn = h('button',{class:'toggle-btn'+(isActive?' active':'')},o);
+      if(compact) { btn.style.fontSize='11px'; btn.style.padding='3px 8px'; }
       const tagColor = (typeof TAG_COLORS !== 'undefined' && TAG_COLORS[o]) || defaultColor;
       if(tagColor && colorMap[tagColor]) {
         const cm = isActive ? colorMap[tagColor].act : colorMap[tagColor].inact;
@@ -1002,7 +1004,7 @@ function renderForm() {
   const syncZones = ()=>{ form.searchZones=[...zvG,...zvBl,...zvBu]; };
   const zoneRowGreen = makeToggleRow(ZONE_GREEN, zvG,  v=>{zvG=v; syncZones();}, 'chip-success');
   const zoneRowBlue  = makeToggleRow(ZONE_BLUE,  zvBl, v=>{zvBl=v;syncZones();}, 'chip-accent');
-  const zoneRowBurdo = makeToggleRow(ZONE_BURDO, zvBu, v=>{zvBu=v;syncZones();}, 'chip-purple');
+  const zoneRowBurdo = makeToggleRow(ZONE_BURDO, zvBu, v=>{zvBu=v;syncZones();}, 'chip-purple', true);
 
   // Tipo inmueble select
   const propSel = h('select',{style:{maxWidth:'180px'}});
@@ -1021,22 +1023,29 @@ function renderForm() {
   topRow.append(fld('Presupuesto máx.', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
   topRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
 
-  // FILA 2: Etiquetas (ancho completo)
+  // FILA 2: Etiquetas (izq) + Zonas (der) en 2 columnas
   const tagField2 = h('div',{class:'field'});
   tagField2.append(h('label',{},'Etiquetas'));
   tagField2.append(tagToggle);
 
-  // FILA 3: Zonas en dos columnas
-  const zonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}});
-  const zonaA = h('div',{class:'field'});
-  zonaA.append(h('label',{},'Zonas de búsqueda'));
-  zonaA.append(zoneRowGreen);
-  zonaA.append(zoneRowBlue);
-  const zonaB2 = h('div',{class:'field',style:{paddingTop:'18px'}});
-  zonaB2.append(zoneRowBurdo);
-  zonasGrid.append(zonaA, zonaB2);
+  const zonaCol2 = h('div',{class:'field'});
+  zonaCol2.append(h('label',{},'Zonas de búsqueda'));
+  // Zonas en grid 2 col interno
+  const zonasInner = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px',marginTop:'4px'}});
+  const zonaLeft = h('div',{});
+  zonaLeft.append(zoneRowGreen);
+  zonaLeft.append(h('div',{style:{marginTop:'4px'}}));
+  zonaLeft.append(zoneRowBlue);
+  const zonaRight = h('div',{});
+  zonaRight.append(zoneRowBurdo);
+  zonasInner.append(zonaLeft, zonaRight);
+  zonaCol2.append(zonasInner);
 
-  sections.append(formSectionEl('Etiquetas, zonas y clasificación', topRow, tagField2, zonasGrid));
+  const etiqZonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}});
+  etiqZonasGrid.append(tagField2, zonaCol2);
+  const zonasGrid = etiqZonasGrid; // alias para el check
+
+  sections.append(formSectionEl('Etiquetas, zonas y clasificación', topRow, etiqZonasGrid));
 
   wrap.append(sections);
 
@@ -1086,9 +1095,9 @@ function renderCard(c) {
   // Columna izquierda — solo nombre + teléfono, fondo coloreado
   const leftCol = h('div',{style:{
     background:urgBg,
-    padding:'12px 16px',
+    padding:'12px 14px',
     display:'flex',flexDirection:'column',justifyContent:'center',gap:'4px',
-    flexShrink:'0',width:'220px',minWidth:'220px'
+    flexShrink:'0',width:'170px',minWidth:'170px'
   }});
 
   // Avatar + nombre en fila
@@ -1097,7 +1106,7 @@ function renderCard(c) {
   av.style.flexShrink='0';
   nameRow2.append(av);
   nameRow2.append(h('div',{style:{
-    fontWeight:'800',fontSize:'15px',color:'#ffffff',textShadow:'-1px -1px 0 rgba(0,0,0,.15), 1px -1px 0 rgba(0,0,0,.15), -1px 1px 0 rgba(0,0,0,.15), 1px 1px 0 rgba(0,0,0,.15)',
+    fontWeight:'800',fontSize:'16px',color:'#ffffff',wordBreak:'break-word',textShadow:'-1px -1px 0 rgba(0,0,0,.15), 1px -1px 0 rgba(0,0,0,.15), -1px 1px 0 rgba(0,0,0,.15), 1px 1px 0 rgba(0,0,0,.15)',
     overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',minWidth:'0',flex:'1'
   }},c.name||'Sin nombre'));
   leftCol.append(nameRow2);
