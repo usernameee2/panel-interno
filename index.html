@@ -120,8 +120,8 @@
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: var(--radius); padding: 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #dbeafe; border-bottom: 1px solid #93c5fd; border-radius: var(--radius) var(--radius) 0 0; }
-  .section-form { background: #f0dfc8; border: 1px solid #c49060; border-radius: var(--radius); padding: 14px 16px; }
-  .section-form .section-title { background: #8b5e3c; border-bottom-color: #8b5e3c; color: #ffffff; font-weight: 800; }
+  .section-form { background: #fff0eb; border: 1px solid #f9b99a; border-radius: var(--radius); padding: 14px 16px; }
+  .section-form .section-title { background: #e8623a; border-bottom-color: #e8623a; color: #ffffff; font-weight: 800; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .flex { display: flex; align-items: center; gap: 8px; }
@@ -195,7 +195,7 @@
 
   /* Form */
   .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .form-sections { display: grid; gap: 14px; background: #e8d4ba; padding: 8px; border-radius: var(--radius); }
+  .form-sections { display: grid; gap: 14px; background: #fde8de; padding: 8px; border-radius: var(--radius); }
   .field { display: grid; gap: 4px; }
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
@@ -422,7 +422,7 @@ const URGENCY = {
   2:{l:'Media',c:'#EF9F27'},
   3:{l:'Alta',c:'#7c3aed'}
 };
-const PROP_TYPES=['Piso','Casa','Villa','Solar','Local','Nave'];
+const PROP_TYPES=['Piso','Casa','Chalet','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
 const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Planta Baja','Okupa OK','1 línea','2 línea'];
@@ -994,26 +994,7 @@ function renderForm() {
   sections.append(formSectionEl('Datos personales', row1, row2));
 
   // ── BLOQUE 2+3: Todo junto — 3 columnas (Opción B) ──
-  const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'14px'}});
-
-  // Tipo inmueble como select (guarda en propertyTypes[0])
-  const propSel = h('select',{});
-  [['','— Seleccionar —'],...PROP_TYPES.map(t=>[t,t])].forEach(([v,l])=>{
-    const o=h('option',{value:v},l);
-    if((form.propertyTypes?.[0]||'')=== v) o.selected=true;
-    propSel.append(o);
-  });
-  propSel.addEventListener('change',e=>{ form.propertyTypes = e.target.value ? [e.target.value] : []; });
-
-  // Columna 1: Tipo inmueble (dropdown) + Etiquetas
-  const tagCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
-  tagCol.append(fld('Tipo de inmueble', propSel));
-  const tagField = h('div',{class:'field'});
-  tagField.append(h('label',{},'Etiquetas'));
-  tagField.append(tagToggle);
-  tagCol.append(tagField);
-
-  // Columna 2: Zonas — primera mitad
+  // Preparar zonas
   const ZONE_BLUE  = ZONE_SUGG.filter(z=>!ZONE_GREEN.includes(z)&&!ZONE_BURDO.includes(z));
   let zvG = zoneVals.filter(z=>ZONE_GREEN.includes(z));
   let zvBl= zoneVals.filter(z=>ZONE_BLUE.includes(z));
@@ -1023,28 +1004,39 @@ function renderForm() {
   const zoneRowBlue  = makeToggleRow(ZONE_BLUE,  zvBl, v=>{zvBl=v;syncZones();}, 'chip-accent');
   const zoneRowBurdo = makeToggleRow(ZONE_BURDO, zvBu, v=>{zvBu=v;syncZones();}, 'chip-purple');
 
-  const zonaCol = h('div',{class:'field'});
-  zonaCol.append(h('label',{},'Zonas de búsqueda'));
-  zonaCol.append(zoneRowGreen);
-  zonaCol.append(zoneRowBlue);
+  // Tipo inmueble select
+  const propSel = h('select',{style:{maxWidth:'180px'}});
+  [['','— Tipo —'],...PROP_TYPES.map(t=>[t,t])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);
+    if((form.propertyTypes?.[0]||'')=== v) o.selected=true;
+    propSel.append(o);
+  });
+  propSel.addEventListener('change',e=>{ form.propertyTypes = e.target.value ? [e.target.value] : []; });
 
-  // Columna 3: Clasificación + Presupuesto + Dormitorios + segunda mitad de zonas
-  const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
-  const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}});
-  invBudRow.append(fld('Urgencia', urgSel));
-  invBudRow.append(fld('Tipo inversión', sel('investmentType',invOpts,form.investmentType)));
-  clasCol.append(invBudRow);
-  const presBedsRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}});
-  presBedsRow.append(fld('Presupuesto máx.', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
-  presBedsRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
-  clasCol.append(presBedsRow);
-  // Segunda mitad de zonas ocupa el espacio vacío
-  const zonaB = h('div',{class:'field',style:{marginTop:'0px'}});
-  zonaB.append(zoneRowBurdo);
-  clasCol.append(zonaB);
+  // FILA 1: Tipo inmueble + Urgencia + Tipo inversión + Presupuesto + Dormitorios
+  const topRow = h('div',{style:{display:'grid',gridTemplateColumns:'160px 1fr 1fr 1fr 1fr',gap:'10px',alignItems:'end'}});
+  topRow.append(fld('Tipo de inmueble', propSel));
+  topRow.append(fld('Urgencia', urgSel));
+  topRow.append(fld('Tipo inversión', sel('investmentType',invOpts,form.investmentType)));
+  topRow.append(fld('Presupuesto máx.', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
+  topRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
 
-  block23.append(tagCol, zonaCol, clasCol);
-  sections.append(formSectionEl('Etiquetas, zonas y clasificación', block23));
+  // FILA 2: Etiquetas (ancho completo)
+  const tagField2 = h('div',{class:'field'});
+  tagField2.append(h('label',{},'Etiquetas'));
+  tagField2.append(tagToggle);
+
+  // FILA 3: Zonas en dos columnas
+  const zonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}});
+  const zonaA = h('div',{class:'field'});
+  zonaA.append(h('label',{},'Zonas de búsqueda'));
+  zonaA.append(zoneRowGreen);
+  zonaA.append(zoneRowBlue);
+  const zonaB2 = h('div',{class:'field',style:{paddingTop:'18px'}});
+  zonaB2.append(zoneRowBurdo);
+  zonasGrid.append(zonaA, zonaB2);
+
+  sections.append(formSectionEl('Etiquetas, zonas y clasificación', topRow, tagField2, zonasGrid));
 
   wrap.append(sections);
 
