@@ -917,7 +917,7 @@ function renderForm() {
   let propVals=[...form.propertyTypes];
   const propToggle=makeMultiToggle(PROP_TYPES,propVals,v=>{form.propertyTypes=v;propVals=v;},'');
   let tagVals=[...form.tags];
-  const tagToggle=makeMultiToggle(TAG_SUGG,tagVals,v=>{form.tags=v;tagVals=v;});
+  const tagToggle=makeToggleRow(TAG_SUGG,tagVals,v=>{form.tags=v;tagVals=v;});
   let zoneVals=[...form.searchZones];
   const zoneToggle=makeMultiToggle(ZONE_SUGG,zoneVals,v=>{form.searchZones=v;zoneVals=v;},null,'chip-accent');
 
@@ -1074,9 +1074,9 @@ function renderCard(c, filtered) {
   if(c.isVIP) { const star=h('div',{class:'vip-star'},'★'); av.append(star); }
   inner.append(av);
 
-  const info = h('div',{});
-  const nameRow = h('div',{class:'flex-wrap gap-4',style:{marginBottom:'2px'}});
-  nameRow.append(h('span',{style:{fontSize:'14px',fontWeight:'600',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:'200px'}},c.name||'Sin nombre'));
+  const info = h('div',{style:{minWidth:0,overflow:'hidden'}});
+  const nameRow = h('div',{class:'flex-wrap gap-4',style:{marginBottom:'2px',minWidth:0}});
+  nameRow.append(h('span',{style:{fontSize:'14px',fontWeight:'600',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'block',maxWidth:'100%'}},c.name||'Sin nombre'));
   if(c.isVIP) nameRow.append(chip('VIP','chip-vip'));
   nameRow.append(urgencyBadge(c.urgency));
   info.append(nameRow);
