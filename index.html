@@ -1123,8 +1123,8 @@ function renderCard(c, idx) {
   const fn2 = nameParts2[0];
   const ln2 = nameParts2.slice(1).join(' ');
   const nameBlock2 = h('div',{style:{minWidth:0,overflow:'hidden',flex:'1'}});
-  nameBlock2.append(h('div',{style:{fontWeight:'800',fontSize:'16px',color:'#fff',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textShadow:'-1px -1px 0 rgba(0,0,0,.15),1px 1px 0 rgba(0,0,0,.15)'}},fn2));
-  if(ln2) nameBlock2.append(h('div',{style:{fontWeight:'600',fontSize:'13px',color:'rgba(255,255,255,.88)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginTop:'1px',textShadow:'-1px -1px 0 rgba(0,0,0,.12),1px 1px 0 rgba(0,0,0,.12)'}},ln2));
+  nameBlock2.append(h('div',{style:{fontWeight:'700',fontSize:'15px',color:'#fff',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textShadow:'-1px -1px 0 rgba(0,0,0,.15),1px 1px 0 rgba(0,0,0,.15)'}},fn2));
+  if(ln2) nameBlock2.append(h('div',{style:{fontWeight:'700',fontSize:'15px',color:'#fff',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textShadow:'-1px -1px 0 rgba(0,0,0,.15),1px 1px 0 rgba(0,0,0,.15)'}},ln2));
   nameRow2.append(nameBlock2);
   leftCol.append(nameRow2);
 
@@ -1164,7 +1164,7 @@ function renderCard(c, idx) {
       background:urgBg,color:'#fff',whiteSpace:'nowrap',textAlign:'center'
     }},urg.l));
   }
-  if(c.budgetMax) metaStack.append(h('span',{style:{fontSize:'12px',fontWeight:'700',color:'var(--success)',whiteSpace:'nowrap'}},'💶 '+fmt(c.budgetMax)));
+  if(c.budgetMax) metaStack.append(h('span',{style:{fontSize:'12px',fontWeight:'700',color:'#1d4ed8',whiteSpace:'nowrap'}},'💶 '+fmt(c.budgetMax)));
   if(c.lastContact) metaStack.append(h('span',{style:{fontSize:'11px',color:'#555',whiteSpace:'nowrap'}},'📅 '+fmtDate(c.lastContact)));
   rightCol.append(metaStack);
 
