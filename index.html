@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f4f1;
-    --surface: #ffffff;
-    --surface2: #f0ede8;
+    --bg: #ffffff;
+    --surface: #f2f0ec;
+    --surface2: #e8e5e0;
     --border: #7a7672;
     --border2: #9a9690;
     --text: #1a1916;
@@ -1064,62 +1064,98 @@ function renderForm() {
 }
 
 // CONTACT CARD (list item)
-function renderCard(c, filtered) {
-  const u = URGENCY[c.urgency]||URGENCY[2];
-  const card = h('div',{class:'card contact-card'+(c.isVIP?' vip':'')});
+function renderCard(c) {
+  const urg = c.urgency ? URGENCY[c.urgency] : null;
+  // Colores por urgencia
+  const urgBg    = urg ? urg.c : '#6b7280';
+  const urgLight  = c.urgency===1 ? '#e8f5f0' : c.urgency===2 ? '#fef3e2' : c.urgency===3 ? '#fde8e8' : '#f0ede8';
+  const urgBorder = c.urgency===1 ? '#1D9E75' : c.urgency===2 ? '#EF9F27' : c.urgency===3 ? '#E24B4A' : '#9a9690';
+
+  const card = h('div',{class:'contact-card'+(c.isVIP?' vip':'')});
+  card.style.cssText = `
+    display:flex; border-radius:var(--radius); overflow:hidden;
+    border:1px solid ${urgBorder}; background:#fff;
+    cursor:pointer; transition:box-shadow .15s, transform .1s;
+    margin-bottom:0;
+  `;
   card.addEventListener('click',()=>setState({view:'detail',detailContact:c}));
+  card.addEventListener('mouseenter',()=>{ card.style.boxShadow='0 4px 12px rgba(0,0,0,.1)'; card.style.transform='translateY(-1px)'; });
+  card.addEventListener('mouseleave',()=>{ card.style.boxShadow='none'; card.style.transform='none'; });
 
-  const inner = h('div',{class:'contact-card-inner'});
+  // Barra lateral de color según urgencia
+  const bar = h('div',{style:{width:'6px',flexShrink:'0',background:urgBg}});
+  card.append(bar);
+
+  // Cabecera coloreada con nombre
+  const header = h('div',{style:{
+    background:urgBg, padding:'10px 14px',
+    display:'flex', alignItems:'center', gap:'10px', flexShrink:'0', minWidth:'220px', maxWidth:'260px'
+  }});
+
   const av = avatar(c.name);
-  if(c.isVIP) { const star=h('div',{class:'vip-star'},'★'); av.append(star); }
-  inner.append(av);
+  av.style.flexShrink='0';
+  if(c.isVIP){ const star=h('div',{class:'vip-star'},'★'); av.append(star); }
+  header.append(av);
 
-  const info = h('div',{style:{minWidth:0,overflow:'hidden'}});
-  const nameRow = h('div',{class:'flex-wrap gap-4',style:{marginBottom:'2px',minWidth:0}});
-  nameRow.append(h('span',{style:{fontSize:'14px',fontWeight:'600',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'block',maxWidth:'100%'}},c.name||'Sin nombre'));
-  if(c.isVIP) nameRow.append(chip('VIP','chip-vip'));
-  nameRow.append(urgencyBadge(c.urgency));
-  info.append(nameRow);
+  const nameBlock = h('div',{style:{minWidth:0}});
+  const nameEl = h('div',{style:{
+    fontWeight:'700', fontSize:'15px', color:'#fff',
+    overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'
+  }}, c.name||'Sin nombre');
+  nameBlock.append(nameEl);
+  if(c.isVIP) {
+    const vipEl = h('span',{style:{fontSize:'11px',color:'rgba(255,255,255,.85)',fontWeight:'600'}}, '★ VIP');
+    nameBlock.append(vipEl);
+  }
+  if(urg) {
+    const urgEl = h('span',{style:{fontSize:'11px',color:'rgba(255,255,255,.75)',display:'block'}}, urg.l);
+    nameBlock.append(urgEl);
+  }
+  header.append(nameBlock);
 
-  const metaRow = h('div',{class:'contact-info-row'});
-  if(c.createdBy) metaRow.append(h('span',{},'Agente: '+c.createdBy));
+  // Datos debajo del nombre (teléfono, fecha) — dentro del header
+  const metaBlock = h('div',{style:{
+    padding:'6px 14px 10px 14px', background:urgLight,
+    flexShrink:'0', minWidth:'220px', maxWidth:'260px',
+    display:'flex', flexDirection:'column', gap:'3px'
+  }});
+  // Misma columna que header — los ponemos juntos en columna izq
+  const leftCol = h('div',{style:{display:'flex',flexDirection:'column',flexShrink:'0',minWidth:'220px',maxWidth:'260px',background:'#fff',borderRight:'1px solid '+urgBorder}});
+  leftCol.append(header);
+
+  const metaInner = h('div',{style:{padding:'6px 14px 10px',background:urgLight}});
   if(c.phone) {
-    const waNum = cleanPhone(c.whatsapp||c.phone).replace('+','');
-    const phoneWrap = h('span',{style:{display:'inline-flex',alignItems:'center',gap:'4px'}});
-    phoneWrap.append(h('span',{},c.phone));
+    const phoneWrap = h('div',{style:{display:'flex',alignItems:'center',gap:'6px',fontSize:'13px',color:'#333'}});
+    phoneWrap.append(h('span',{style:{fontWeight:'500'}},c.phone));
     const copyBtn = h('button',{class:'copy-btn',onClick:e=>{
       e.stopPropagation();
       navigator.clipboard.writeText(c.phone).then(()=>{
-        copyBtn.textContent='✓ Copiado';
-        copyBtn.classList.add('copied');
+        copyBtn.textContent='✓';copyBtn.classList.add('copied');
         setTimeout(()=>{copyBtn.textContent='Copiar';copyBtn.classList.remove('copied');},1500);
       });
     }},'Copiar');
     phoneWrap.append(copyBtn);
-    metaRow.append(phoneWrap);
+    metaInner.append(phoneWrap);
   }
-  if(c.email) metaRow.append(h('span',{},c.email));
-  if(c.lastContact) metaRow.append(h('span',{},'Contacto: '+fmtDate(c.lastContact)));
-  info.append(metaRow);
+  if(c.lastContact) metaInner.append(h('div',{style:{fontSize:'11px',color:'#666'}},'Contacto: '+fmtDate(c.lastContact)));
+  if(c.budgetMax) metaInner.append(h('div',{style:{fontSize:'12px',color:urgBorder,fontWeight:'600'}},fmt(c.budgetMax)));
+  leftCol.append(metaInner);
+  card.append(leftCol);
+
+  // Columna derecha: etiquetas
+  const rightCol = h('div',{style:{flex:'1',padding:'10px 14px',display:'flex',flexDirection:'column',justifyContent:'center',gap:'6px',minWidth:0}});
 
   const chips = h('div',{class:'contact-chips'});
-  if(c.budgetMax) chips.append(chip(fmt(c.budgetMax),'chip-success'));
+  const ZGREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
+  const ZBURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
 
-  // Zonas — todas visibles, clickeables
   (c.searchZones||[]).forEach(z=>{
     const isActive = state.filters.zone===z;
-    const ZGREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
-    const ZBURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
     const zColor = isActive?'chip-accent': ZGREEN.includes(z)?'chip-success': ZBURDO.includes(z)?'chip-warn':'chip-accent';
     const zc=chip(z, zColor);
     zc.style.cursor='pointer';
-    zc.style.fontWeight = isActive?'700':'500';
-    zc.style.boxShadow = isActive?'0 0 0 2px var(--accent)':'none';
-    zc.title= isActive?'Quitar filtro de '+z:'Filtrar por '+z;
-    zc.addEventListener('click',e=>{
-      e.stopPropagation();
-      setState({filters:{...state.filters,zone:isActive?'':z}});
-    });
+    if(isActive) zc.style.boxShadow='0 0 0 2px var(--accent)';
+    zc.addEventListener('click',e=>{ e.stopPropagation(); setState({filters:{...state.filters,zone:isActive?'':z}}); });
     chips.append(zc);
   });
 
@@ -1127,29 +1163,21 @@ function renderCard(c, filtered) {
   if(c.needsMortgage) chips.append(chip('Hipoteca','chip-warn'));
   if(c.investmentType) chips.append(chip(c.investmentType, TAG_COLORS[c.investmentType]||'chip-accent'));
 
-  // Tags — todas visibles, clickeables
   (c.tags||[]).forEach(t=>{
     const isActive = state.filters.tag===t;
-    const colorClass = TAG_COLORS[t] || 'chip-accent';
-    const tc=chip(t, colorClass);
+    const tc=chip(t, TAG_COLORS[t]||'chip-accent');
     tc.style.cursor='pointer';
-    tc.style.fontWeight = isActive?'700':'500';
-    tc.style.boxShadow = isActive?'0 0 0 2px var(--accent)':'none';
-    tc.title= isActive?'Quitar filtro de '+t:'Filtrar por '+t;
-    tc.addEventListener('click',e=>{
-      e.stopPropagation();
-      setState({filters:{...state.filters,tag:isActive?'':t}});
-    });
+    if(isActive) tc.style.boxShadow='0 0 0 2px var(--accent)';
+    tc.addEventListener('click',e=>{ e.stopPropagation(); setState({filters:{...state.filters,tag:isActive?'':t}}); });
     chips.append(tc);
   });
 
-  // Recordatorio pendiente
   const today=new Date().toISOString().split('T')[0];
   const pendingR=(c.reminders||[]).filter(r=>r.date<=today);
-  if(pendingR.length>0) chips.append(chip('🔔 '+pendingR.length+' recordatorio'+(pendingR.length>1?'s':''),'chip-warn'));
-  info.append(chips);
-  inner.append(info);
-  card.append(inner);
+  if(pendingR.length>0) chips.append(chip('🔔 '+pendingR.length,'chip-warn'));
+
+  rightCol.append(chips);
+  card.append(rightCol);
   return card;
 }
 
