@@ -858,7 +858,6 @@ function makeMultiToggle(options, values, onChange, label, defaultColor) {
     options.forEach(o=>{
       const isActive = vals.includes(o);
       const btn = h('button',{class:'toggle-btn'+(isActive?' active':'')},o);
-      if(compact) { btn.style.fontSize='11px'; btn.style.padding='3px 8px'; }
       const tagColor = (typeof TAG_COLORS !== 'undefined' && TAG_COLORS[o]) || defaultColor;
       if(tagColor && colorMap[tagColor]) {
         const cm = isActive ? colorMap[tagColor].act : colorMap[tagColor].inact;
@@ -1105,10 +1104,13 @@ function renderCard(c) {
   const av = avatar(c.name);
   av.style.flexShrink='0';
   nameRow2.append(av);
-  nameRow2.append(h('div',{style:{
-    fontWeight:'800',fontSize:'16px',color:'#ffffff',wordBreak:'break-word',textShadow:'-1px -1px 0 rgba(0,0,0,.15), 1px -1px 0 rgba(0,0,0,.15), -1px 1px 0 rgba(0,0,0,.15), 1px 1px 0 rgba(0,0,0,.15)',
-    overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',minWidth:'0',flex:'1'
-  }},c.name||'Sin nombre'));
+  const nameParts2 = (c.name||'Sin nombre').trim().split(' ');
+  const fn2 = nameParts2[0];
+  const ln2 = nameParts2.slice(1).join(' ');
+  const nameBlock2 = h('div',{style:{minWidth:0,overflow:'hidden',flex:'1'}});
+  nameBlock2.append(h('div',{style:{fontWeight:'800',fontSize:'16px',color:'#fff',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textShadow:'-1px -1px 0 rgba(0,0,0,.15),1px 1px 0 rgba(0,0,0,.15)'}},fn2));
+  if(ln2) nameBlock2.append(h('div',{style:{fontWeight:'600',fontSize:'13px',color:'rgba(255,255,255,.88)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginTop:'1px',textShadow:'-1px -1px 0 rgba(0,0,0,.12),1px 1px 0 rgba(0,0,0,.12)'}},ln2));
+  nameRow2.append(nameBlock2);
   leftCol.append(nameRow2);
 
   // Teléfono
