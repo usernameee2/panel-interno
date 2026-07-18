@@ -10,8 +10,8 @@
     --bg: #f5f4f1;
     --surface: #ffffff;
     --surface2: #f0ede8;
-    --border: #8a8880;
-    --border2: #aaa8a4;
+    --border: #7a7672;
+    --border2: #9a9690;
     --text: #1a1916;
     --text2: #6b6760;
     --text3: #9e9b96;
@@ -947,8 +947,8 @@ function renderForm() {
 
   sections.append(sectionEl('Datos personales', row1, row2));
 
-  // ── BLOQUE 2+3: 2 columnas — izq: tipo+etiquetas+zonas / der: clasificación ──
-  const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1.8fr 1fr',gap:'14px'}});
+  // ── BLOQUE 2+3: Todo junto — 3 columnas (Opción B) ──
+  const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'14px'}});
 
   // Tipo inmueble como select (guarda en propertyTypes[0])
   const propSel = h('select',{});
@@ -959,19 +959,32 @@ function renderForm() {
   });
   propSel.addEventListener('change',e=>{ form.propertyTypes = e.target.value ? [e.target.value] : []; });
 
-  // Columna izquierda: Tipo inmueble + Etiquetas + Zonas
-  const leftCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
-  leftCol.append(fld('Tipo de inmueble', propSel));
+  // Columna 1: Tipo inmueble (dropdown) + Etiquetas
+  const tagCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  tagCol.append(fld('Tipo de inmueble', propSel));
   const tagField = h('div',{class:'field'});
   tagField.append(h('label',{},'Etiquetas'));
   tagField.append(tagToggle);
-  leftCol.append(tagField);
-  const zonaField = h('div',{class:'field'});
-  zonaField.append(h('label',{},'Zonas de búsqueda'));
-  zonaField.append(zoneToggle);
-  leftCol.append(zonaField);
+  tagCol.append(tagField);
 
-  // Columna derecha: Clasificación + Presupuesto + Dormitorios
+  // Columna 2: Zonas — primera mitad
+  const ZONE_MID = Math.ceil(ZONE_SUGG.length / 2);
+  const ZONE_A = ZONE_SUGG.slice(0, ZONE_MID);
+  const ZONE_B = ZONE_SUGG.slice(ZONE_MID);
+  let zoneValsA = zoneVals.filter(z=>ZONE_A.includes(z));
+  let zoneValsB = zoneVals.filter(z=>ZONE_B.includes(z));
+  const zoneToggleA = makeMultiToggle(ZONE_A, zoneValsA, v=>{
+    zoneValsA=v; form.searchZones=[...zoneValsA,...zoneValsB];
+  }, null, 'chip-accent');
+  const zoneToggleB = makeMultiToggle(ZONE_B, zoneValsB, v=>{
+    zoneValsB=v; form.searchZones=[...zoneValsA,...zoneValsB];
+  }, null, 'chip-accent');
+
+  const zonaCol = h('div',{class:'field'});
+  zonaCol.append(h('label',{},'Zonas de búsqueda'));
+  zonaCol.append(zoneToggleA);
+
+  // Columna 3: Clasificación + Presupuesto + Dormitorios + segunda mitad de zonas
   const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
   const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}});
   invBudRow.append(fld('Urgencia', urgSel));
@@ -981,9 +994,13 @@ function renderForm() {
   presBedsRow.append(fld('Presupuesto máx.', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
   presBedsRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
   clasCol.append(presBedsRow);
-  clasCol.append(vipToggleWrap);
+  // Segunda mitad de zonas ocupa el espacio vacío
+  const zonaB = h('div',{class:'field',style:{marginTop:'4px'}});
+  zonaB.append(h('label',{},'(continuación)'));
+  zonaB.append(zoneToggleB);
+  clasCol.append(zonaB);
 
-  block23.append(leftCol, clasCol);
+  block23.append(tagCol, zonaCol, clasCol);
   sections.append(sectionEl('Etiquetas, zonas y clasificación', block23));
 
   wrap.append(sections);
