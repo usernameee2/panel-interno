@@ -21,9 +21,9 @@
     --success: #1a7a52;
     --success-bg: #e6f4ee;
     --success-border: #a8d8c0;
-    --warn: #7a1f2e;
-    --warn-bg: #f8eaed;
-    --warn-border: #d4a0a8;
+    --warn: #1a4a8a;
+    --warn-bg: #e8eef8;
+    --warn-border: #9ab0d8;
     --danger: #8a1e1e;
     --danger-bg: #faeaea;
     --danger-border: #e8b0b0;
@@ -93,7 +93,7 @@
   /* Inputs */
   input, select, textarea {
     width: 100%; font-family: var(--font); font-size: 13px; color: var(--text);
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
     padding: 8px 10px; outline: none; transition: border-color .15s;
   }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); }
@@ -113,7 +113,7 @@
   button:disabled { opacity: 0.5; cursor: default; }
 
   /* Card / Surface */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: var(--shadow); }
+  .card { background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: var(--shadow); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
@@ -157,14 +157,14 @@
   .filter-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
   .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; }
   .filter-bar select { max-width: 180px; }
-  .filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .filter-panel { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .filter-panel-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
-  .filter-chip { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); transition: all .15s; white-space: nowrap; }
+  .filter-chip { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: #fff; color: var(--text); transition: all .15s; white-space: nowrap; }
   .filter-chip:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
   .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
   .filter-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
   .filter-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
-  .filter-select { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; transition: all .15s; }
+  .filter-select { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: #fff; color: var(--text); cursor: pointer; transition: all .15s; }
   .filter-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
   .filter-clear { font-family: var(--font); font-size: 12px; color: var(--danger); background: none; border: none; cursor: pointer; padding: 5px 8px; border-radius: 20px; margin-left: 4px; }
   .filter-clear:hover { background: var(--danger-bg); }
@@ -272,7 +272,7 @@
   .sidebar-chip.active { background: var(--accent); color: #fff; font-weight: 600; }
   .sidebar-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
   .sidebar-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
-  .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 5px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--text); cursor: pointer; margin-bottom: 4px; }
+  .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: #fff; color: var(--text); cursor: pointer; margin-bottom: 4px; }
   .sidebar-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
   .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
   .sidebar-clear { width: 100%; font-family: var(--font); font-size: 11px; color: var(--danger); background: none; border: none; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); text-align: left; }
@@ -1066,120 +1066,121 @@ function renderForm() {
 // CONTACT CARD (list item)
 function renderCard(c) {
   const urg = c.urgency ? URGENCY[c.urgency] : null;
-  // Colores por urgencia
-  const urgBg    = urg ? urg.c : '#6b7280';
-  const urgLight  = c.urgency===1 ? '#e8f5f0' : c.urgency===2 ? '#fef3e2' : c.urgency===3 ? '#fde8e8' : '#f0ede8';
-  const urgBorder = c.urgency===1 ? '#1D9E75' : c.urgency===2 ? '#EF9F27' : c.urgency===3 ? '#E24B4A' : '#9a9690';
+  const urgBg    = urg ? urg.c : '#9a9690';
+  const urgLight  = c.urgency===1?'#e8f5f0':c.urgency===2?'#fef3e2':c.urgency===3?'#fde8e8':'#f5f4f1';
+  const urgBorder = c.urgency===1?'#1D9E75':c.urgency===2?'#EF9F27':c.urgency===3?'#E24B4A':'#c8c4bc';
 
-  const card = h('div',{class:'contact-card'+(c.isVIP?' vip':'')});
-  card.style.cssText = `
-    display:flex; border-radius:var(--radius); overflow:hidden;
-    border:1px solid ${urgBorder}; background:#fff;
-    cursor:pointer; transition:box-shadow .15s, transform .1s;
-    margin-bottom:0;
-  `;
+  const card = h('div',{});
+  card.style.cssText=`display:flex;border-radius:10px;overflow:hidden;border:1.5px solid ${urgBorder};background:#fff;cursor:pointer;transition:box-shadow .15s,transform .1s;`;
   card.addEventListener('click',()=>setState({view:'detail',detailContact:c}));
-  card.addEventListener('mouseenter',()=>{ card.style.boxShadow='0 4px 12px rgba(0,0,0,.1)'; card.style.transform='translateY(-1px)'; });
-  card.addEventListener('mouseleave',()=>{ card.style.boxShadow='none'; card.style.transform='none'; });
+  card.addEventListener('mouseenter',()=>{card.style.boxShadow='0 4px 16px rgba(0,0,0,.12)';card.style.transform='translateY(-1px)';});
+  card.addEventListener('mouseleave',()=>{card.style.boxShadow='none';card.style.transform='none';});
 
-  // Barra lateral de color según urgencia
-  const bar = h('div',{style:{width:'6px',flexShrink:'0',background:urgBg}});
-  card.append(bar);
+  // Barra lateral color urgencia
+  card.append(h('div',{style:{width:'5px',flexShrink:'0',background:urgBg,borderRadius:'0'}}));
 
-  // Cabecera coloreada con nombre
-  const header = h('div',{style:{
-    background:urgBg, padding:'10px 14px',
-    display:'flex', alignItems:'center', gap:'10px', flexShrink:'0', minWidth:'220px', maxWidth:'260px'
+  // Columna izquierda — solo nombre + teléfono, fondo coloreado
+  const leftCol = h('div',{style:{
+    background:urgBg,
+    padding:'12px 16px',
+    display:'flex',flexDirection:'column',justifyContent:'center',gap:'4px',
+    flexShrink:'0',width:'220px',minWidth:'220px'
   }});
 
+  // Avatar + nombre en fila
+  const nameRow2 = h('div',{style:{display:'flex',alignItems:'center',gap:'10px'}});
   const av = avatar(c.name);
   av.style.flexShrink='0';
-  if(c.isVIP){ const star=h('div',{class:'vip-star'},'★'); av.append(star); }
-  header.append(av);
+  nameRow2.append(av);
+  nameRow2.append(h('div',{style:{
+    fontWeight:'700',fontSize:'15px',color:'#fff',
+    overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',minWidth:'0',flex:'1'
+  }},c.name||'Sin nombre'));
+  leftCol.append(nameRow2);
 
-  const nameBlock = h('div',{style:{minWidth:0}});
-  const nameEl = h('div',{style:{
-    fontWeight:'700', fontSize:'15px', color:'#fff',
-    overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'
-  }}, c.name||'Sin nombre');
-  nameBlock.append(nameEl);
-  if(c.isVIP) {
-    const vipEl = h('span',{style:{fontSize:'11px',color:'rgba(255,255,255,.85)',fontWeight:'600'}}, '★ VIP');
-    nameBlock.append(vipEl);
-  }
-  if(urg) {
-    const urgEl = h('span',{style:{fontSize:'11px',color:'rgba(255,255,255,.75)',display:'block'}}, urg.l);
-    nameBlock.append(urgEl);
-  }
-  header.append(nameBlock);
-
-  // Datos debajo del nombre (teléfono, fecha) — dentro del header
-  const metaBlock = h('div',{style:{
-    padding:'6px 14px 10px 14px', background:urgLight,
-    flexShrink:'0', minWidth:'220px', maxWidth:'260px',
-    display:'flex', flexDirection:'column', gap:'3px'
-  }});
-  // Misma columna que header — los ponemos juntos en columna izq
-  const leftCol = h('div',{style:{display:'flex',flexDirection:'column',flexShrink:'0',minWidth:'220px',maxWidth:'260px',background:'#fff',borderRight:'1px solid '+urgBorder}});
-  leftCol.append(header);
-
-  const metaInner = h('div',{style:{padding:'6px 14px 10px',background:urgLight}});
-  if(c.phone) {
-    const phoneWrap = h('div',{style:{display:'flex',alignItems:'center',gap:'6px',fontSize:'13px',color:'#333'}});
-    phoneWrap.append(h('span',{style:{fontWeight:'500'}},c.phone));
-    const copyBtn = h('button',{class:'copy-btn',onClick:e=>{
+  // Teléfono
+  if(c.phone){
+    const phoneRow = h('div',{style:{display:'flex',alignItems:'center',gap:'6px',marginTop:'4px'}});
+    phoneRow.append(h('span',{style:{fontSize:'12px',color:'rgba(255,255,255,.9)',fontWeight:'500'}},c.phone));
+    const copyBtn=h('button',{style:{
+      fontSize:'10px',padding:'1px 6px',borderRadius:'20px',border:'1px solid rgba(255,255,255,.4)',
+      background:'rgba(255,255,255,.15)',color:'#fff',cursor:'pointer',fontFamily:'var(--font)'
+    },onClick:e=>{
       e.stopPropagation();
       navigator.clipboard.writeText(c.phone).then(()=>{
-        copyBtn.textContent='✓';copyBtn.classList.add('copied');
-        setTimeout(()=>{copyBtn.textContent='Copiar';copyBtn.classList.remove('copied');},1500);
+        copyBtn.textContent='✓';
+        setTimeout(()=>{copyBtn.textContent='Copiar';},1500);
       });
     }},'Copiar');
-    phoneWrap.append(copyBtn);
-    metaInner.append(phoneWrap);
+    phoneRow.append(copyBtn);
+    leftCol.append(phoneRow);
   }
-  if(c.lastContact) metaInner.append(h('div',{style:{fontSize:'11px',color:'#666'}},'Contacto: '+fmtDate(c.lastContact)));
-  if(c.budgetMax) metaInner.append(h('div',{style:{fontSize:'12px',color:urgBorder,fontWeight:'600'}},fmt(c.budgetMax)));
-  leftCol.append(metaInner);
   card.append(leftCol);
 
-  // Columna derecha: etiquetas
-  const rightCol = h('div',{style:{flex:'1',padding:'10px 14px',display:'flex',flexDirection:'column',justifyContent:'center',gap:'6px',minWidth:0}});
+  // Columna derecha — etiquetas + info secundaria
+  const rightCol = h('div',{style:{
+    flex:'1',padding:'10px 14px',
+    display:'flex',flexDirection:'column',justifyContent:'center',gap:'6px',
+    background:'#fff',minWidth:'0'
+  }});
 
-  const chips = h('div',{class:'contact-chips'});
+  // Fila superior: urgencia + presupuesto + fecha
+  const infoRow = h('div',{style:{display:'flex',gap:'8px',alignItems:'center',flexWrap:'wrap',marginBottom:'4px'}});
+  if(urg) {
+    infoRow.append(h('span',{style:{
+      fontSize:'12px',fontWeight:'700',padding:'2px 10px',borderRadius:'20px',
+      background:urgBg,color:'#fff'
+    }},urg.l));
+  }
+  if(c.budgetMax) infoRow.append(h('span',{style:{fontSize:'12px',fontWeight:'600',color:'var(--success)'}},'💶 '+fmt(c.budgetMax)));
+  if(c.lastContact) infoRow.append(h('span',{style:{fontSize:'11px',color:'#666'}},'📅 '+fmtDate(c.lastContact)));
+  rightCol.append(infoRow);
+
+  // Etiquetas — más grandes
+  const chips2 = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'5px'}});
   const ZGREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
   const ZBURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
 
+  const bigChip=(label,cls)=>{
+    const el=chip(label,cls);
+    el.style.fontSize='13px';
+    el.style.padding='4px 12px';
+    el.style.fontWeight='600';
+    return el;
+  };
+
   (c.searchZones||[]).forEach(z=>{
-    const isActive = state.filters.zone===z;
-    const zColor = isActive?'chip-accent': ZGREEN.includes(z)?'chip-success': ZBURDO.includes(z)?'chip-warn':'chip-accent';
-    const zc=chip(z, zColor);
+    const isActive=state.filters.zone===z;
+    const zColor=isActive?'chip-accent':ZGREEN.includes(z)?'chip-success':ZBURDO.includes(z)?'chip-warn':'chip-accent';
+    const zc=bigChip(z,zColor);
     zc.style.cursor='pointer';
     if(isActive) zc.style.boxShadow='0 0 0 2px var(--accent)';
-    zc.addEventListener('click',e=>{ e.stopPropagation(); setState({filters:{...state.filters,zone:isActive?'':z}}); });
-    chips.append(zc);
+    zc.addEventListener('click',e=>{e.stopPropagation();setState({filters:{...state.filters,zone:isActive?'':z}});});
+    chips2.append(zc);
   });
 
-  if(c.bedroomsMin) chips.append(chip(c.bedroomsMin+'+ hab.','chip-accent'));
-  if(c.needsMortgage) chips.append(chip('Hipoteca','chip-warn'));
-  if(c.investmentType) chips.append(chip(c.investmentType, TAG_COLORS[c.investmentType]||'chip-accent'));
+  if(c.bedroomsMin) chips2.append(bigChip(c.bedroomsMin+'+ hab.','chip-accent'));
+  if(c.needsMortgage) chips2.append(bigChip('Hipoteca','chip-warn'));
+  if(c.investmentType) chips2.append(bigChip(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
 
   (c.tags||[]).forEach(t=>{
-    const isActive = state.filters.tag===t;
-    const tc=chip(t, TAG_COLORS[t]||'chip-accent');
+    const isActive=state.filters.tag===t;
+    const tc=bigChip(t,TAG_COLORS[t]||'chip-accent');
     tc.style.cursor='pointer';
     if(isActive) tc.style.boxShadow='0 0 0 2px var(--accent)';
-    tc.addEventListener('click',e=>{ e.stopPropagation(); setState({filters:{...state.filters,tag:isActive?'':t}}); });
-    chips.append(tc);
+    tc.addEventListener('click',e=>{e.stopPropagation();setState({filters:{...state.filters,tag:isActive?'':t}});});
+    chips2.append(tc);
   });
 
   const today=new Date().toISOString().split('T')[0];
   const pendingR=(c.reminders||[]).filter(r=>r.date<=today);
-  if(pendingR.length>0) chips.append(chip('🔔 '+pendingR.length,'chip-warn'));
+  if(pendingR.length>0) chips2.append(bigChip('🔔 '+pendingR.length+' recordatorio'+(pendingR.length>1?'s':''),'chip-warn'));
 
-  rightCol.append(chips);
+  rightCol.append(chips2);
   card.append(rightCol);
   return card;
 }
+
 
 // DETAIL VIEW
 function renderDetail() {
