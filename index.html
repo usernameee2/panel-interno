@@ -155,7 +155,8 @@
 
   /* Filter bar */
   .filter-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-  .filter-bar input { flex: 1; min-width: 180px; }
+  .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; }
+  .filter-bar select { max-width: 180px; }
   .filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .filter-panel-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
   .filter-chip { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); transition: all .15s; white-space: nowrap; }
@@ -969,7 +970,7 @@ function renderForm() {
   tagCol.append(tagField);
 
   // Columna 2: Zonas — primera mitad
-  const ZONE_MID = Math.ceil(ZONE_SUGG.length / 2);
+  const ZONE_MID = 17;
   const ZONE_A = ZONE_SUGG.slice(0, ZONE_MID);
   const ZONE_B = ZONE_SUGG.slice(ZONE_MID);
   let zoneValsA = zoneVals.filter(z=>ZONE_A.includes(z));
@@ -1046,7 +1047,7 @@ function renderCard(c, filtered) {
 
   const info = h('div',{});
   const nameRow = h('div',{class:'flex-wrap gap-4',style:{marginBottom:'2px'}});
-  nameRow.append(h('span',{style:{fontSize:'14px',fontWeight:'600'}},c.name||'Sin nombre'));
+  nameRow.append(h('span',{style:{fontSize:'14px',fontWeight:'600',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:'200px'}},c.name||'Sin nombre'));
   if(c.isVIP) nameRow.append(chip('VIP','chip-vip'));
   nameRow.append(urgencyBadge(c.urgency));
   info.append(nameRow);
