@@ -1262,7 +1262,7 @@ function renderDetail() {
   if(c.phone){
     const pw=h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}});
     pw.append(h('span',{style:{fontWeight:'600',fontSize:'15px'}},c.phone));
-    const cb=h('button',{class:'copy-btn',onClick:()=>{navigator.clipboard.writeText(c.phone).then(()=>{cb.textContent='✓';setTimeout(()=>{cb.textContent='Copiar';},1500);})};},'Copiar');
+    const cb=h('button',{class:'copy-btn',onClick:()=>{navigator.clipboard.writeText(c.phone).then(()=>{cb.textContent='✓';setTimeout(()=>{cb.textContent='Copiar';},1500);});}},'Copiar');
     pw.append(cb);
     quickRow.append(pw);
   }
@@ -1296,7 +1296,7 @@ function renderDetail() {
     row.append(h('div',{class:'detail-label'},label));
     const valWrap=h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}});
     valWrap.append(h('span',{},value));
-    const cb=h('button',{class:'copy-btn',onClick:()=>{navigator.clipboard.writeText(value).then(()=>{cb.textContent='✓';setTimeout(()=>{cb.textContent='Copiar';},1500);})};},'Copiar');
+    const cb=h('button',{class:'copy-btn',onClick:()=>{navigator.clipboard.writeText(value).then(()=>{cb.textContent='✓';setTimeout(()=>{cb.textContent='Copiar';},1500);});}},'Copiar');
     valWrap.append(cb);
     row.append(valWrap);
     return row;
