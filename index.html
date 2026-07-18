@@ -116,7 +116,7 @@
   button:disabled { opacity: 0.5; cursor: default; }
 
   /* Card / Surface */
-  .card { background: #ffffff; border: 1.5px solid #e8d5b8; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .card { background: #ffffff; border: 1.5px solid #99f6e4; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
@@ -193,7 +193,7 @@
 
   /* Form */
   .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .form-sections { display: grid; gap: 14px; }
+  .form-sections { display: grid; gap: 14px; background: #f0fdfa; padding: 8px; border-radius: var(--radius); }
   .field { display: grid; gap: 4px; }
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
@@ -266,7 +266,7 @@
 
   /* Layout con sidebar */
   .crm-layout { display: flex; gap: 0; align-items: flex-start; }
-  .sidebar { width: 220px; min-width: 220px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; }
+  .sidebar { width: 220px; min-width: 220px; background: #dbeafe; border: 1.5px solid #93c5fd; border-radius: var(--radius); padding: 14px 12px; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; }
   .sidebar-title { font-size: 10px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
   .sidebar-section { margin-bottom: 14px; }
   .sidebar-section-label { font-size: 11px; font-weight: 800; color: #1a3a6b; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .05em; }
@@ -1073,7 +1073,7 @@ function renderCard(c) {
   const urg = c.urgency ? URGENCY[c.urgency] : null;
   const urgBg    = urg ? urg.c : '#9a9690';
   const urgLight  = c.urgency===1?'#e8f5f0':c.urgency===2?'#fef3e2':c.urgency===3?'#fde8e8':'#f5f4f1';
-  const urgBorder = c.urgency===1?'#1D9E75':c.urgency===2?'#EF9F27':c.urgency===3?'#E24B4A':'#c8c4bc';
+  const urgBorder = c.urgency===1?'#1D9E75':c.urgency===2?'#EF9F27':c.urgency===3?'#7c3aed':'#c8c4bc';
 
   const card = h('div',{});
   card.style.cssText=`display:flex;border-radius:10px;overflow:hidden;border:1.5px solid ${urgBorder};background:#fff;cursor:pointer;transition:box-shadow .15s,transform .1s;`;
@@ -1124,7 +1124,7 @@ function renderCard(c) {
 
   // Columna derecha — meta apilada + etiquetas en paralelo
   // Fondo suave del color de urgencia (muy claro)
-  const urgLightBg = c.urgency===1?'#f0fdf4':c.urgency===2?'#fff7ed':c.urgency===3?'#fff1f2':'#f8fafc';
+  const urgLightBg = c.urgency===1?'#f0fdf4':c.urgency===2?'#fff7ed':c.urgency===3?'#f5f3ff':'#f8fafc';
   const rightCol = h('div',{style:{
     flex:'1',padding:'10px 14px',
     display:'flex',gap:'10px',alignItems:'flex-start',
@@ -1312,7 +1312,7 @@ function renderDetail() {
     row.append(valWrap);
     return row;
   };
-  const dataRow=(label,value)=>{ if(!value) return null; return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{},value)); };
+  const dataRow=(label,value)=>{ if(!value) return null; return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{style:{fontWeight:'600',textTransform:'uppercase',fontSize:'13px'}},value)); };
 
   // Presupuesto y requisitos
   const reqCard = h('div',{class:'detail-card',style:{background:'#fff'}});
