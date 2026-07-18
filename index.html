@@ -21,9 +21,9 @@
     --success: #1a7a52;
     --success-bg: #e6f4ee;
     --success-border: #a8d8c0;
-    --warn: #8a5e00;
-    --warn-bg: #fdf3dc;
-    --warn-border: #e8d090;
+    --warn: #7a1f2e;
+    --warn-bg: #f8eaed;
+    --warn-border: #d4a0a8;
     --danger: #8a1e1e;
     --danger-bg: #faeaea;
     --danger-border: #e8b0b0;
@@ -789,7 +789,7 @@ function makeTagInput(values, onChange, suggestions, placeholder) {
 }
 
 // ─── MULTI TOGGLE ────────────────────────────────────────────────────────────
-function makeMultiToggle(options, values, onChange, label) {
+function makeMultiToggle(options, values, onChange, label, defaultColor) {
   let vals = [...values];
   const el = h('div',{class:'grid-stack',style:{gap:'6px'}});
   if(label) el.append(h('label',{},label));
@@ -806,7 +806,7 @@ function makeMultiToggle(options, values, onChange, label) {
     options.forEach(o=>{
       const isActive = vals.includes(o);
       const btn = h('button',{class:'toggle-btn'+(isActive?' active':'')},o);
-      const tagColor = typeof TAG_COLORS !== 'undefined' ? TAG_COLORS[o] : null;
+      const tagColor = (typeof TAG_COLORS !== 'undefined' && TAG_COLORS[o]) || defaultColor;
       if(tagColor && colorMap[tagColor]) {
         const cm = isActive ? colorMap[tagColor].act : colorMap[tagColor].inact;
         btn.style.background   = cm.bg;
@@ -876,7 +876,7 @@ function renderForm() {
   let tagVals=[...form.tags];
   const tagToggle=makeMultiToggle(TAG_SUGG,tagVals,v=>{form.tags=v;tagVals=v;});
   let zoneVals=[...form.searchZones];
-  const zoneToggle=makeMultiToggle(ZONE_SUGG,zoneVals,v=>{form.searchZones=v;zoneVals=v;});
+  const zoneToggle=makeMultiToggle(ZONE_SUGG,zoneVals,v=>{form.searchZones=v;zoneVals=v;},null,'chip-accent');
 
   const bedsOpts=[['','—'],...[1,2,3,4].map(n=>[String(n),n+'+ hab.'])];
   const invOpts=INV_TYPES.map(t=>[t,t||'—']);
@@ -911,44 +911,65 @@ function renderForm() {
 
   const sections = h('div',{class:'form-sections'});
 
-  // ── BLOQUE 1: Datos personales — 3 columnas ──
-  const row1 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px 14px'}});
+  // ── BLOQUE 1: Datos personales ──
+  // Fila 1: Nombre (amplio) + Email (amplio)
+  const row1 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px 14px'}});
   row1.append(fld('Nombre *', inp('text','name','Nombre completo',form.name)));
-  row1.append(fld('Teléfono', inp('tel','phone','+34 600 000 000',form.phone)));
   row1.append(fld('Email', inp('email','email','correo@ejemplo.com',form.email)));
 
-  const row2 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px 14px',marginTop:'10px'}});
-  row2.append(fld('WhatsApp (si es distinto)', inp('tel','whatsapp','+34 600...',form.whatsapp)));
+  // Fila 2: 5 campos angostos — Teléfono, WhatsApp, Último contacto, Drive, Forma contacto
+  const contactSel = h('select',{});
+  [['','— Preferida —'],...CONTACT_METHODS.map(m=>[m,m])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);
+    if((form.contactMethods?.[0]||'')=== v) o.selected=true;
+    contactSel.append(o);
+  });
+  contactSel.addEventListener('change',e=>{ form.contactMethods = e.target.value ? [e.target.value] : []; });
+
+  const row2 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr',gap:'10px 10px',marginTop:'10px'}});
+  row2.append(fld('Teléfono', inp('tel','phone','+34 600...',form.phone)));
+  row2.append(fld('WhatsApp', inp('tel','whatsapp','+34 600...',form.whatsapp)));
   row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
-  row2.append(fld('Drive del cliente', inp('url','driveLink','https://drive.google.com/...',form.driveLink)));
+  row2.append(fld('Drive', inp('url','driveLink','https://drive...',form.driveLink)));
+  row2.append(fld('Forma contacto', contactSel));
 
-  const row3 = h('div',{style:{marginTop:'10px'}});
-  row3.append(h('div',{class:'field'},h('label',{},'Forma de contacto preferida'),methodToggle));
-
-  sections.append(sectionEl('Datos personales', row1, row2, row3));
+  sections.append(sectionEl('Datos personales', row1, row2));
 
   // ── BLOQUE 2+3: Todo junto — 3 columnas (Opción B) ──
   const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'14px'}});
 
-  // Columna 1: Etiquetas — flex-wrap sin columnas visibles
-  const tagCol = h('div',{class:'field'});
-  tagCol.append(h('label',{},'Etiquetas'));
-  tagCol.append(tagToggle);
+  // Tipo inmueble como select (guarda en propertyTypes[0])
+  const propSel = h('select',{});
+  [['','— Seleccionar —'],...PROP_TYPES.map(t=>[t,t])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);
+    if((form.propertyTypes?.[0]||'')=== v) o.selected=true;
+    propSel.append(o);
+  });
+  propSel.addEventListener('change',e=>{ form.propertyTypes = e.target.value ? [e.target.value] : []; });
 
-  // Columna 2: Zonas + Tipo inmueble
-  const zonaCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
-  zonaCol.append(h('div',{class:'field'},h('label',{},'Zonas de búsqueda'),zoneToggle));
-  zonaCol.append(h('div',{class:'field'},h('label',{},'Tipo de inmueble'),propToggle));
+  // Columna 1: Tipo inmueble (dropdown) + Etiquetas
+  const tagCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  tagCol.append(fld('Tipo de inmueble', propSel));
+  const tagField = h('div',{class:'field'});
+  tagField.append(h('label',{},'Etiquetas'));
+  tagField.append(tagToggle);
+  tagCol.append(tagField);
 
-  // Columna 3: Clasificación + Presupuesto + VIP + Dormitorios
+  // Columna 2: Zonas
+  const zonaCol = h('div',{class:'field'});
+  zonaCol.append(h('label',{},'Zonas de búsqueda'));
+  zonaCol.append(zoneToggle);
+
+  // Columna 3: Clasificación + Presupuesto + Dormitorios — campos angostos
   const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
   const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}});
   invBudRow.append(fld('Urgencia', urgSel));
-  invBudRow.append(fld('Tipo de inversión', sel('investmentType',invOpts,form.investmentType)));
+  invBudRow.append(fld('Tipo inversión', sel('investmentType',invOpts,form.investmentType)));
   clasCol.append(invBudRow);
-  clasCol.append(fld('Presupuesto máx. (€)', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
-  clasCol.append(fld('Dormitorios mínimos', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
-  clasCol.append(vipToggleWrap);
+  const presBedsRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}});
+  presBedsRow.append(fld('Presupuesto máx.', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
+  presBedsRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
+  clasCol.append(presBedsRow);
 
   block23.append(tagCol, zonaCol, clasCol);
   sections.append(sectionEl('Etiquetas, zonas y clasificación', block23));
