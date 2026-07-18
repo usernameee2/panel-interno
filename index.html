@@ -121,9 +121,9 @@
   /* Card / Surface */
   .card { background: #ffffff; border: 1px solid #d4a574; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
-  .section { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: var(--radius); padding: 14px 16px; }
+  .section { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: var(--radius); padding: 0 16px 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #dbeafe; border-bottom: 1px solid #93c5fd; border-radius: var(--radius) var(--radius) 0 0; }
-  .section-form { background: #a8d5b8; border: 1px solid #6aad88; border-radius: var(--radius); padding: 14px 16px; }
+  .section-form { background: #a8d5b8; border: 1px solid #6aad88; border-radius: var(--radius); padding: 0 16px 14px 16px; }
   .section-form .section-title { background: #2d5a3d; border-bottom-color: #2d5a3d; color: #ffffff; font-weight: 800; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -1031,7 +1031,7 @@ function renderForm() {
 
   // FILA 2: Etiquetas (izq) + Zonas (der) en 2 columnas
   const tagField2 = h('div',{style:{display:'flex',flexDirection:'column',gap:'4px'}});
-  tagField2.append(h('label',{},'Etiquetas'));
+  tagField2.append(h('label',{style:{fontSize:'11px',fontWeight:'700',color:'#1e40af',textTransform:'uppercase',letterSpacing:'.06em',display:'block',marginBottom:'4px'}},'Etiquetas'));
   tagField2.append(tagToggleRow);
 
   const zonaCol2 = h('div',{class:'field'});
@@ -1047,7 +1047,7 @@ function renderForm() {
   zonasInner.append(zonaLeft, zonaRight);
   zonaCol2.append(zonasInner);
 
-  const etiqZonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}});
+  const etiqZonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1.6fr',gap:'14px'}});
   etiqZonasGrid.append(tagField2, zonaCol2);
   const zonasGrid = etiqZonasGrid; // alias para el check
 
