@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f8f9ff;
+    --bg: #f0ece8;
     --surface: #ffffff;
     --surface2: #e8e5e0;
     --border: #7a7672;
@@ -1031,11 +1031,11 @@ function renderForm() {
 
   // FILA 2: Etiquetas (izq) + Zonas (der) en 2 columnas
   const tagField2 = h('div',{style:{display:'flex',flexDirection:'column',gap:'4px'}});
-  tagField2.append(h('label',{style:{fontSize:'11px',fontWeight:'700',color:'#1e40af',textTransform:'uppercase',letterSpacing:'.06em',display:'block',marginBottom:'4px'}},'Etiquetas'));
+  tagField2.append(h('label',{style:{fontSize:'11px',fontWeight:'700',color:'#111827',textTransform:'uppercase',letterSpacing:'.06em',display:'block',marginBottom:'4px'}},'Etiquetas'));
   tagField2.append(tagToggleRow);
 
   const zonaCol2 = h('div',{class:'field'});
-  zonaCol2.append(h('label',{},'Zonas de búsqueda'));
+  zonaCol2.append(h('label',{style:{fontSize:'11px',fontWeight:'700',color:'#111827',textTransform:'uppercase',letterSpacing:'.06em',display:'block',marginBottom:'4px'}},'Zonas de búsqueda'));
   // Zonas en grid 2 col interno
   const zonasInner = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px',marginTop:'4px'}});
   const zonaLeft = h('div',{});
@@ -1047,7 +1047,7 @@ function renderForm() {
   zonasInner.append(zonaLeft, zonaRight);
   zonaCol2.append(zonasInner);
 
-  const etiqZonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1.6fr',gap:'14px'}});
+  const etiqZonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1.6fr',gap:'14px',marginTop:'4px'}});
   etiqZonasGrid.append(tagField2, zonaCol2);
   const zonasGrid = etiqZonasGrid; // alias para el check
 
@@ -1083,12 +1083,19 @@ function renderForm() {
 }
 
 // CONTACT CARD (list item)
-function renderCard(c) {
+function renderCard(c, idx) {
   const urg = c.urgency ? URGENCY[c.urgency] : null;
-  const urgBg    = urg ? urg.c : '#9a9690';
-  const urgLight  = c.urgency===1?'#e8f5f0':c.urgency===2?'#fef3e2':c.urgency===3?'#fde8e8':'#f5f4f1';
-  const urgBorder = c.urgency===1?'#1D9E75':c.urgency===2?'#EF9F27':c.urgency===3?'#7c3aed':'#c8c4bc';
-
+  const noUrgPalette = [
+    {bg:'#6366f1',border:'#4f46e5',light:'#eef2ff'},
+    {bg:'#0891b2',border:'#0e7490',light:'#ecfeff'},
+    {bg:'#059669',border:'#047857',light:'#ecfdf5'},
+    {bg:'#d97706',border:'#b45309',light:'#fffbeb'},
+    {bg:'#db2777',border:'#be185d',light:'#fdf2f8'},
+  ];
+  const noUrgColor = noUrgPalette[(idx||0) % noUrgPalette.length];
+  const urgBg    = urg ? urg.c : noUrgColor.bg;
+  const urgLight  = c.urgency===1?'#e8f5f0':c.urgency===2?'#fef3e2':c.urgency===3?'#fde8e8':noUrgColor.light;
+  const urgBorder = c.urgency===1?'#1D9E75':c.urgency===2?'#EF9F27':c.urgency===3?'#7c3aed':noUrgColor.border;
   const card = h('div',{});
   card.style.cssText=`display:flex;border-radius:10px;overflow:hidden;border:1.5px solid ${urgBorder};background:#fff;cursor:pointer;transition:box-shadow .15s,transform .1s;`;
   card.addEventListener('click',()=>setState({view:'detail',detailContact:c}));
@@ -1856,7 +1863,7 @@ function renderList() {
     main.append(empty);
   } else {
     const list=h('div',{class:'contact-list'});
-    filtered.forEach(c=>list.append(renderCard(c)));
+    filtered.forEach((c,i)=>list.append(renderCard(c,i)));
     main.append(list);
   }
   layout.append(main);
