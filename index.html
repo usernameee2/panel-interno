@@ -205,7 +205,7 @@
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
   /* Multi-toggle */
-  .multi-toggle { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .multi-toggle { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0; }
   .toggle-btn { font-family: var(--font); font-size: 12px; padding: 5px 13px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border2); background: var(--surface); color: var(--text); transition: all .15s; font-weight: 500; }
   .toggle-btn:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
   .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; box-shadow: 0 1px 4px rgba(24,95,165,.3); }
@@ -427,7 +427,7 @@ const URGENCY = {
   2:{l:'Media',c:'#EF9F27'},
   3:{l:'Alta',c:'#7c3aed'}
 };
-const PROP_TYPES=['Piso','Casa','Chalet','Villa','Solar','Local','Nave'];
+const PROP_TYPES=['Piso','Casa','Chalet','Casa / Piso / Chalet','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
 const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Planta Baja','Okupa OK','1 línea','2 línea'];
@@ -436,13 +436,13 @@ const ZONE_GREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Play
 const ZONE_BURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
 const TAG_COLORS={
   'Premium':            'chip-vip',
-  'Extranjero':         'chip-accent',
+  'Extranjero':         'chip-purple',
   'Inversor':           'chip-orange',
-  'Primera vivienda':   'chip-accent',
-  'Segunda vivienda':   'chip-accent',
+  'Primera vivienda':   'chip-purple',
+  'Segunda vivienda':   'chip-purple',
   'No Inversor':        'chip-warn',
   'Vivienda propia':    'chip-orange',
-  'Habla inglés':       'chip-accent',
+  'Habla inglés':       'chip-purple',
   'Tiene NIE':          'chip-orange',
   'Sin NIE':            'chip-warn',
   'Tiene efectivo':     'chip-orange',
@@ -451,8 +451,8 @@ const TAG_COLORS={
   'Piscina':            'chip-accent',
   'Planta Baja':        'chip-accent',
   'Okupa OK':           'chip-warn',
-  '1 línea':            'chip-accent',
-  '2 línea':            'chip-success',
+  '1 línea':            'chip-purple',
+  '2 línea':            'chip-purple',
   // Tipos de inversión
   'Uso propio':         'chip-accent',
   'Inversión alquiler': 'chip-success',
@@ -1030,7 +1030,7 @@ function renderForm() {
   topRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
 
   // FILA 2: Etiquetas (izq) + Zonas (der) en 2 columnas
-  const tagField2 = h('div',{class:'field'});
+  const tagField2 = h('div',{style:{display:'flex',flexDirection:'column',gap:'4px'}});
   tagField2.append(h('label',{},'Etiquetas'));
   tagField2.append(tagToggleRow);
 
