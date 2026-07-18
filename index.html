@@ -116,10 +116,12 @@
   button:disabled { opacity: 0.5; cursor: default; }
 
   /* Card / Surface */
-  .card { background: #ffffff; border: 1px solid #d4c5f0; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .card { background: #ffffff; border: 1px solid #fcd34d; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
-  .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
-  .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
+  .section { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: var(--radius); padding: 14px 16px; }
+  .section-title { font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #dbeafe; border-bottom: 1px solid #93c5fd; border-radius: var(--radius) var(--radius) 0 0; }
+  .section-form { background: #fffbeb; border: 1px solid #fcd34d; border-radius: var(--radius); padding: 14px 16px; }
+  .section-form .section-title { background: #fef3c7; border-bottom-color: #fcd34d; color: #92400e; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .flex { display: flex; align-items: center; gap: 8px; }
@@ -183,7 +185,7 @@
   /* Detail view */
   .detail-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
   .detail-header-right { margin-left: auto; display: flex; gap: 8px; }
-  .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+  .detail-card { background: #dbeafe; border: 1.5px solid #93c5fd; border-radius: var(--radius); padding: 12px 14px; }
   .detail-card-title { font-size: 11px; font-weight: 800; color: #222; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
   .detail-row { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .detail-row:last-child { border-bottom: none; }
@@ -193,7 +195,7 @@
 
   /* Form */
   .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .form-sections { display: grid; gap: 14px; background: #f5f0ff; padding: 8px; border-radius: var(--radius); }
+  .form-sections { display: grid; gap: 14px; background: #fef8ed; padding: 8px; border-radius: var(--radius); }
   .field { display: grid; gap: 4px; }
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
@@ -960,6 +962,12 @@ function renderForm() {
   };
 
   const sections = h('div',{class:'form-sections'});
+  // Override de clase para sections del formulario
+  const formSectionEl = (title, ...children) => {
+    const el = sectionEl(title, ...children);
+    el.className = 'section section-form';
+    return el;
+  };
 
   // Select de forma de contacto
   const contactSel = h('select',{});
@@ -984,7 +992,7 @@ function renderForm() {
   row2.append(fld('Forma contacto', contactSel));
   row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
 
-  sections.append(sectionEl('Datos personales', row1, row2));
+  sections.append(formSectionEl('Datos personales', row1, row2));
 
   // ── BLOQUE 2+3: Todo junto — 3 columnas (Opción B) ──
   const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'14px'}});
@@ -1037,7 +1045,7 @@ function renderForm() {
   clasCol.append(zonaB);
 
   block23.append(tagCol, zonaCol, clasCol);
-  sections.append(sectionEl('Etiquetas, zonas y clasificación', block23));
+  sections.append(formSectionEl('Etiquetas, zonas y clasificación', block23));
 
   wrap.append(sections);
 
@@ -1098,7 +1106,7 @@ function renderCard(c) {
   av.style.flexShrink='0';
   nameRow2.append(av);
   nameRow2.append(h('div',{style:{
-    fontWeight:'800',fontSize:'15px',color:'#ffffff',textShadow:'0 1px 2px rgba(0,0,0,.25)',
+    fontWeight:'800',fontSize:'15px',color:'#ffffff',textShadow:'-1px -1px 0 rgba(0,0,0,.15), 1px -1px 0 rgba(0,0,0,.15), -1px 1px 0 rgba(0,0,0,.15), 1px 1px 0 rgba(0,0,0,.15)',
     overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',minWidth:'0',flex:'1'
   }},c.name||'Sin nombre'));
   leftCol.append(nameRow2);
@@ -1315,7 +1323,7 @@ function renderDetail() {
   const dataRow=(label,value)=>{ if(!value) return null; return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{style:{fontWeight:'600',textTransform:'uppercase',fontSize:'13px'}},value)); };
 
   // Presupuesto y requisitos
-  const reqCard = h('div',{class:'detail-card',style:{background:'#fff'}});
+  const reqCard = h('div',{class:'detail-card',style:{background:'#dbeafe',border:'1.5px solid #93c5fd'}});
   reqCard.append(h('div',{class:'detail-card-title'},'Presupuesto y requisitos'));
   [
     c.budgetMax?dataRow('Presupuesto máx.',fmt(c.budgetMax)):null,
