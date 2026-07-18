@@ -10,8 +10,8 @@
     --bg: #f5f4f1;
     --surface: #ffffff;
     --surface2: #f0ede8;
-    --border: #c8c4bc;
-    --border2: #d8d4ce;
+    --border: #8a8880;
+    --border2: #aaa8a4;
     --text: #1a1916;
     --text2: #6b6760;
     --text3: #9e9b96;
@@ -38,7 +38,7 @@
     --mono: 'DM Mono', monospace;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; min-height: 100vh; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.5; min-height: 100vh; }
   #app { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
 
   /* ── MOBILE ── */
@@ -417,7 +417,7 @@ const URGENCY = {
 const PROP_TYPES=['Piso','Casa','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Planta Baja','Okupa OK'];
+const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Planta Baja','Okupa OK','1 línea','2 línea'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos','Benidorm','Jávea','Calpe','Villajoyosa'];
 const TAG_COLORS={
   'Premium':            'chip-vip',
@@ -436,6 +436,8 @@ const TAG_COLORS={
   'Piscina':            'chip-accent',
   'Planta Baja':        'chip-accent',
   'Okupa OK':           'chip-warn',
+  '1 línea':            'chip-accent',
+  '2 línea':            'chip-success',
   // Tipos de inversión
   'Uso propio':         'chip-accent',
   'Inversión alquiler': 'chip-success',
@@ -599,7 +601,7 @@ let state = {
   editContact: null,
   detailContact: null,
   search: '',
-  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'' },
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false },
   showFilters: false,
   sort: 'date_desc',
   toast: null,
@@ -704,6 +706,8 @@ function getFiltered() {
   if (f.noNIE) list = list.filter(c=>c.tags?.includes('Sin NIE'));
   if (f.wantsPool) list = list.filter(c=>c.tags?.includes('Piscina') || c.wantsPool);
   if (f.bedroomsMin) list = list.filter(c=>c.bedroomsMin && Number(c.bedroomsMin) >= Number(f.bedroomsMin));
+  if (f.hasOkupa) list = list.filter(c=>c.tags?.includes('Okupa OK'));
+  if (f.hablaIngles) list = list.filter(c=>c.tags?.includes('Habla inglés'));
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
     if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
@@ -943,8 +947,8 @@ function renderForm() {
 
   sections.append(sectionEl('Datos personales', row1, row2));
 
-  // ── BLOQUE 2+3: Todo junto — 3 columnas (Opción B) ──
-  const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'14px'}});
+  // ── BLOQUE 2+3: 2 columnas — izq: tipo+etiquetas+zonas / der: clasificación ──
+  const block23 = h('div',{style:{display:'grid',gridTemplateColumns:'1.8fr 1fr',gap:'14px'}});
 
   // Tipo inmueble como select (guarda en propertyTypes[0])
   const propSel = h('select',{});
@@ -955,20 +959,19 @@ function renderForm() {
   });
   propSel.addEventListener('change',e=>{ form.propertyTypes = e.target.value ? [e.target.value] : []; });
 
-  // Columna 1: Tipo inmueble (dropdown) + Etiquetas
-  const tagCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
-  tagCol.append(fld('Tipo de inmueble', propSel));
+  // Columna izquierda: Tipo inmueble + Etiquetas + Zonas
+  const leftCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  leftCol.append(fld('Tipo de inmueble', propSel));
   const tagField = h('div',{class:'field'});
   tagField.append(h('label',{},'Etiquetas'));
   tagField.append(tagToggle);
-  tagCol.append(tagField);
+  leftCol.append(tagField);
+  const zonaField = h('div',{class:'field'});
+  zonaField.append(h('label',{},'Zonas de búsqueda'));
+  zonaField.append(zoneToggle);
+  leftCol.append(zonaField);
 
-  // Columna 2: Zonas
-  const zonaCol = h('div',{class:'field'});
-  zonaCol.append(h('label',{},'Zonas de búsqueda'));
-  zonaCol.append(zoneToggle);
-
-  // Columna 3: Clasificación + Presupuesto + Dormitorios — campos angostos
+  // Columna derecha: Clasificación + Presupuesto + Dormitorios
   const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
   const invBudRow = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}});
   invBudRow.append(fld('Urgencia', urgSel));
@@ -978,8 +981,9 @@ function renderForm() {
   presBedsRow.append(fld('Presupuesto máx.', sel('budgetMax',BUDGET_OPTS,form.budgetMax)));
   presBedsRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
   clasCol.append(presBedsRow);
+  clasCol.append(vipToggleWrap);
 
-  block23.append(tagCol, zonaCol, clasCol);
+  block23.append(leftCol, clasCol);
   sections.append(sectionEl('Etiquetas, zonas y clasificación', block23));
 
   wrap.append(sections);
@@ -1620,6 +1624,8 @@ function renderList() {
     ['💰 Tiene efectivo','hasEfectivo','active'],
     ['✅ Tiene NIE','hasNIE','active'],
     ['❌ Sin NIE','noNIE','active-warn'],
+    ['Okupa OK','hasOkupa','active-warn'],
+    ['🇬🇧 Habla inglés','hablaIngles','active'],
   ];
   chips.forEach(([label,field,cls])=>{
     const c=h('button',{class:'filter-chip'+(f[field]?' '+cls:''),onClick:()=>setState({filters:{...f,[field]:!f[field]}})},label);
@@ -1697,7 +1703,7 @@ function renderList() {
   if(af>0){
     sidebar.append(h('hr',{class:'sidebar-divider'}));
     sidebar.append(h('button',{class:'sidebar-clear',
-      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:''}})
+      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false}})
     },'✕ Limpiar filtros ('+af+')'));
   }
   layout.append(sidebar);
