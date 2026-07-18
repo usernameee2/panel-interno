@@ -1000,21 +1000,21 @@ function renderForm() {
   tagCol.append(tagField);
 
   // Columna 2: Zonas — primera mitad
-  const ZONE_MID = 17;
-  const ZONE_A = ZONE_SUGG.slice(0, ZONE_MID);
-  const ZONE_B = ZONE_SUGG.slice(ZONE_MID);
-  let zoneValsA = zoneVals.filter(z=>ZONE_A.includes(z));
-  let zoneValsB = zoneVals.filter(z=>ZONE_B.includes(z));
-  const zoneRowA = makeToggleRow(ZONE_A, zoneValsA, v=>{
-    zoneValsA=v; form.searchZones=[...zoneValsA,...zoneValsB];
-  }, 'chip-accent');
-  const zoneRowB = makeToggleRow(ZONE_B, zoneValsB, v=>{
-    zoneValsB=v; form.searchZones=[...zoneValsA,...zoneValsB];
-  }, 'chip-accent');
+  const ZONE_GREEN = ['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
+  const ZONE_BURDO = ['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
+  const ZONE_BLUE  = ZONE_SUGG.filter(z=>!ZONE_GREEN.includes(z)&&!ZONE_BURDO.includes(z));
+  let zvG = zoneVals.filter(z=>ZONE_GREEN.includes(z));
+  let zvBl= zoneVals.filter(z=>ZONE_BLUE.includes(z));
+  let zvBu= zoneVals.filter(z=>ZONE_BURDO.includes(z));
+  const syncZones = ()=>{ form.searchZones=[...zvG,...zvBl,...zvBu]; };
+  const zoneRowGreen = makeToggleRow(ZONE_GREEN, zvG,  v=>{zvG=v; syncZones();}, 'chip-success');
+  const zoneRowBlue  = makeToggleRow(ZONE_BLUE,  zvBl, v=>{zvBl=v;syncZones();}, 'chip-accent');
+  const zoneRowBurdo = makeToggleRow(ZONE_BURDO, zvBu, v=>{zvBu=v;syncZones();}, 'chip-warn');
 
   const zonaCol = h('div',{class:'field'});
   zonaCol.append(h('label',{},'Zonas de búsqueda'));
-  zonaCol.append(zoneRowA);
+  zonaCol.append(zoneRowGreen);
+  zonaCol.append(zoneRowBlue);
 
   // Columna 3: Clasificación + Presupuesto + Dormitorios + segunda mitad de zonas
   const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
@@ -1028,7 +1028,7 @@ function renderForm() {
   clasCol.append(presBedsRow);
   // Segunda mitad de zonas ocupa el espacio vacío
   const zonaB = h('div',{class:'field',style:{marginTop:'0px'}});
-  zonaB.append(zoneRowB);
+  zonaB.append(zoneRowBurdo);
   clasCol.append(zonaB);
 
   block23.append(tagCol, zonaCol, clasCol);
@@ -1108,7 +1108,10 @@ function renderCard(c, filtered) {
   // Zonas — todas visibles, clickeables
   (c.searchZones||[]).forEach(z=>{
     const isActive = state.filters.zone===z;
-    const zc=chip(z,'chip-accent');
+    const ZGREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
+    const ZBURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
+    const zColor = isActive?'chip-accent': ZGREEN.includes(z)?'chip-success': ZBURDO.includes(z)?'chip-warn':'chip-accent';
+    const zc=chip(z, zColor);
     zc.style.cursor='pointer';
     zc.style.fontWeight = isActive?'700':'500';
     zc.style.boxShadow = isActive?'0 0 0 2px var(--accent)':'none';
