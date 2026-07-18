@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #ffffff;
-    --surface: #f2f0ec;
+    --bg: #f8f9ff;
+    --surface: #ffffff;
     --surface2: #e8e5e0;
     --border: #7a7672;
     --border2: #9a9690;
@@ -116,7 +116,7 @@
   button:disabled { opacity: 0.5; cursor: default; }
 
   /* Card / Surface */
-  .card { background: #fffbf5; border: 1.5px solid #e8d5b8; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: var(--shadow); }
+  .card { background: #ffffff; border: 1.5px solid #e8d5b8; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
@@ -158,8 +158,8 @@
 
   /* Filter bar */
   .filter-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-  .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; background: #dbeafe !important; border-color: #93c5fd !important; }
-  .filter-bar select { max-width: 180px; background: #dbeafe !important; border-color: #93c5fd !important; color: #1e40af !important; font-weight: 700 !important; }
+  .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; background: #dbeafe !important; border-color: #93c5fd !important; color: #1e40af !important; }
+  .filter-bar select { max-width: 180px; background: #dbeafe !important; border-color: #93c5fd !important; color: #1e40af !important; font-weight: 700 !important; border-radius: 8px !important; }
   .filter-panel { background: var(--accent); border: none; border-radius: var(--radius); padding: 12px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .filter-panel-title { font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
   .filter-chip { font-family: var(--font); font-size: 13px; font-weight: 700; padding: 6px 14px; border-radius: 20px; cursor: pointer; border: none; background: #ffffff; color: #1a3a6b; transition: all .15s; white-space: nowrap; }
@@ -275,7 +275,7 @@
   .sidebar-chip.active { background: var(--accent); color: #fff; font-weight: 600; }
   .sidebar-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
   .sidebar-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
-  .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid #93c5fd; background: #eff6ff; color: #1e40af; cursor: pointer; margin-bottom: 4px; font-weight: 700; }
+  .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid #93c5fd; background: #ffffff; color: #1e40af; cursor: pointer; margin-bottom: 4px; font-weight: 700; }
   .sidebar-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
   .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
   .sidebar-clear { width: 100%; font-family: var(--font); font-size: 11px; color: #c0392b; background: none; border: none; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); text-align: left; font-weight: 600; }
@@ -289,7 +289,7 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
 
   /* Notes history */
-  .note-entry { border-left: 3px solid var(--border); padding: 8px 12px; margin-bottom: 6px; background: var(--surface); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .note-entry { border-left: 3px solid var(--border); padding: 8px 12px; margin-bottom: 6px; background: #ffffff; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
   .note-entry:last-child { margin-bottom: 0; }
   .note-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
   .note-date { font-size: 11px; color: #555; }
@@ -416,7 +416,7 @@ function showLoginScreen() {
 const URGENCY = {
   1:{l:'Baja',c:'#1D9E75'},
   2:{l:'Media',c:'#EF9F27'},
-  3:{l:'Alta',c:'#E24B4A'}
+  3:{l:'Alta',c:'#7c3aed'}
 };
 const PROP_TYPES=['Piso','Casa','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
@@ -1265,7 +1265,8 @@ function renderDetail() {
   hero.append(heroLeft);
 
   // Bloque datos rápidos
-  const heroRight = h('div',{style:{flex:'1',padding:'16px 20px',display:'flex',flexDirection:'column',justifyContent:'center',gap:'8px',background:'#fff'}});
+  const detailUrgLightBg = c.urgency===1?'#f0fdf4':c.urgency===2?'#fff7ed':c.urgency===3?'#f5f3ff':'#f8fafc';
+  const heroRight = h('div',{style:{flex:'1',padding:'16px 20px',display:'flex',flexDirection:'column',justifyContent:'center',gap:'8px',background:detailUrgLightBg}});
 
   // Fila: teléfono + email + fecha + presupuesto
   const quickRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'14px',alignItems:'center'}});
