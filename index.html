@@ -170,10 +170,10 @@
 
   /* Contact list */
   .contact-list { display: grid; gap: 8px; }
-  .contact-card { cursor: pointer; transition: box-shadow .15s, transform .1s; }
+  .contact-card { cursor: pointer; transition: box-shadow .15s, transform .1s; overflow: hidden; }
   .contact-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-  .contact-card-inner { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
-  .contact-info-row { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 12px; color: var(--text2); margin: 3px 0 6px; }
+  .contact-card-inner { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; min-width: 0; }
+  .contact-info-row { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 12px; color: var(--text2); margin: 3px 0 6px; min-width: 0; }
   .contact-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 
   /* Detail view */
@@ -455,7 +455,7 @@ const ZONE_SUGG=[
   'Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5',
   'Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas',
   'Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada',
-  'Rojales','Algorfa','Santa Pola','Gran Alacant','Los Montesinos',
+  'Rojales','Santa Pola','Gran Alacant','Algorfa','Los Montesinos',
   'Elche','Crevillente','Almoradí','Elda','Alcoy',
   'Benidorm','Jávea','Calpe','Villajoyosa',
 ];
@@ -601,7 +601,7 @@ let state = {
   editContact: null,
   detailContact: null,
   search: '',
-  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false },
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false, hasPremium:false },
   showFilters: false,
   sort: 'date_desc',
   toast: null,
@@ -708,6 +708,7 @@ function getFiltered() {
   if (f.bedroomsMin) list = list.filter(c=>c.bedroomsMin && Number(c.bedroomsMin) >= Number(f.bedroomsMin));
   if (f.hasOkupa) list = list.filter(c=>c.tags?.includes('Okupa OK'));
   if (f.hablaIngles) list = list.filter(c=>c.tags?.includes('Habla inglés'));
+  if (f.hasPremium) list = list.filter(c=>c.tags?.includes('Premium'));
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
     if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
@@ -995,8 +996,8 @@ function renderForm() {
   presBedsRow.append(fld('Dormitorios', sel('bedroomsMin',bedsOpts,form.bedroomsMin)));
   clasCol.append(presBedsRow);
   // Segunda mitad de zonas ocupa el espacio vacío
-  const zonaB = h('div',{class:'field',style:{marginTop:'4px'}});
-  zonaB.append(h('label',{},'(continuación)'));
+  const zonaB = h('div',{class:'field',style:{marginTop:'0px'}});
+  
   zonaB.append(zoneToggleB);
   clasCol.append(zonaB);
 
@@ -1635,7 +1636,7 @@ function renderList() {
   const fp=h('div',{class:'filter-panel'});
   fp.append(h('div',{class:'filter-panel-title'},'Filtros rápidos'));
   const chips=[
-    ['★ Solo VIP','isVIP','active-vip'],
+    ['★ Premium','hasPremium','active-vip'],
     ['🏊 Piscina','wantsPool','active'],
     ['Hipoteca','needsMortgage','active-warn'],
     ['💰 Tiene efectivo','hasEfectivo','active'],
@@ -1720,7 +1721,7 @@ function renderList() {
   if(af>0){
     sidebar.append(h('hr',{class:'sidebar-divider'}));
     sidebar.append(h('button',{class:'sidebar-clear',
-      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false}})
+      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false}})
     },'✕ Limpiar filtros ('+af+')'));
   }
   layout.append(sidebar);
