@@ -918,6 +918,15 @@ function renderForm() {
 
   const sections = h('div',{class:'form-sections'});
 
+  // Select de forma de contacto
+  const contactSel = h('select',{});
+  [['','— Preferida —'],...CONTACT_METHODS.map(m=>[m,m])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);
+    if((form.contactMethods?.[0]||'')=== v) o.selected=true;
+    contactSel.append(o);
+  });
+  contactSel.addEventListener('change',e=>{ form.contactMethods = e.target.value ? [e.target.value] : []; });
+
   // ── BLOQUE 1: Datos personales ──
   // Fila 1: Nombre + Teléfono + Email
   const row1 = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px 14px'}});
