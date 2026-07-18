@@ -158,7 +158,7 @@
   .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; }
   .filter-bar select { max-width: 180px; }
   .filter-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .filter-panel-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
+  .filter-panel-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
   .filter-chip { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text); transition: all .15s; white-space: nowrap; }
   .filter-chip:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
   .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
@@ -266,13 +266,13 @@
   .sidebar { width: 220px; min-width: 220px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; }
   .sidebar-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
   .sidebar-section { margin-bottom: 14px; }
-  .sidebar-section-label { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+  .sidebar-section-label { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 6px; display: block; }
   .sidebar-chip { display: block; width: 100%; text-align: left; font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text); transition: all .12s; margin-bottom: 2px; }
   .sidebar-chip:hover { background: var(--surface2); color: var(--text); }
   .sidebar-chip.active { background: var(--accent); color: #fff; font-weight: 600; }
   .sidebar-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
   .sidebar-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
-  .sidebar-select { width: 100%; font-family: var(--font); font-size: 12px; padding: 5px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; margin-bottom: 4px; }
+  .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 5px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--text); cursor: pointer; margin-bottom: 4px; }
   .sidebar-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
   .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
   .sidebar-clear { width: 100%; font-family: var(--font); font-size: 11px; color: var(--danger); background: none; border: none; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); text-align: left; }
@@ -802,6 +802,36 @@ function makeTagInput(values, onChange, suggestions, placeholder) {
 }
 
 // ─── MULTI TOGGLE ────────────────────────────────────────────────────────────
+function makeToggleRow(options, values, onChange, defaultColor) {
+  let vals = [...values];
+  const colorMap = {
+    'chip-vip':     {inact:{bg:'var(--vip-bg)',    border:'var(--vip-border)',    color:'var(--vip)'},    act:{bg:'var(--vip)',    border:'var(--vip)',    color:'#fff'}},
+    'chip-success': {inact:{bg:'var(--success-bg)', border:'var(--success-border)',color:'var(--success)'}, act:{bg:'var(--success)', border:'var(--success)', color:'#fff'}},
+    'chip-warn':    {inact:{bg:'var(--warn-bg)',    border:'var(--warn-border)',   color:'var(--warn)'},    act:{bg:'var(--warn)',    border:'var(--warn)',    color:'#fff'}},
+    'chip-accent':  {inact:{bg:'var(--accent-bg)', border:'var(--accent-border)', color:'var(--accent)'},  act:{bg:'var(--accent)',  border:'var(--accent)',  color:'#fff'}},
+  };
+  const row = h('div',{class:'multi-toggle'});
+  function refresh() {
+    row.innerHTML='';
+    options.forEach(o=>{
+      const isActive = vals.includes(o);
+      const btn = h('button',{class:'toggle-btn'+(isActive?' active':'')},o);
+      const tagColor = (typeof TAG_COLORS !== 'undefined' && TAG_COLORS[o]) || defaultColor;
+      if(tagColor && colorMap[tagColor]) {
+        const cm = isActive ? colorMap[tagColor].act : colorMap[tagColor].inact;
+        btn.style.background  = cm.bg;
+        btn.style.borderColor = cm.border;
+        btn.style.color       = cm.color;
+        btn.style.fontWeight  = isActive ? '700' : '500';
+      }
+      btn.addEventListener('click',()=>{vals=vals.includes(o)?vals.filter(x=>x!==o):[...vals,o];onChange(vals);refresh();});
+      row.append(btn);
+    });
+  }
+  refresh();
+  return row;
+}
+
 function makeMultiToggle(options, values, onChange, label, defaultColor) {
   let vals = [...values];
   const el = h('div',{class:'grid-stack',style:{gap:'6px'}});
@@ -975,16 +1005,16 @@ function renderForm() {
   const ZONE_B = ZONE_SUGG.slice(ZONE_MID);
   let zoneValsA = zoneVals.filter(z=>ZONE_A.includes(z));
   let zoneValsB = zoneVals.filter(z=>ZONE_B.includes(z));
-  const zoneToggleA = makeMultiToggle(ZONE_A, zoneValsA, v=>{
+  const zoneRowA = makeToggleRow(ZONE_A, zoneValsA, v=>{
     zoneValsA=v; form.searchZones=[...zoneValsA,...zoneValsB];
-  }, null, 'chip-accent');
-  const zoneToggleB = makeMultiToggle(ZONE_B, zoneValsB, v=>{
+  }, 'chip-accent');
+  const zoneRowB = makeToggleRow(ZONE_B, zoneValsB, v=>{
     zoneValsB=v; form.searchZones=[...zoneValsA,...zoneValsB];
-  }, null, 'chip-accent');
+  }, 'chip-accent');
 
   const zonaCol = h('div',{class:'field'});
   zonaCol.append(h('label',{},'Zonas de búsqueda'));
-  zonaCol.append(zoneToggleA);
+  zonaCol.append(zoneRowA);
 
   // Columna 3: Clasificación + Presupuesto + Dormitorios + segunda mitad de zonas
   const clasCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
@@ -998,8 +1028,7 @@ function renderForm() {
   clasCol.append(presBedsRow);
   // Segunda mitad de zonas ocupa el espacio vacío
   const zonaB = h('div',{class:'field',style:{marginTop:'0px'}});
-  
-  zonaB.append(zoneToggleB);
+  zonaB.append(zoneRowB);
   clasCol.append(zonaB);
 
   block23.append(tagCol, zonaCol, clasCol);
