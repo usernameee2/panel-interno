@@ -123,7 +123,7 @@
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: var(--radius); padding: 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #dbeafe; border-bottom: 1px solid #93c5fd; border-radius: var(--radius) var(--radius) 0 0; }
-  .section-form { background: #e8f5ee; border: 1px solid #90c4a0; border-radius: var(--radius); padding: 14px 16px; }
+  .section-form { background: #a8d5b8; border: 1px solid #6aad88; border-radius: var(--radius); padding: 14px 16px; }
   .section-form .section-title { background: #2d5a3d; border-bottom-color: #2d5a3d; color: #ffffff; font-weight: 800; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -200,7 +200,7 @@
 
   /* Form */
   .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .form-sections { display: grid; gap: 14px; background: #d8ede0; padding: 8px; border-radius: var(--radius); }
+  .form-sections { display: grid; gap: 14px; background: #8ec4a0; padding: 8px; border-radius: var(--radius); }
   .field { display: grid; gap: 4px; }
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
@@ -933,7 +933,7 @@ function renderForm() {
   let propVals=[...form.propertyTypes];
   const propToggle=makeMultiToggle(PROP_TYPES,propVals,v=>{form.propertyTypes=v;propVals=v;},'');
   let tagVals=[...form.tags];
-  const tagToggle=makeToggleRow(TAG_SUGG,tagVals,v=>{form.tags=v;tagVals=v;});
+  const tagToggleRow=makeToggleRow(TAG_SUGG,tagVals,v=>{form.tags=v;tagVals=v;});
   let zoneVals=[...form.searchZones];
   const zoneToggle=makeMultiToggle(ZONE_SUGG,zoneVals,v=>{form.searchZones=v;zoneVals=v;},null,'chip-accent');
 
@@ -1032,7 +1032,7 @@ function renderForm() {
   // FILA 2: Etiquetas (izq) + Zonas (der) en 2 columnas
   const tagField2 = h('div',{class:'field'});
   tagField2.append(h('label',{},'Etiquetas'));
-  tagField2.append(tagToggle);
+  tagField2.append(tagToggleRow);
 
   const zonaCol2 = h('div',{class:'field'});
   zonaCol2.append(h('label',{},'Zonas de búsqueda'));
