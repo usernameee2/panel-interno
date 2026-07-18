@@ -22,6 +22,9 @@
     --success-bg: #e6f4ee;
     --success-border: #a8d8c0;
     --warn: #1a4a8a;
+    --orange: #c2410c;
+    --orange-bg: #fff7ed;
+    --orange-border: #fdba74;
     --purple: #6b21a8;
     --purple-bg: #f3e8ff;
     --purple-border: #c084fc;
@@ -141,6 +144,8 @@
   .chip-success { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
   .chip-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); }
   .chip-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+  .chip-purple { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-border); font-weight: 600; }
+  .chip-orange { background: var(--orange-bg); color: var(--orange); border-color: var(--orange-border); font-weight: 600; }
   .chip-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 600; }
   .chip-remove { cursor: pointer; opacity: .5; font-size: 14px; line-height: 1; }
   .chip-remove:hover { opacity: 1; }
@@ -432,15 +437,15 @@ const ZONE_BURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','
 const TAG_COLORS={
   'Premium':            'chip-vip',
   'Extranjero':         'chip-accent',
-  'Inversor':           'chip-success',
+  'Inversor':           'chip-orange',
   'Primera vivienda':   'chip-accent',
   'Segunda vivienda':   'chip-accent',
   'No Inversor':        'chip-warn',
-  'Vivienda propia':    'chip-success',
+  'Vivienda propia':    'chip-orange',
   'Habla inglés':       'chip-accent',
-  'Tiene NIE':          'chip-success',
+  'Tiene NIE':          'chip-orange',
   'Sin NIE':            'chip-warn',
-  'Tiene efectivo':     'chip-success',
+  'Tiene efectivo':     'chip-orange',
   'Necesita hipoteca':  'chip-warn',
   'Abierto a reformar': 'chip-warn',
   'Piscina':            'chip-accent',
@@ -816,6 +821,7 @@ function makeToggleRow(options, values, onChange, defaultColor, compact) {
     'chip-warn':    {inact:{bg:'var(--warn-bg)',    border:'var(--warn-border)',   color:'var(--warn)'},    act:{bg:'var(--warn)',    border:'var(--warn)',    color:'#fff'}},
     'chip-accent':  {inact:{bg:'var(--accent-bg)', border:'var(--accent-border)', color:'var(--accent)'},  act:{bg:'var(--accent)',  border:'var(--accent)',  color:'#fff'}},
     'chip-purple':  {inact:{bg:'var(--purple-bg)', border:'var(--purple-border)', color:'var(--purple)'},  act:{bg:'var(--purple)',  border:'var(--purple)',  color:'#fff'}},
+    'chip-orange':  {inact:{bg:'var(--orange-bg)', border:'var(--orange-border)', color:'var(--orange)'},  act:{bg:'var(--orange)',  border:'var(--orange)',  color:'#fff'}},
   };
   const row = h('div',{class:'multi-toggle'});
   function refresh() {
@@ -852,6 +858,7 @@ function makeMultiToggle(options, values, onChange, label, defaultColor) {
     'chip-warn':    {inact:{bg:'var(--warn-bg)',    border:'var(--warn-border)',   color:'var(--warn)'},    act:{bg:'var(--warn)',    border:'var(--warn)',    color:'#fff'}},
     'chip-accent':  {inact:{bg:'var(--accent-bg)', border:'var(--accent-border)', color:'var(--accent)'},  act:{bg:'var(--accent)',  border:'var(--accent)',  color:'#fff'}},
     'chip-purple':  {inact:{bg:'var(--purple-bg)', border:'var(--purple-border)', color:'var(--purple)'},  act:{bg:'var(--purple)',  border:'var(--purple)',  color:'#fff'}},
+    'chip-orange':  {inact:{bg:'var(--orange-bg)', border:'var(--orange-border)', color:'var(--orange)'},  act:{bg:'var(--orange)',  border:'var(--orange)',  color:'#fff'}},
   };
   function refresh() {
     row.innerHTML='';
@@ -1001,7 +1008,7 @@ function renderForm() {
   let zvBl= zoneVals.filter(z=>ZONE_BLUE.includes(z));
   let zvBu= zoneVals.filter(z=>ZONE_BURDO.includes(z));
   const syncZones = ()=>{ form.searchZones=[...zvG,...zvBl,...zvBu]; };
-  const zoneRowGreen = makeToggleRow(ZONE_GREEN, zvG,  v=>{zvG=v; syncZones();}, 'chip-success');
+  const zoneRowGreen = makeToggleRow(ZONE_GREEN, zvG,  v=>{zvG=v; syncZones();}, 'chip-orange');
   const zoneRowBlue  = makeToggleRow(ZONE_BLUE,  zvBl, v=>{zvBl=v;syncZones();}, 'chip-accent');
   const zoneRowBurdo = makeToggleRow(ZONE_BURDO, zvBu, v=>{zvBu=v;syncZones();}, 'chip-purple', true);
 
@@ -1295,7 +1302,7 @@ function renderDetail() {
   // Etiquetas grandes
   const tagsRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
   const bigChip2=(t,cls)=>{const el=chip(t,cls);el.style.fontSize='13px';el.style.padding='4px 12px';el.style.fontWeight='600';return el;};
-  (c.searchZones||[]).forEach(z=>tagsRow.append(bigChip2(z,ZONE_GREEN.includes(z)?'chip-success':ZONE_BURDO.includes(z)?'chip-purple':'chip-accent')));
+  (c.searchZones||[]).forEach(z=>tagsRow.append(bigChip2(z,ZONE_GREEN.includes(z)?'chip-orange':ZONE_BURDO.includes(z)?'chip-purple':'chip-accent')));
   if(c.investmentType) tagsRow.append(bigChip2(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
   if(c.bedroomsMin) tagsRow.append(bigChip2(c.bedroomsMin+'+ hab.','chip-accent'));
   if(c.needsMortgage) tagsRow.append(bigChip2('Hipoteca','chip-warn'));
