@@ -116,7 +116,7 @@
   button:disabled { opacity: 0.5; cursor: default; }
 
   /* Card / Surface */
-  .card { background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: var(--shadow); }
+  .card { background: #fffbf5; border: 1.5px solid #e8d5b8; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: var(--shadow); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: var(--surface2); border-radius: var(--radius); padding: 14px 16px; }
   .section-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: var(--surface2); border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
@@ -158,8 +158,8 @@
 
   /* Filter bar */
   .filter-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-  .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; background: #eef3fc !important; border-color: #b0c4e8 !important; }
-  .filter-bar select { max-width: 180px; background: #eef3fc !important; border-color: #b0c4e8 !important; color: #1a3a6b !important; font-weight: 600 !important; }
+  .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; background: #dbeafe !important; border-color: #93c5fd !important; }
+  .filter-bar select { max-width: 180px; background: #dbeafe !important; border-color: #93c5fd !important; color: #1e40af !important; font-weight: 700 !important; }
   .filter-panel { background: var(--accent); border: none; border-radius: var(--radius); padding: 12px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .filter-panel-title { font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
   .filter-chip { font-family: var(--font); font-size: 13px; font-weight: 700; padding: 6px 14px; border-radius: 20px; cursor: pointer; border: none; background: #ffffff; color: #1a3a6b; transition: all .15s; white-space: nowrap; }
@@ -269,13 +269,13 @@
   .sidebar { width: 220px; min-width: 220px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; }
   .sidebar-title { font-size: 10px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
   .sidebar-section { margin-bottom: 14px; }
-  .sidebar-section-label { font-size: 12px; font-weight: 700; color: #1a3a6b; margin-bottom: 6px; display: block; }
+  .sidebar-section-label { font-size: 11px; font-weight: 800; color: #1a3a6b; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .05em; }
   .sidebar-chip { display: block; width: 100%; text-align: left; font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text); transition: all .12s; margin-bottom: 2px; }
   .sidebar-chip:hover { background: var(--surface2); color: var(--text); }
   .sidebar-chip.active { background: var(--accent); color: #fff; font-weight: 600; }
   .sidebar-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
   .sidebar-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
-  .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid #b0c4e8; background: #fff; color: #1a3a6b; cursor: pointer; margin-bottom: 4px; font-weight: 600; }
+  .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid #93c5fd; background: #eff6ff; color: #1e40af; cursor: pointer; margin-bottom: 4px; font-weight: 700; }
   .sidebar-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
   .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
   .sidebar-clear { width: 100%; font-family: var(--font); font-size: 11px; color: #c0392b; background: none; border: none; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); text-align: left; font-weight: 600; }
@@ -296,7 +296,7 @@
   .note-text { font-size: 13px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
   .note-add-form { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; display: grid; gap: 8px; }
   .note-type-row { display: flex; flex-wrap: wrap; gap: 5px; }
-  .note-type-btn { font-family: var(--font); font-size: 11px; padding: 3px 10px; border-radius: 20px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text2); transition: all .12s; }
+  .note-type-btn { font-family: var(--font); font-size: 11px; padding: 3px 10px; border-radius: 20px; cursor: pointer; border: 1.5px solid #93c5fd; background: #eff6ff; color: #1e40af; transition: all .12s; font-weight: 600; }
   .note-type-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   /* Copy button */
@@ -1123,10 +1123,12 @@ function renderCard(c) {
   card.append(leftCol);
 
   // Columna derecha — meta apilada + etiquetas en paralelo
+  // Fondo suave del color de urgencia (muy claro)
+  const urgLightBg = c.urgency===1?'#f0fdf4':c.urgency===2?'#fff7ed':c.urgency===3?'#fff1f2':'#f8fafc';
   const rightCol = h('div',{style:{
     flex:'1',padding:'10px 14px',
     display:'flex',gap:'10px',alignItems:'flex-start',
-    background:'#fff',minWidth:'0'
+    background:urgLightBg,minWidth:'0'
   }});
 
   // Sub-col izquierda: urgencia + presupuesto + fecha apilados verticalmente
@@ -1240,7 +1242,7 @@ function renderDetail() {
 
   // Acciones
   const actions = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
-  const btnStyle = {display:'inline-flex',alignItems:'center',gap:'4px',padding:'5px 12px',borderRadius:'20px',fontSize:'12px',fontWeight:'600',background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',cursor:'pointer'};
+  const btnStyle = {display:'inline-flex',alignItems:'center',gap:'4px',padding:'5px 12px',borderRadius:'20px',fontSize:'12px',fontWeight:'700',background:'rgba(0,0,0,.18)',color:'#fff',border:'1px solid rgba(255,255,255,.5)',cursor:'pointer'};
   const actionBtn=(label,href,onClickFn)=>{
     const btn=href
       ? h('a',{href:href,target:'_blank',style:{...btnStyle,textDecoration:'none'}},label)
