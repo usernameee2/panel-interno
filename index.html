@@ -80,9 +80,9 @@
   .login-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
   .login-logo { font-size: 32px; margin-bottom: 6px; text-align: center; }
   .login-title { font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 4px; }
-  .login-subtitle { font-size: 13px; color: var(--text3); text-align: center; margin-bottom: 24px; }
+  .login-subtitle { font-size: 13px; color: #555; text-align: center; margin-bottom: 24px; }
   .login-error { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; margin-bottom: 12px; display: none; }
-  .login-footer { font-size: 11px; color: var(--text3); text-align: center; margin-top: 16px; }
+  .login-footer { font-size: 11px; color: #555; text-align: center; margin-top: 16px; }
 
   /* Typography */
   h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
@@ -104,7 +104,7 @@
   .btn { font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; border-radius: var(--radius-sm); padding: 7px 14px; transition: all .15s; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 5px; }
   .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .btn-primary:hover { background: #174d78; }
-  .btn-secondary { background: var(--surface); color: var(--text2); border-color: var(--border); }
+  .btn-secondary { background: #fff; color: #222; border-color: var(--border); }
   .btn-secondary:hover { background: var(--surface2); }
   .btn-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
   .btn-danger:hover { background: #f0d0d0; }
@@ -151,20 +151,20 @@
   /* Header */
   .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
   .top-bar-right { display: flex; gap: 8px; flex-wrap: wrap; }
-  .subtitle { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .subtitle { font-size: 12px; color: #555; margin-top: 2px; }
 
   /* Filter bar */
   .filter-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
   .filter-bar input { flex: 1; min-width: 180px; max-width: 400px; }
   .filter-bar select { max-width: 180px; }
-  .filter-panel { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .filter-panel-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
-  .filter-chip { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; border: 1.5px solid var(--border); background: #fff; color: var(--text); transition: all .15s; white-space: nowrap; }
+  .filter-panel { background: var(--accent); border: none; border-radius: var(--radius); padding: 12px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .filter-panel-title { font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .07em; width: 100%; margin-bottom: 4px; }
+  .filter-chip { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; border: none; background: rgba(255,255,255,.92); color: #222; transition: all .15s; white-space: nowrap; }
   .filter-chip:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); }
   .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
   .filter-chip.active-vip { background: var(--vip-bg); color: var(--vip); border-color: var(--vip-border); font-weight: 700; }
   .filter-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
-  .filter-select { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: #fff; color: var(--text); cursor: pointer; transition: all .15s; }
+  .filter-select { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; border: none; background: rgba(255,255,255,.92); color: #222; cursor: pointer; transition: all .15s; }
   .filter-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
   .filter-clear { font-family: var(--font); font-size: 12px; color: var(--danger); background: none; border: none; cursor: pointer; padding: 5px 8px; border-radius: 20px; margin-left: 4px; }
   .filter-clear:hover { background: var(--danger-bg); }
@@ -181,10 +181,10 @@
   .detail-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
   .detail-header-right { margin-left: auto; display: flex; gap: 8px; }
   .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
-  .detail-card-title { font-size: 10px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+  .detail-card-title { font-size: 11px; font-weight: 800; color: #222; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
   .detail-row { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .detail-row:last-child { border-bottom: none; }
-  .detail-label { font-size: 11px; color: var(--text3); min-width: 100px; flex-shrink: 0; padding-top: 2px; font-weight: 500; }
+  .detail-label { font-size: 12px; color: #444; min-width: 110px; flex-shrink: 0; padding-top: 2px; font-weight: 600; }
   @media (max-width: 600px) { .detail-panel-grid { grid-template-columns: 1fr !important; } }
   .actions-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -216,7 +216,7 @@
   .stat-card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; }
   .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
   .stat-value { font-size: 26px; font-weight: 600; line-height: 1; }
-  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .stat-sub { font-size: 11px; color: #555; margin-top: 4px; }
   .bar-row { display: flex; align-items: center; gap: 8px; }
   .bar-label { font-size: 12px; color: var(--text2); min-width: 80px; }
   .bar-track { flex: 1; height: 8px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
@@ -239,7 +239,7 @@
   .file-doc { padding: 8px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-width: 130px; }
   .file-doc:hover { background: var(--surface2); }
   .file-name { font-size: 11px; font-weight: 500; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .file-size { font-size: 10px; color: var(--text3); }
+  .file-size { font-size: 10px; color: #555; }
   .file-del { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; border: none; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; line-height: 1; }
 
   /* Toast */
@@ -248,7 +248,7 @@
   .toast-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
 
   /* Empty state */
-  .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); }
+  .empty { text-align: center; padding: 3rem 1rem; color: #555; }
   .empty strong { display: block; font-size: 15px; color: var(--text2); margin-bottom: 6px; }
 
   /* Confirm inline */
@@ -264,9 +264,9 @@
   /* Layout con sidebar */
   .crm-layout { display: flex; gap: 0; align-items: flex-start; }
   .sidebar { width: 220px; min-width: 220px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 12px; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; }
-  .sidebar-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+  .sidebar-title { font-size: 10px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
   .sidebar-section { margin-bottom: 14px; }
-  .sidebar-section-label { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 6px; display: block; }
+  .sidebar-section-label { font-size: 12px; font-weight: 700; color: #222; margin-bottom: 6px; display: block; }
   .sidebar-chip { display: block; width: 100%; text-align: left; font-family: var(--font); font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--text); transition: all .12s; margin-bottom: 2px; }
   .sidebar-chip:hover { background: var(--surface2); color: var(--text); }
   .sidebar-chip.active { background: var(--accent); color: #fff; font-weight: 600; }
@@ -289,7 +289,7 @@
   .note-entry { border-left: 3px solid var(--border); padding: 8px 12px; margin-bottom: 6px; background: var(--surface); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
   .note-entry:last-child { margin-bottom: 0; }
   .note-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
-  .note-date { font-size: 11px; color: var(--text3); }
+  .note-date { font-size: 11px; color: #555; }
   .note-text { font-size: 13px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
   .note-add-form { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; display: grid; gap: 8px; }
   .note-type-row { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -297,12 +297,12 @@
   .note-type-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   /* Copy button */
-  .copy-btn { font-size: 11px; padding: 1px 7px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--text3); cursor: pointer; font-family: var(--font); transition: all .12s; }
+  .copy-btn { font-size: 11px; padding: 1px 7px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: #555; cursor: pointer; font-family: var(--font); transition: all .12s; }
   .copy-btn:hover { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
   .copy-btn.copied { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
 
   /* Loader */
-  .loader { text-align: center; padding: 3rem; color: var(--text3); font-size: 13px; }
+  .loader { text-align: center; padding: 3rem; color: #555; font-size: 13px; }
 
   @media (max-width: 600px) {
     .grid-2 { grid-template-columns: 1fr; }
@@ -420,6 +420,8 @@ const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
 const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Planta Baja','Okupa OK','1 línea','2 línea'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos','Benidorm','Jávea','Calpe','Villajoyosa'];
+const ZONE_GREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
+const ZONE_BURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
 const TAG_COLORS={
   'Premium':            'chip-vip',
   'Extranjero':         'chip-accent',
@@ -1000,8 +1002,6 @@ function renderForm() {
   tagCol.append(tagField);
 
   // Columna 2: Zonas — primera mitad
-  const ZONE_GREEN = ['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
-  const ZONE_BURDO = ['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
   const ZONE_BLUE  = ZONE_SUGG.filter(z=>!ZONE_GREEN.includes(z)&&!ZONE_BURDO.includes(z));
   let zvG = zoneVals.filter(z=>ZONE_GREEN.includes(z));
   let zvBl= zoneVals.filter(z=>ZONE_BLUE.includes(z));
@@ -1186,15 +1186,16 @@ function renderCard(c) {
 function renderDetail() {
   const c = state.detailContact;
   if(!c) return h('div',{},'No hay contacto seleccionado');
-  const u = URGENCY[c.urgency]||URGENCY[2];
+  const urg = c.urgency ? URGENCY[c.urgency] : null;
+  const urgBg = urg ? urg.c : '#6b7280';
   const wrap = h('div',{});
 
   // Header botones
   const hdr = h('div',{class:'detail-header'});
   hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'list',detailContact:null,showMerge:false})},'← Lista'));
-  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>{setState({view:'form',editContact:{...c}});}},'Editar'));
+  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'form',editContact:{...c}})},'Editar'));
   hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({showMerge:!state.showMerge,mergeSearch:'',mergeSelected:null})},state.showMerge?'Cancelar fusión':'Fusionar'));
-  const rightBtns = h('div',{class:'flex',style:{marginLeft:'auto'}});
+  const rightBtns=h('div',{class:'flex',style:{marginLeft:'auto'}});
   rightBtns.append(h('button',{class:'btn btn-danger btn-sm',onClick:()=>setState({confirmDelete:c.id})},'Eliminar'));
   hdr.append(rightBtns);
   wrap.append(hdr);
@@ -1208,45 +1209,85 @@ function renderDetail() {
   }
   if(state.showMerge) wrap.append(renderMergePanel(c));
 
-  // ── PANEL PRINCIPAL ── dos columnas
-  const panel = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px',marginBottom:'14px'}});
+  // ── HERO — cabecera coloreada igual que la tarjeta ──
+  const hero = h('div',{style:{
+    display:'flex',alignItems:'stretch',borderRadius:'12px',overflow:'hidden',
+    border:'1.5px solid '+urgBg,marginBottom:'16px',background:'#fff'
+  }});
 
-  // ── COLUMNA IZQUIERDA ──
-  const left = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  // Barra lateral
+  hero.append(h('div',{style:{width:'6px',background:urgBg,flexShrink:'0'}}));
 
-  // Nombre + VIP + urgencia
-  const nameRow = h('div',{style:{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}});
-  const av = avatar(c.name,'');
+  // Bloque nombre + acciones
+  const heroLeft = h('div',{style:{background:urgBg,padding:'16px 20px',minWidth:'260px',display:'flex',flexDirection:'column',gap:'8px'}});
+  const heroNameRow = h('div',{style:{display:'flex',alignItems:'center',gap:'12px'}});
+  const av = avatar(c.name);
   if(c.isVIP){const star=h('div',{class:'vip-star'},'★');av.append(star);}
-  nameRow.append(av);
-  const nameInfo = h('div',{});
-  nameInfo.append(h('div',{style:{display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}},
-    h('h2',{style:{fontSize:'18px',margin:'0'}},c.name||'Sin nombre'),
-    c.isVIP?chip('VIP','chip-vip'):null,
-    urgencyBadge(c.urgency)
-  ));
-  if(c.createdBy) nameInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)',marginTop:'2px'}},'Agente: '+c.createdBy));
-  if(c.lastContact) nameInfo.append(h('div',{style:{fontSize:'12px',color:'var(--text3)'}},'Último contacto: '+fmtDate(c.lastContact)));
-  nameRow.append(nameInfo);
-  left.append(nameRow);
+  heroNameRow.append(av);
+  const heroNameBlock = h('div',{style:{minWidth:0}});
+  heroNameBlock.append(h('div',{style:{fontSize:'20px',fontWeight:'700',color:'#fff',lineHeight:'1.2'}},c.name||'Sin nombre'));
+  if(urg) heroNameBlock.append(h('div',{style:{fontSize:'13px',color:'rgba(255,255,255,.8)',marginTop:'2px'}},urg.l));
+  heroNameRow.append(heroNameBlock);
+  heroLeft.append(heroNameRow);
 
-  // Acciones rápidas
+  // Acciones
   const actions = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
-  if(c.phone||c.whatsapp) {
-    const waBtn = h('button',{class:'btn btn-secondary btn-sm',onClick:()=>{
-      let p = cleanPhone(c.whatsapp||c.phone);
+  const btnStyle = {display:'inline-flex',alignItems:'center',gap:'4px',padding:'5px 12px',borderRadius:'20px',fontSize:'12px',fontWeight:'600',background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',cursor:'pointer'};
+  const actionBtn=(label,href,onClickFn)=>{
+    const btn=href
+      ? h('a',{href:href,target:'_blank',style:{...btnStyle,textDecoration:'none'}},label)
+      : h('button',{style:{...btnStyle,fontFamily:'var(--font)'},onClick:onClickFn},label);
+    return btn;
+  };
+  if(c.phone||c.whatsapp){
+    actions.append(actionBtn('💬 WhatsApp',null,()=>{
+      let p=cleanPhone(c.whatsapp||c.phone);
       if(!p.startsWith('34')&&!p.startsWith('+34')) p='34'+p.replace('+','');
-      p=p.replace('+','');
-      window.open(`https://wa.me/${p}?text=Hola+${encodeURIComponent(c.name)}%2C+me+pongo+en+contacto+desde+nuestra+inmobiliaria.`,'_blank');
-    }},'💬 WhatsApp');
-    actions.append(waBtn);
+      window.open('https://wa.me/'+p.replace('+','')+'?text=Hola+'+encodeURIComponent(c.name),'_blank');
+    }));
   }
-  if(c.phone) actions.append(h('a',{href:'tel:'+c.phone,class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📞 Llamar'));
-  if(c.email) actions.append(h('a',{href:'mailto:'+c.email,class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'✉️ Email'));
-  if(c.driveLink) actions.append(h('a',{href:c.driveLink,target:'_blank',class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📁 Drive'));
-  const calUrl='https://calendar.google.com/calendar/r/eventedit?text=Reunión+con+'+encodeURIComponent(c.name||'')+'&details='+encodeURIComponent('Cliente CRM\nTeléfono: '+(c.phone||'')+(c.email?'\nEmail: '+c.email:''));
-  actions.append(h('a',{href:calUrl,target:'_blank',class:'btn btn-secondary btn-sm',style:{textDecoration:'none'}},'📅 Calendar'));
-  left.append(actions);
+  if(c.phone) actions.append(actionBtn('📞 Llamar','tel:'+c.phone));
+  if(c.email) actions.append(actionBtn('✉️ Email','mailto:'+c.email));
+  if(c.driveLink) actions.append(actionBtn('📁 Drive',c.driveLink));
+  const calUrl='https://calendar.google.com/calendar/r/eventedit?text=Reunión+con+'+encodeURIComponent(c.name||'');
+  actions.append(actionBtn('📅 Calendar',calUrl));
+  heroLeft.append(actions);
+  hero.append(heroLeft);
+
+  // Bloque datos rápidos
+  const heroRight = h('div',{style:{flex:'1',padding:'16px 20px',display:'flex',flexDirection:'column',justifyContent:'center',gap:'8px',background:'#fff'}});
+
+  // Fila: teléfono + email + fecha + presupuesto
+  const quickRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'14px',alignItems:'center'}});
+  if(c.phone){
+    const pw=h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}});
+    pw.append(h('span',{style:{fontWeight:'600',fontSize:'15px'}},c.phone));
+    const cb=h('button',{class:'copy-btn',onClick:()=>{navigator.clipboard.writeText(c.phone).then(()=>{cb.textContent='✓';setTimeout(()=>{cb.textContent='Copiar';},1500);})};},'Copiar');
+    pw.append(cb);
+    quickRow.append(pw);
+  }
+  if(c.email) quickRow.append(h('span',{style:{fontSize:'13px',color:'#555'}},c.email));
+  if(c.lastContact) quickRow.append(h('span',{style:{fontSize:'13px',color:'#555'}},'📅 '+fmtDate(c.lastContact)));
+  if(c.budgetMax) quickRow.append(h('span',{style:{fontSize:'15px',fontWeight:'700',color:'var(--success)'}},'💶 '+fmt(c.budgetMax)));
+  heroRight.append(quickRow);
+
+  // Etiquetas grandes
+  const tagsRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
+  const bigChip2=(t,cls)=>{const el=chip(t,cls);el.style.fontSize='13px';el.style.padding='4px 12px';el.style.fontWeight='600';return el;};
+  (c.searchZones||[]).forEach(z=>tagsRow.append(bigChip2(z,ZONE_GREEN.includes(z)?'chip-success':ZONE_BURDO.includes(z)?'chip-warn':'chip-accent')));
+  if(c.investmentType) tagsRow.append(bigChip2(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
+  if(c.bedroomsMin) tagsRow.append(bigChip2(c.bedroomsMin+'+ hab.','chip-accent'));
+  if(c.needsMortgage) tagsRow.append(bigChip2('Hipoteca','chip-warn'));
+  (c.tags||[]).forEach(t=>tagsRow.append(bigChip2(t,TAG_COLORS[t]||'chip-accent')));
+  if(tagsRow.children.length) heroRight.append(tagsRow);
+
+  hero.append(heroRight);
+  wrap.append(hero);
+
+  // ── DOS COLUMNAS: info + recordatorios ──
+  const panel = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px',marginBottom:'14px'}});
+  const left = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
+  const right = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
 
   // Helpers
   const copyField=(label,value)=>{
@@ -1255,84 +1296,48 @@ function renderDetail() {
     row.append(h('div',{class:'detail-label'},label));
     const valWrap=h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}});
     valWrap.append(h('span',{},value));
-    const cb=h('button',{class:'copy-btn',onClick:()=>{
-      navigator.clipboard.writeText(value).then(()=>{
-        cb.textContent='✓';cb.classList.add('copied');
-        setTimeout(()=>{cb.textContent='Copiar';cb.classList.remove('copied');},1500);
-      });
-    }},'Copiar');
+    const cb=h('button',{class:'copy-btn',onClick:()=>{navigator.clipboard.writeText(value).then(()=>{cb.textContent='✓';setTimeout(()=>{cb.textContent='Copiar';},1500);})};},'Copiar');
     valWrap.append(cb);
     row.append(valWrap);
     return row;
   };
-  const dataRow=(label,value)=>{
-    if(!value) return null;
-    return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{},value));
-  };
+  const dataRow=(label,value)=>{ if(!value) return null; return h('div',{class:'detail-row'},h('div',{class:'detail-label'},label),h('div',{},value)); };
 
-  // Presupuesto y requisitos — columna izquierda
-  const reqCard = h('div',{class:'detail-card'});
+  // Presupuesto y requisitos
+  const reqCard = h('div',{class:'detail-card',style:{background:'#fff'}});
   reqCard.append(h('div',{class:'detail-card-title'},'Presupuesto y requisitos'));
   [
     c.budgetMax?dataRow('Presupuesto máx.',fmt(c.budgetMax)):null,
-    c.needsMortgage?dataRow('Hipoteca','Sí'):null,
     c.investmentType?dataRow('Tipo inversión',c.investmentType):null,
     c.searchZones?.length?dataRow('Zonas',c.searchZones.join(', ')):null,
     c.propertyTypes?.length?dataRow('Tipo inmueble',c.propertyTypes.join(', ')):null,
     c.bedroomsMin?dataRow('Dormitorios mín.',c.bedroomsMin+'+'):null,
+    c.needsMortgage?dataRow('Hipoteca','Sí, necesita financiación'):null,
   ].filter(Boolean).forEach(r=>reqCard.append(r));
   left.append(reqCard);
 
-  panel.append(left);
-
-  // ── COLUMNA DERECHA ── contacto + etiquetas + recordatorios
-  const right = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
-
-  // Datos de contacto — columna derecha
-  const contactCard = h('div',{class:'detail-card'});
-  contactCard.append(h('div',{class:'detail-card-title'},'Contacto'));
-  [copyField('Teléfono',c.phone),
-   copyField('Email',c.email),
-   c.whatsapp?copyField('WhatsApp',c.whatsapp):null,
-   c.contactMethods?.length?dataRow('Vía preferida',c.contactMethods.join(', ')):null
-  ].filter(Boolean).forEach(r=>contactCard.append(r));
-  right.append(contactCard);
-
-  // Etiquetas — todas coloreadas
-  const tagsCard = h('div',{class:'detail-card'});
-  tagsCard.append(h('div',{class:'detail-card-title'},'Etiquetas'));
-  const tagsWrap = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px',marginTop:'6px'}});
-  if(c.tags?.length) {
-    c.tags.forEach(t=>{
-      tagsWrap.append(chip(t, TAG_COLORS[t]||'chip-accent'));
-    });
-  } else {
-    tagsWrap.append(h('span',{style:{fontSize:'12px',color:'var(--text3)',fontStyle:'italic'}},'Sin etiquetas'));
+  if(c.driveLink){
+    left.append(h('a',{href:c.driveLink,target:'_blank',style:{display:'inline-flex',alignItems:'center',gap:'6px',fontSize:'13px',color:'var(--accent)',textDecoration:'none',padding:'8px 0'}},
+      '📁 Abrir carpeta en Google Drive'));
   }
-  tagsCard.append(tagsWrap);
-  right.append(tagsCard);
 
-  // Recordatorios
+  panel.append(left);
   right.append(renderRemindersSection(c));
-
   panel.append(right);
   wrap.append(panel);
 
-  // ── NOTAS — ancho completo debajo ──
+  // Notas
   const notesSection = renderNotesSection(c);
-  if(state.focusNotes) {
-    notesSection.style.border = '2px solid var(--accent)';
-    notesSection.style.borderRadius = 'var(--radius)';
-    notesSection.style.padding = '4px';
-    setState({focusNotes: false});
+  if(state.focusNotes){
+    notesSection.style.border='2px solid var(--accent)';
+    notesSection.style.borderRadius='var(--radius)';
+    setState({focusNotes:false});
   }
   wrap.append(notesSection);
-
-  // Archivos
   wrap.append(sectionEl('Archivos y fotos', renderFilesSection(c.id)));
-
   return wrap;
 }
+
 
 // NOTES HISTORY SECTION
 function renderNotesSection(c) {
