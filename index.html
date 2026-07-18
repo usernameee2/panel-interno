@@ -1302,7 +1302,11 @@ function renderDetail() {
     pw.append(cb);
     quickRow.append(pw);
   }
-  if(c.email) quickRow.append(h('span',{style:{fontSize:'13px',color:'#555'}},c.email));
+  if(c.email) quickRow.append(h('a',{href:'mailto:'+c.email,style:{
+    fontSize:'13px',fontWeight:'600',color:'#1e3a8a',textDecoration:'none',
+    background:'#eff6ff',border:'1.5px solid #93c5fd',borderRadius:'20px',
+    padding:'3px 12px',whiteSpace:'nowrap'
+  }},c.email));
   if(c.lastContact) quickRow.append(h('span',{style:{fontSize:'13px',color:'#555'}},'📅 '+fmtDate(c.lastContact)));
   if(c.budgetMax) quickRow.append(h('span',{style:{fontSize:'15px',fontWeight:'700',color:'var(--success)'}},'💶 '+fmt(c.budgetMax)));
   heroRight.append(quickRow);
