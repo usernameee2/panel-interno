@@ -1150,7 +1150,7 @@ function renderCard(c, idx) {
   // Teléfono
   if(c.phone){
     const phoneRow = h('div',{style:{display:'flex',alignItems:'center',gap:'6px',marginTop:'4px'}});
-    phoneRow.append(h('span',{style:{fontSize:'12px',color:'#ffffff',fontWeight:'500'}},c.phone));
+    phoneRow.append(h('span',{style:{fontSize:'12px',color:'#ffffff',fontWeight:'500',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},c.phone));
     const copyBtn=h('button',{style:{
       fontSize:'10px',padding:'1px 6px',borderRadius:'20px',border:'1px solid rgba(255,255,255,.4)',
       background:'rgba(255,255,255,.15)',color:'#fff',cursor:'pointer',fontFamily:'var(--font)'
