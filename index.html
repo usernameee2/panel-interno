@@ -152,7 +152,7 @@
   /* Chip */
   .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #252525; color: #d0d0d0; border: 1px solid #444; white-space: nowrap; font-weight: 500; }
   .chip-accent { background: #0f2744; color: #ffffff; border-color: #3b82f6; }
-  .chip-success { background: #1a3d24; color: #d1fae5; border-color: #4a8c5c; }
+  .chip-success { background: #14532d; color: #ffffff; border-color: #22c55e; }
   .chip-warn { background: #0f1f3d; color: #ffffff; border-color: #3b82f6; }
   .chip-danger { background: #450a0a; color: #f87171; border-color: #dc2626; }
   .chip-purple { background: #3b0764; color: #ffffff; border-color: #8b5cf6; font-weight: 600; }
@@ -642,6 +642,7 @@ let state = {
   syncing: false,
   sheetsConfigured: !!LS.get('crm_sheets_url'),
   focusNotes: false,
+  displayCount: 50,
 };
 let toastTimer = null;
 
@@ -832,7 +833,7 @@ function makeToggleRow(options, values, onChange, defaultColor, compact) {
   let vals = [...values];
   const colorMap = {
     'chip-vip':     {inact:{bg:'#422006', border:'#d97706', color:'#fbbf24'}, act:{bg:'#d97706', border:'#d97706', color:'#fff'}},
-    'chip-success': {inact:{bg:'#1a3d24', border:'#4a8c5c', color:'#d1fae5'}, act:{bg:'#2d6a3f', border:'#2d6a3f', color:'#fff'}},
+    'chip-success': {inact:{bg:'#14532d', border:'#22c55e', color:'#ffffff'}, act:{bg:'#16a34a', border:'#16a34a', color:'#fff'}},
     'chip-warn':    {inact:{bg:'#0f1f3d', border:'#3b82f6', color:'#ffffff'}, act:{bg:'#1d4ed8', border:'#1d4ed8', color:'#fff'}},
     'chip-accent':  {inact:{bg:'#0f2744', border:'#3b82f6', color:'#ffffff'}, act:{bg:'#3b82f6', border:'#3b82f6', color:'#fff'}},
     'chip-purple':  {inact:{bg:'#3b0764', border:'#8b5cf6', color:'#ffffff'}, act:{bg:'#7c3aed', border:'#7c3aed', color:'#fff'}},
@@ -869,7 +870,7 @@ function makeMultiToggle(options, values, onChange, label, defaultColor) {
   el.append(row);
   const colorMap = {
     'chip-vip':     {inact:{bg:'#422006', border:'#d97706', color:'#fbbf24'}, act:{bg:'#d97706', border:'#d97706', color:'#fff'}},
-    'chip-success': {inact:{bg:'#1a3d24', border:'#4a8c5c', color:'#d1fae5'}, act:{bg:'#2d6a3f', border:'#2d6a3f', color:'#fff'}},
+    'chip-success': {inact:{bg:'#14532d', border:'#22c55e', color:'#ffffff'}, act:{bg:'#16a34a', border:'#16a34a', color:'#fff'}},
     'chip-warn':    {inact:{bg:'#0f1f3d', border:'#3b82f6', color:'#ffffff'}, act:{bg:'#1d4ed8', border:'#1d4ed8', color:'#fff'}},
     'chip-accent':  {inact:{bg:'#0f2744', border:'#3b82f6', color:'#ffffff'}, act:{bg:'#3b82f6', border:'#3b82f6', color:'#fff'}},
     'chip-purple':  {inact:{bg:'#3b0764', border:'#8b5cf6', color:'#ffffff'}, act:{bg:'#7c3aed', border:'#7c3aed', color:'#fff'}},
@@ -1118,7 +1119,7 @@ function renderCard(c, idx) {
   const urgBorder  = pc.border;
   const card = h('div',{});
   card.style.cssText=`display:flex;border-radius:10px;overflow:hidden;border:1.5px solid ${urgBorder};background:#fff;cursor:pointer;transition:box-shadow .15s,transform .1s;`;
-  card.addEventListener('click',()=>setState({view:'detail',detailContact:c}));
+  card.addEventListener('click',()=>{ setState({view:'detail',detailContact:c}); window.scrollTo({top:0,behavior:'smooth'}); });
   card.addEventListener('mouseenter',()=>{card.style.boxShadow='0 4px 16px rgba(0,0,0,.12)';card.style.transform='translateY(-1px)';});
   card.addEventListener('mouseleave',()=>{card.style.boxShadow='none';card.style.transform='none';});
 
@@ -1246,7 +1247,7 @@ function renderDetail() {
 
   // Header botones
   const hdr = h('div',{class:'detail-header'});
-  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'list',detailContact:null,showMerge:false})},'← Lista'));
+  hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>{ setState({view:'list',detailContact:null,showMerge:false}); window.scrollTo({top:0}); }},'← Lista'));
   hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({view:'form',editContact:{...c}})},'Editar'));
   hdr.append(h('button',{class:'btn btn-secondary btn-sm',onClick:()=>setState({showMerge:!state.showMerge,mergeSearch:'',mergeSelected:null})},state.showMerge?'Cancelar fusión':'Fusionar'));
   const rightBtns=h('div',{class:'flex',style:{marginLeft:'auto'}});
@@ -1847,7 +1848,7 @@ function renderList() {
   if(af>0){
     sidebar.append(h('hr',{class:'sidebar-divider'}));
     sidebar.append(h('button',{class:'sidebar-clear',
-      onClick:()=>setState({filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false}})
+      onClick:()=>setState({displayCount:50,filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false}})
     },'✕ Limpiar filtros ('+af+')'));
   }
   // Chips de filtros activos en sidebar
@@ -1887,7 +1888,17 @@ function renderList() {
     main.append(empty);
   } else {
     const list=h('div',{class:'contact-list'});
-    filtered.forEach((c,i)=>list.append(renderCard(c,i)));
+    const visible = filtered.slice(0, state.displayCount);
+    visible.forEach((c,i)=>list.append(renderCard(c,i)));
+    if(filtered.length > state.displayCount) {
+      const remaining = filtered.length - state.displayCount;
+      const moreBtn = h('button',{
+        class:'btn btn-secondary',
+        style:{width:'100%',marginTop:'10px',padding:'12px',fontSize:'14px',fontWeight:'600'},
+        onClick:()=>setState({displayCount: state.displayCount + 50})
+      }, `Ver más (${remaining} restantes)`);
+      list.append(moreBtn);
+    }
     main.append(list);
   }
   layout.append(main);
