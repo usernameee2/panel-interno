@@ -79,6 +79,17 @@
     .note-type-row { gap: 4px; }
     .note-type-btn { font-size: 10px; padding: 2px 7px; }
     .stats-grid { grid-template-columns: 1fr 1fr; }
+    /* Tarjetas de contacto en móvil */
+    .contact-card { flex-direction: column !important; }
+    .contact-card > div:first-child { display: none; } /* ocultar barra lateral */
+    /* Columna izquierda (nombre) ocupa ancho completo */
+    .contact-card > div:nth-child(2) { width: 100% !important; min-width: unset !important; flex-direction: row !important; align-items: center !important; padding: 10px 12px !important; }
+    /* Columna derecha (etiquetas) ocupa ancho completo */
+    .contact-card > div:nth-child(3) { width: 100% !important; padding: 8px 12px !important; border-top: 1px solid rgba(255,255,255,.2); }
+    /* Formulario en móvil */
+    .form-sections > * { grid-template-columns: 1fr !important; }
+    /* Toprow del formulario en 2 cols en lugar de 5 */
+    .form-header { flex-wrap: wrap; gap: 8px; }
   }
 
   /* Login screen */
@@ -429,8 +440,8 @@ const URGENCY = {
 };
 const PROP_TYPES=['Piso','Casa','Chalet','Casa / Piso / Chalet','Villa','Solar','Local','Nave'];
 const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
-const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
-const TAG_SUGG=['Premium','Extranjero','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Planta Baja','Okupa OK','1 línea','2 línea'];
+const INV_TYPES=['','Inversión alquiler','Compra-venta','Cartera','Inversor'];
+const TAG_SUGG=['Premium','Extranjero','Español','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Playa','Planta Baja','Okupa OK','Para vacacionar','Para vivir','1 línea','2 línea'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos','Benidorm','Jávea','Calpe','Villajoyosa'];
 const ZONE_GREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
 const ZONE_BURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa'];
@@ -450,11 +461,14 @@ const TAG_COLORS={
   'Abierto a reformar': 'chip-warn',
   'Piscina':            'chip-accent',
   'Planta Baja':        'chip-accent',
+  'Español':            'chip-accent',
+  'Para vacacionar':    'chip-success',
+  'Para vivir':         'chip-success',
+  'Playa':              'chip-accent',
   'Okupa OK':           'chip-warn',
   '1 línea':            'chip-purple',
   '2 línea':            'chip-purple',
   // Tipos de inversión
-  'Uso propio':         'chip-accent',
   'Inversión alquiler': 'chip-success',
   'Compra-venta':       'chip-accent',
   'Cartera':            'chip-vip',
@@ -467,6 +481,7 @@ const TAG_COLORS={
   'Nave':               'chip-warn',
 };
 const ZONE_SUGG=[
+  'Toda la Costa',
   'Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5',
   'Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas',
   'Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada',
