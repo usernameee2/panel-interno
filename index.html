@@ -1227,6 +1227,7 @@ function renderCard(c, idx) {
   });
 
   if(c.bedroomsMin) chips2.append(bigChip(c.bedroomsMin+'+ hab.','chip-accent'));
+  (c.propertyTypes||[]).forEach(pt=>{ if(pt) chips2.append(bigChip(pt, TAG_COLORS[pt]||'chip-warn')); });
   if(c.needsMortgage) chips2.append(bigChip('Hipoteca','chip-warn'));
   if(c.investmentType) chips2.append(bigChip(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
 
@@ -1390,6 +1391,7 @@ function renderDetail() {
   const tagsRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
   const bigChip2=(t,cls)=>{const el=chip(t,cls);el.style.fontSize='13px';el.style.padding='4px 12px';el.style.fontWeight='600';return el;};
   (c.searchZones||[]).forEach(z=>tagsRow.append(bigChip2(z,ZONE_GREEN.includes(z)?'chip-orange':ZONE_BURDO.includes(z)?'chip-purple':'chip-accent')));
+  (c.propertyTypes||[]).forEach(pt=>{ if(pt) tagsRow.append(bigChip2(pt, TAG_COLORS[pt]||'chip-warn')); });
   if(c.investmentType) tagsRow.append(bigChip2(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
   if(c.bedroomsMin) tagsRow.append(bigChip2(c.bedroomsMin+'+ hab.','chip-accent'));
   if(c.needsMortgage) tagsRow.append(bigChip2('Hipoteca','chip-warn'));
