@@ -443,8 +443,8 @@ const CONTACT_METHODS=['Llamada','WhatsApp','Email','Presencial/Oficina'];
 const INV_TYPES=['','Uso propio','Inversión alquiler','Compra-venta','Cartera','Inversor'];
 const TAG_SUGG=['Premium','Extranjero','Español','Inversor','Primera vivienda','Segunda vivienda','No Inversor','Vivienda propia','Habla inglés','Tiene NIE','Sin NIE','Tiene efectivo','Necesita hipoteca','Abierto a reformar','Piscina','Playa','Planta Baja','Okupa OK','Para vacacionar','Para vivir','1 línea','2 línea'];
 const COAST_ZONES=['Torrevieja','Playa Flamenca','Orihuela Costa','Guardamar del Segura','Pilar de la Horadada','La Mata','Santa Pola','Gran Alacant','Los Montesinos','Benidorm','Jávea','Calpe','Villajoyosa'];
-const ZONE_GREEN=['Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5'];
-const ZONE_BURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Benidorm','Jávea','Calpe','Villajoyosa','La Nucía','Polop','Alfaz','Denia'];
+const ZONE_GREEN=['Alicante','San Vicente','El Campello','Muchavista','Carolinas','Florida','Garbinet','San Juan Pueblo','Playa San Juan','Pau 5'];
+const ZONE_BURDO=['Algorfa','Los Montesinos','Elche','Crevillente','Almoradí','Elda','Alcoy','Villena','Ibi','Benidorm','Jávea','Calpe','Villajoyosa','La Nucía','Polop','Alfaz','Denia'];
 const TAG_COLORS={
   'Premium':            'chip-vip',
   'Extranjero':         'chip-purple',
@@ -482,11 +482,11 @@ const TAG_COLORS={
 };
 const ZONE_SUGG=[
   'Toda la Costa',
-  'Alicante','San Vicente','El Campello','San Juan Pueblo','Playa San Juan','Pau 5',
+  'Alicante','San Vicente','El Campello','Muchavista','Carolinas','Florida','Garbinet','San Juan Pueblo','Playa San Juan','Pau 5',
   'Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas',
   'Guardamar del Segura','Pilar de la Horadada','La Mata','Ciudad Quesada',
   'Rojales','Santa Pola','Gran Alacant','Algorfa','Los Montesinos',
-  'Elche','Crevillente','Almoradí','Elda','Alcoy',
+  'Elche','Crevillente','Almoradí','Elda','Alcoy','Villena','Ibi',
   'Benidorm','Jávea','Calpe','Villajoyosa','La Nucía','Polop','Alfaz','Denia',
 ];
 const NOTE_TYPES=[
@@ -513,7 +513,7 @@ const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2
 const avatarColor = n => AVATAR_COLORS[(n?.charCodeAt(0)||65) % AVATAR_COLORS.length];
 const initials = n => (n||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
 const fmt = n => n ? '€' + Number(n).toLocaleString('es-ES') : '';
-const fmtDate = d => { if(!d) return ''; try { const dt=new Date(d); return isNaN(dt)?d:dt.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'}); } catch { return d; } };
+const fmtDate = d => { if(!d) return ''; try { const [y,m,dy]=d.split('-'); if(y&&m&&dy) return dy+'-'+m+'-'+y; const dt=new Date(d); return isNaN(dt)?d:dt.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'-'); } catch { return d; } };
 const urgLabel = v => (URGENCY[v]||URGENCY[2]).l;
 const urgColor = v => (URGENCY[v]||URGENCY[2]).c;
 const cleanPhone = p => (p||'').replace(/[\s\-\(\)]/g,'');
@@ -642,6 +642,7 @@ let state = {
   syncing: false,
   sheetsConfigured: !!LS.get('crm_sheets_url'),
   focusNotes: false,
+  searchNotes: false,
   displayCount: 50,
 };
 let toastTimer = null;
@@ -716,7 +717,8 @@ function getFiltered() {
   if (q) list = list.filter(c =>
     c.name?.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q) ||
     c.phone?.includes(q) || c.tags?.some(t=>t.toLowerCase().includes(q)) ||
-    c.searchZones?.some(z=>z.toLowerCase().includes(q)) || c.createdBy?.toLowerCase().includes(q)
+    c.searchZones?.some(z=>z.toLowerCase().includes(q)) || c.createdBy?.toLowerCase().includes(q) ||
+    (state.searchNotes && c.notes?.some(n=>n.text?.toLowerCase().includes(q)))
   );
   const f = state.filters;
   if (f.isVIP) list = list.filter(c=>c.isVIP);
@@ -1745,9 +1747,15 @@ function renderList() {
 
   // Search + sort row
   const fbar=h('div',{class:'filter-bar'});
-  const sinp=h('input',{type:'text',value:state.search,placeholder:'Buscar por nombre, zona, email, agente, etiqueta...'});
+  const sinp=h('input',{type:'text',value:state.search,placeholder:'Buscar por nombre, zona, email, etiqueta...','data-searchbox':'true'});
   sinp.addEventListener('input',e=>setState({search:e.target.value}));
   fbar.append(sinp);
+  // Checkbox buscar en notas
+  const notesChk = h('label',{style:{display:'flex',alignItems:'center',gap:'6px',fontSize:'12px',color:'#aaaaaa',cursor:'pointer',whiteSpace:'nowrap',userSelect:'none'}});
+  const chkInput = h('input',{type:'checkbox',checked:state.searchNotes,style:{width:'14px',height:'14px',cursor:'pointer',accentColor:'#3b82f6'}});
+  chkInput.addEventListener('change',e=>setState({searchNotes:e.target.checked}));
+  notesChk.append(chkInput, document.createTextNode('Buscar en notas'));
+  fbar.append(notesChk);
   const sortSel=h('select',{style:{fontSize:'13px',minWidth:'150px'}},
     h('option',{value:'date_desc'},'Más recientes'),
     h('option',{value:'name'},'Nombre A–Z'),
@@ -2022,6 +2030,11 @@ function renderSheetsConfig() {
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
 function render() {
+  // Guardar estado del input de búsqueda antes de re-renderizar
+  const prevFocused = document.activeElement;
+  const wasSearch = prevFocused && prevFocused.dataset && prevFocused.dataset.searchbox === 'true';
+  const cursorPos = wasSearch ? prevFocused.selectionStart : null;
+
   const app=document.getElementById('app');
   app.innerHTML='';
   if(state.toast) {
@@ -2032,6 +2045,15 @@ function render() {
   else if(state.view==='detail') app.append(renderDetail());
   else if(state.view==='stats') app.append(renderStats());
   else if(state.view==='sheets_config') app.append(renderSheetsConfig());
+
+  // Restaurar foco al buscador si lo tenía
+  if(wasSearch && state.view==='list') {
+    const newInput = document.querySelector('[data-searchbox="true"]');
+    if(newInput) {
+      newInput.focus();
+      try { newInput.setSelectionRange(cursorPos, cursorPos); } catch(e) {}
+    }
+  }
 }
 
 // ─── ARRANQUE ─────────────────────────────────────────────────────────────────
