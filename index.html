@@ -1466,14 +1466,15 @@ function renderDetail() {
 // NOTES HISTORY SECTION
 function renderNotesSection(c) {
   const notes = Array.isArray(c.notes) ? [...c.notes] : (c.notes ? [{v:'otro',text:c.notes,date:c.lastContact||new Date().toISOString().split('T')[0]}] : []);
-  const wrap = h('div',{class:'grid-stack',style:{gap:'4px'}});
 
-  // Lista de notas existentes (más recientes primero)
+  // ── COLUMNA IZQUIERDA: historial ──────────────────────────────────────────
+  const histCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'6px',flex:'1.4',minWidth:'0'}});
+  histCol.append(h('div',{style:{fontSize:'13px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'4px'}},'Historial'));
   const sorted = [...notes].sort((a,b)=>b.date>a.date?1:-1);
   if(sorted.length===0) {
-    wrap.append(h('div',{style:{fontSize:'12px',color:'var(--text3)',fontStyle:'italic'}},'Sin notas todavía. Añadí la primera abajo.'));
+    histCol.append(h('div',{style:{fontSize:'14px',color:'var(--text3)',fontStyle:'italic'}},'Sin notas todavía.'));
   } else {
-    sorted.forEach((n,origIdx)=>{
+    sorted.forEach(n=>{
       const nt = NOTE_TYPES.find(t=>t.v===n.v)||NOTE_TYPES[5];
       const entry = h('div',{class:'note-entry'});
       entry.style.borderLeftColor = n.v==='llamada'?'var(--accent)':n.v==='reunion'||n.v==='visita'?'var(--warn)':n.v==='whatsapp'?'var(--success)':'var(--border)';
@@ -1481,27 +1482,26 @@ function renderNotesSection(c) {
       meta.append(h('span',{class:'chip '+nt.c,style:{fontSize:'10px',padding:'1px 7px'}},nt.l));
       meta.append(h('span',{class:'note-date'},n.date));
       if(n.createdBy) meta.append(h('span',{style:{fontSize:'11px',color:'var(--text3)'}},n.createdBy));
-      // Botón eliminar nota
       const delBtn = h('button',{
         style:{marginLeft:'auto',fontSize:'11px',color:'var(--text3)',border:'none',background:'none',cursor:'pointer',padding:'0 2px'},
         onClick:()=>{
           if(!confirm('¿Eliminar esta nota? Esta acción no se puede deshacer.')) return;
-          const updated={...c,notes:notes.filter((_,i)=>i!==notes.indexOf(n))};
+          const updated={...c,notes:notes.filter(x=>x!==n)};
           saveContact(updated);
         }
       },'✕');
       meta.append(delBtn);
       entry.append(meta);
       entry.append(h('div',{class:'note-text'},n.text));
-      wrap.append(entry);
+      histCol.append(entry);
     });
   }
 
-  // Formulario para nueva nota
+  // ── COLUMNA DERECHA: nueva nota ────────────────────────────────────────────
   let newType='otro', newText='';
-  const form = h('div',{class:'note-add-form'});
-
-  // Selector de tipo
+  const formCol = h('div',{style:{flex:'1',minWidth:'0'}});
+  formCol.append(h('div',{style:{fontSize:'13px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'4px'}},'Nueva nota'));
+  const form = h('div',{class:'note-add-form',style:{marginTop:'0'}});
   const typeRow = h('div',{class:'note-type-row'});
   NOTE_TYPES.forEach(nt=>{
     const btn = h('button',{class:'note-type-btn'+(newType===nt.v?' active':'')},nt.l);
@@ -1512,30 +1512,23 @@ function renderNotesSection(c) {
     });
     typeRow.append(btn);
   });
-  // Activar "otro" por defecto visualmente
   typeRow.querySelector('.note-type-btn:last-child').classList.add('active');
-
-  const textarea = h('textarea',{placeholder:'Escribí tu nota aquí...',style:{minHeight:'70px',fontSize:'13px',resize:'vertical'}});
+  const textarea = h('textarea',{placeholder:'Escribí tu nota aquí...',style:{minHeight:'120px',fontSize:'15px',resize:'vertical',width:'100%'}});
   textarea.addEventListener('input',e=>newText=e.target.value);
-
-  const addRow2 = h('div',{style:{display:'flex',justifyContent:'flex-end'}});
-  const addBtn = h('button',{class:'btn btn-primary btn-sm',onClick:()=>{
+  const addBtn = h('button',{class:'btn btn-primary',style:{width:'100%',marginTop:'6px'},onClick:()=>{
     if(!newText.trim()) return;
-    const newNote = {
-      v: newType,
-      text: newText.trim(),
-      date: new Date().toISOString().split('T')[0],
-      createdBy: c.createdBy||''
-    };
+    const newNote={v:newType,text:newText.trim(),date:new Date().toISOString().split('T')[0],createdBy:c.createdBy||''};
     const updated={...c,notes:[...notes,newNote]};
     saveContact(updated);
   }},'Guardar nota');
-  addRow2.append(addBtn);
+  form.append(typeRow, textarea, addBtn);
+  formCol.append(form);
 
-  form.append(typeRow, textarea, addRow2);
-  wrap.append(form);
+  // ── GRID 2 COLUMNAS ───────────────────────────────────────────────────────
+  const grid = h('div',{style:{display:'flex',gap:'16px',alignItems:'flex-start'}});
+  grid.append(histCol, formCol);
 
-  return sectionEl('Historial de notas', wrap);
+  return sectionEl('Historial de notas', grid);
 }
 
 // REMINDERS SECTION
