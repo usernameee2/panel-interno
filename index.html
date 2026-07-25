@@ -44,7 +44,7 @@
     --mono: 'DM Mono', monospace;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.5; min-height: 100vh; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 17px; line-height: 1.5; min-height: 100vh; }
   #app { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
 
   /* ── MOBILE ── */
@@ -109,7 +109,7 @@
 
   /* Inputs */
   input, select, textarea {
-    width: 100%; font-family: var(--font); font-size: 14px; color: #e0e0e0; font-weight: 600;
+    width: 100%; font-family: var(--font); font-size: 15px; color: #e0e0e0; font-weight: 600;
     background: #111; border: 1.5px solid #333; border-radius: var(--radius-sm);
     padding: 8px 10px; outline: none; transition: border-color .15s;
   }
@@ -313,7 +313,7 @@
   .note-entry:last-child { margin-bottom: 0; }
   .note-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
   .note-date { font-size: 11px; color: #999999; }
-  .note-text { font-size: 13px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+  .note-text { font-size: 15px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
   .note-add-form { background: #0d1f14; border: 1.5px solid #16a34a; color: #ffffff; border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; display: grid; gap: 8px; }
   .note-type-row { display: flex; flex-wrap: wrap; gap: 5px; }
   .note-type-btn { font-family: var(--font); font-size: 11px; padding: 3px 10px; border-radius: 20px; cursor: pointer; border: 1.5px solid #16a34a; background: #0d1f14; color: #4ade80; transition: all .12s; font-weight: 600; }
@@ -1345,6 +1345,7 @@ function renderDetail() {
       : h('button',{style:{...btnStyle,fontFamily:'var(--font)'},onClick:onClickFn},label);
     return btn;
   };
+  if(c.phone||c.whatsapp){actions.append(actionBtn('💬 WhatsApp',null,()=>{let p=cleanPhone(c.whatsapp||c.phone);if(!p.startsWith('34')&&!p.startsWith('+34'))p='34'+p.replace('+','');window.open('https://wa.me/'+p.replace('+','')+'?text=Hola+'+encodeURIComponent(c.name),'_blank');}));}
   if(c.phone) actions.append(actionBtn('📞 Llamar','tel:'+c.phone));
   if(c.email) actions.append(actionBtn('✉️ Email','mailto:'+c.email));
   if(c.driveLink) actions.append(actionBtn('📁 Drive',c.driveLink));
@@ -1361,7 +1362,7 @@ function renderDetail() {
   const quickRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'14px',alignItems:'center'}});
   if(c.phone){
     const pw=h('div',{style:{display:'flex',alignItems:'center',gap:'6px'}});
-    pw.append(h('span',{style:{fontWeight:'600',fontSize:'15px'}},c.phone));
+    pw.append(h('span',{style:{fontWeight:'600',fontSize:'15px'}},'📞 '+c.phone));
     const cb=h('button',{class:'copy-btn',onClick:()=>{navigator.clipboard.writeText(c.phone).then(()=>{cb.textContent='✓';setTimeout(()=>{cb.textContent='Copiar';},1500);});}},'Copiar');
     pw.append(cb);
     quickRow.append(pw);
@@ -1839,7 +1840,7 @@ function renderList() {
 
   // ── GRID: sort+search izq | recordatorios der ────────────────────────────────
   const homeGrid = h('div',{style:{display:'grid',gridTemplateColumns:'auto 300px',gap:'14px',alignItems:'start',marginBottom:'12px'}});
-  const leftCol2 = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px'}});
+  const leftCol2 = h('div',{style:{display:'flex',flexDirection:'column',gap:'8px',background:'#1a1a2e',borderRadius:'10px',padding:'10px',border:'1px solid #2a2a4a'}});
   const sortSel=h('select',{style:{width:'220px',fontSize:'13px',background:'#1a1a1a',border:'1px solid #333',color:'#e0e0e0',borderRadius:'8px',padding:'6px 10px',fontWeight:'700'}},
     h('option',{value:'date_desc'},'Más recientes'),
     h('option',{value:'name'},'Nombre A–Z'),
