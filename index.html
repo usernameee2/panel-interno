@@ -205,7 +205,7 @@
   .detail-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
   .detail-header-right { margin-left: auto; display: flex; gap: 8px; }
   .detail-card { background: #0f1a2e; border: 1.5px solid #1e3a5f; border-radius: var(--radius); padding: 12px 14px; }
-  .detail-card-title { font-size: 13px; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+  .detail-card-title { font-size: 14px; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
   .detail-row { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .detail-row:last-child { border-bottom: none; }
   .detail-label { font-size: 14px; font-weight: 700; color: #93c5fd; min-width: 120px; flex-shrink: 0; padding-top: 2px; }
@@ -214,7 +214,7 @@
 
   /* Form */
   .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .form-sections { display: grid; gap: 14px; background: #0a1a10; padding: 8px; border-radius: var(--radius); }
+  .form-sections { display: grid; gap: 10px; background: #0a1a10; padding: 8px; border-radius: var(--radius); }
   .field { display: grid; gap: 4px; }
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
@@ -315,7 +315,7 @@
   .note-entry { border-left: 3px solid #333; padding: 8px 12px; margin-bottom: 6px; background: #111; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
   .note-entry:last-child { margin-bottom: 0; }
   .note-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
-  .note-date { font-size: 11px; color: #999999; }
+  .note-date { font-size: 13px; color: #999999; }
   .note-text { font-size: 17px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
   .note-add-form { background: #0d1f14; border: 1.5px solid #16a34a; color: #ffffff; border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; display: grid; gap: 8px; }
   .note-type-row { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -1325,7 +1325,7 @@ function renderDetail() {
   hero.append(h('div',{style:{width:'6px',background:urgBg,flexShrink:'0'}}));
 
   // Bloque nombre + acciones
-  const heroLeft = h('div',{style:{background:'#0d0d0d',borderLeft:'6px solid '+urgBg,padding:'16px 20px',minWidth:'240px',display:'flex',flexDirection:'column',gap:'8px'}});
+  const heroLeft = h('div',{style:{background:'#0d0d0d',borderLeft:'6px solid '+urgBg,padding:'16px 20px',minWidth:'220px',maxWidth:'300px',display:'flex',flexDirection:'column',gap:'6px'}});
   const heroNameRow = h('div',{style:{display:'flex',alignItems:'center',gap:'12px'}});
   const av = avatar(c.name);
   if(c.isVIP){const star=h('div',{class:'vip-star'},'★');av.append(star);}
@@ -1335,19 +1335,10 @@ function renderDetail() {
   if(urg) heroNameBlock.append(h('div',{style:{fontSize:'13px',color:'#dddddd',marginTop:'2px'}},urg.l));
   heroNameRow.append(heroNameBlock);
   // Botón Llamar junto al nombre, a la derecha
-  heroNameRow.append(h('div',{style:{flex:'1'}}));
-  if(c.phone){
-    heroNameRow.append(h('a',{href:'tel:'+c.phone,style:{
-      display:'inline-flex',alignItems:'center',gap:'4px',padding:'4px 12px',
-      borderRadius:'20px',fontSize:'12px',fontWeight:'700',
-      background:'#0e7490',color:'#fff',
-      border:'none',textDecoration:'none',flexShrink:'0'
-    }},'📞 Llamar'));
-  }
   heroLeft.append(heroNameRow);
 
-  // Acciones (sin WhatsApp que ya está arriba)
   const actions = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
+  if(c.phone) actions.append(h('a',{href:'tel:'+c.phone,style:{display:'inline-flex',alignItems:'center',gap:'4px',padding:'5px 12px',borderRadius:'20px',fontSize:'12px',fontWeight:'700',background:'#0e7490',color:'#fff',border:'none',textDecoration:'none'}},'📞 Llamar'));
   const btnStyle = {display:'inline-flex',alignItems:'center',gap:'4px',padding:'5px 12px',borderRadius:'20px',fontSize:'12px',fontWeight:'700',background:'rgba(0,0,0,.18)',color:'#fff',border:'1px solid rgba(255,255,255,.5)',cursor:'pointer'};
   const actionBtn=(label,href,onClickFn)=>{
     const btn=href
@@ -1469,7 +1460,6 @@ function renderNotesSection(c) {
 
   // ── COLUMNA IZQUIERDA: historial ──────────────────────────────────────────
   const histCol = h('div',{style:{display:'flex',flexDirection:'column',gap:'6px',flex:'1.4',minWidth:'0'}});
-  histCol.append(h('div',{style:{fontSize:'13px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'4px'}},'Historial'));
   const sorted = [...notes].sort((a,b)=>b.date>a.date?1:-1);
   if(sorted.length===0) {
     histCol.append(h('div',{style:{fontSize:'14px',color:'var(--text3)',fontStyle:'italic'}},'Sin notas todavía.'));
