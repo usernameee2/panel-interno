@@ -1084,24 +1084,31 @@ function renderForm() {
     h('button',{class:'btn btn-secondary',onClick:()=>setState({view: state.detailContact?'detail':'list',editContact:null})},'Cancelar'),
     h('button',{class:'btn btn-primary',onClick:saveForm},'Guardar contacto')
   );
+
+  // Campo de nota inicial (solo en nuevo contacto)
+  const isNewContact = !state.contacts.find(x=>x.id===form.id);
+  let initNoteText = '';
+  if(isNewContact) {
+    const noteSection = h('div',{style:{marginTop:'12px',background:'#0d1f14',border:'1.5px solid #22c55e',borderRadius:'10px',padding:'14px'}});
+    noteSection.append(h('label',{style:{fontSize:'13px',fontWeight:'800',color:'#86efac',textTransform:'uppercase',letterSpacing:'.05em',display:'block',marginBottom:'8px'}},'Nota inicial (opcional)'));
+    const noteTA = h('textarea',{style:{width:'100%',minHeight:'80px',background:'#111',border:'1px solid #333',borderRadius:'8px',padding:'10px',color:'#ffffff',fontSize:'15px',resize:'vertical',fontFamily:'var(--font)'},placeholder:'Agregá una nota sobre este contacto...'});
+    noteTA.addEventListener('input',e=>{ initNoteText=e.target.value; });
+    noteSection.append(noteTA);
+    wrap.append(noteSection);
+  }
   wrap.append(footer);
 
   function saveForm() {
     if(!form.name.trim()){errDiv.textContent='El nombre es obligatorio';errDiv.style.display='block';return;}
     errDiv.style.display='none';
-    const isNew = !state.contacts.find(x=>x.id===form.id);
-    saveContact(form).then ? saveContact(form) : saveContact(form);
-    // Si es nuevo, ir al detalle con notas enfocadas
-    if(isNew) {
-      setTimeout(()=>{
-        const saved = state.contacts.find(x=>x.id===form.id)||form;
-        setState({view:'detail', detailContact:saved, editContact:null, focusNotes:true});
-        setTimeout(()=>{
-          const notesSection = document.querySelector('.note-add-form textarea');
-          if(notesSection) notesSection.focus();
-        }, 150);
-      }, 100);
+    // Si hay nota inicial, agregarla al contacto
+    if(initNoteText.trim()) {
+      const noteEntry = {id:Date.now().toString(),v:'otro',text:initNoteText.trim(),date:new Date().toISOString().split('T')[0]};
+      form.notes = [...(form.notes||[]), noteEntry];
     }
+    saveContact(form).then ? saveContact(form) : saveContact(form);
+    // Siempre volver a la lista al guardar
+    setTimeout(()=>{ setState({view:'list', editContact:null, focusNotes:false}); window.scrollTo({top:0}); }, 100);
   }
 
   return wrap;
