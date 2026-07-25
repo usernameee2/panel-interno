@@ -1257,7 +1257,7 @@ function renderDetail() {
   if(!c) return h('div',{},'No hay contacto seleccionado');
   const urg = c.urgency ? URGENCY[c.urgency] : null;
   const urgBg = urg ? urg.c : '#6b7280';
-  const wrap = h('div',{style:{maxWidth:'920px',margin:'0 auto'}});
+  const wrap = h('div',{});
 
   // Header botones
   const hdr = h('div',{class:'detail-header'});
@@ -1409,7 +1409,7 @@ function renderDetail() {
   wrap.append(hero);
 
   // ── DOS COLUMNAS: info + recordatorios ──
-  const panel = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px',marginBottom:'14px'}});
+  const panel = h('div',{style:{display:'grid',gridTemplateColumns:'1.3fr 1fr',gap:'14px',marginBottom:'14px'}});
   const left = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
   const right = h('div',{style:{display:'flex',flexDirection:'column',gap:'10px'}});
 
