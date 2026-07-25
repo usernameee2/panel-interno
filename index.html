@@ -668,7 +668,7 @@ async function saveContact(c) {
   if (exists) contacts = state.contacts.map(x=>x.id===c.id?c:x);
   else contacts = [c, ...state.contacts];
   saveContacts(contacts);
-  setState({contacts, view: state.detailContact ? 'detail' : 'list', editContact:null, detailContact: exists ? c : state.detailContact});
+  setState({contacts, view: state.view==='form' ? 'list' : (state.detailContact ? 'detail' : 'list'), editContact:null, detailContact: c});
   // Sync a Sheets en segundo plano
   if (SHEETS_URL) {
     const res = await API.saveContact(c);
