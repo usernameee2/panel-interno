@@ -109,7 +109,7 @@
 
   /* Inputs */
   input, select, textarea {
-    width: 100%; font-family: var(--font); font-size: 13px; color: #e0e0e0; font-weight: 600;
+    width: 100%; font-family: var(--font); font-size: 14px; color: #e0e0e0; font-weight: 600;
     background: #111; border: 1.5px solid #333; border-radius: var(--radius-sm);
     padding: 8px 10px; outline: none; transition: border-color .15s;
   }
@@ -133,7 +133,7 @@
   .card { background: #1a1a1a; border: 1px solid #333; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: #0f1a2e; border: 1.5px solid #1e3a5f; border-radius: var(--radius); padding: 0 16px 14px 16px; }
-  .section-title { font-size: 11px; font-weight: 700; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #0a1525; border-bottom: 1px solid #1e3a5f; border-radius: var(--radius) var(--radius) 0 0; }
+  .section-title { font-size: 13px; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #0a1525; border-bottom: 1px solid #1e3a5f; border-radius: var(--radius) var(--radius) 0 0; }
   .section-form { background: #0d1f14; border: 1px solid #1a4a2e; border-radius: var(--radius); padding: 0 16px 14px 16px; }
   .section-form .section-title { background: #1a3a28; border-bottom-color: #1a3a28; color: #4ade80; font-weight: 800; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -202,7 +202,7 @@
   .detail-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
   .detail-header-right { margin-left: auto; display: flex; gap: 8px; }
   .detail-card { background: #0f1a2e; border: 1.5px solid #1e3a5f; border-radius: var(--radius); padding: 12px 14px; }
-  .detail-card-title { font-size: 11px; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+  .detail-card-title { font-size: 13px; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
   .detail-row { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .detail-row:last-child { border-bottom: none; }
   .detail-label { font-size: 12px; color: #93c5fd; min-width: 110px; flex-shrink: 0; padding-top: 2px; font-weight: 600; }
@@ -1059,7 +1059,7 @@ function renderForm() {
   const zonaCol2 = h('div',{class:'field'});
   zonaCol2.append(h('label',{style:{fontSize:'11px',fontWeight:'700',color:'#ffffff',textTransform:'uppercase',letterSpacing:'.06em',display:'block',marginBottom:'4px'}},'Zonas de búsqueda'));
   // Zonas en grid 2 col interno
-  const zonasInner = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px',marginTop:'4px'}});
+  const zonasInner = h('div',{style:{display:'grid',gridTemplateColumns:'1.6fr 1fr',gap:'6px',marginTop:'4px'}});
   const zonaLeft = h('div',{});
   zonaLeft.append(zoneRowGreen);
   zonaLeft.append(h('div',{style:{marginTop:'4px'}}));
@@ -1247,7 +1247,7 @@ function renderDetail() {
   if(!c) return h('div',{},'No hay contacto seleccionado');
   const urg = c.urgency ? URGENCY[c.urgency] : null;
   const urgBg = urg ? urg.c : '#6b7280';
-  const wrap = h('div',{});
+  const wrap = h('div',{style:{maxWidth:'920px',margin:'0 auto'}});
 
   // Header botones
   const hdr = h('div',{class:'detail-header'});
@@ -1324,9 +1324,18 @@ function renderDetail() {
   heroNameBlock.append(h('div',{style:{fontSize:'20px',fontWeight:'800',color:'#ffffff',lineHeight:'1.2',textShadow:'-1px -1px 0 rgba(0,0,0,.15), 1px -1px 0 rgba(0,0,0,.15), -1px 1px 0 rgba(0,0,0,.15), 1px 1px 0 rgba(0,0,0,.15)'}},c.name||'Sin nombre'));
   if(urg) heroNameBlock.append(h('div',{style:{fontSize:'13px',color:'#dddddd',marginTop:'2px'}},urg.l));
   heroNameRow.append(heroNameBlock);
+  // WhatsApp junto al nombre para reducir alto del panel
+  if(c.phone||c.whatsapp){
+    const waBtn = h('button',{style:{display:'inline-flex',alignItems:'center',gap:'4px',padding:'4px 12px',borderRadius:'20px',fontSize:'12px',fontWeight:'700',background:'rgba(0,0,0,.25)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',cursor:'pointer',fontFamily:'var(--font)',flexShrink:'0'},onClick:()=>{
+      let p=cleanPhone(c.whatsapp||c.phone);
+      if(!p.startsWith('34')&&!p.startsWith('+34')) p='34'+p.replace('+','');
+      window.open('https://wa.me/'+p.replace('+','')+'?text=Hola+'+encodeURIComponent(c.name),'_blank');
+    }},'💬 WhatsApp');
+    heroNameRow.append(waBtn);
+  }
   heroLeft.append(heroNameRow);
 
-  // Acciones
+  // Acciones (sin WhatsApp que ya está arriba)
   const actions = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
   const btnStyle = {display:'inline-flex',alignItems:'center',gap:'4px',padding:'5px 12px',borderRadius:'20px',fontSize:'12px',fontWeight:'700',background:'rgba(0,0,0,.18)',color:'#fff',border:'1px solid rgba(255,255,255,.5)',cursor:'pointer'};
   const actionBtn=(label,href,onClickFn)=>{
@@ -1335,13 +1344,6 @@ function renderDetail() {
       : h('button',{style:{...btnStyle,fontFamily:'var(--font)'},onClick:onClickFn},label);
     return btn;
   };
-  if(c.phone||c.whatsapp){
-    actions.append(actionBtn('💬 WhatsApp',null,()=>{
-      let p=cleanPhone(c.whatsapp||c.phone);
-      if(!p.startsWith('34')&&!p.startsWith('+34')) p='34'+p.replace('+','');
-      window.open('https://wa.me/'+p.replace('+','')+'?text=Hola+'+encodeURIComponent(c.name),'_blank');
-    }));
-  }
   if(c.phone) actions.append(actionBtn('📞 Llamar','tel:'+c.phone));
   if(c.email) actions.append(actionBtn('✉️ Email','mailto:'+c.email));
   if(c.driveLink) actions.append(actionBtn('📁 Drive',c.driveLink));
