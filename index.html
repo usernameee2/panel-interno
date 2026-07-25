@@ -160,6 +160,7 @@
   .chip-danger { background: #450a0a; color: #f87171; border-color: #dc2626; }
   .chip-purple { background: #3b0764; color: #ffffff; border-color: #8b5cf6; font-weight: 600; }
   .chip-orange { background: #2e1a0e; color: #ffedd5; border-color: #8a5230; font-weight: 600; }
+  .chip-teal { background: #0d3340; color: #5eead4; border-color: #0d9488; font-weight: 700; }
   .chip-vip { background: #422006; color: #fbbf24; border-color: #d97706; font-weight: 600; }
   .chip-remove { cursor: pointer; opacity: .5; font-size: 14px; line-height: 1; }
   .chip-remove:hover { opacity: 1; }
@@ -479,8 +480,8 @@ const TAG_COLORS={
   'Piso':               'chip-accent',
   'Casa':               'chip-accent',
   'Villa':              'chip-vip',
-  'Solar':              'chip-warn',
-  'Local':              'chip-warn',
+  'Solar':              'chip-teal',
+  'Local':              'chip-teal',
   'Nave':               'chip-warn',
 };
 const ZONE_SUGG=[
@@ -845,6 +846,7 @@ function makeToggleRow(options, values, onChange, defaultColor, compact) {
     'chip-accent':  {inact:{bg:'#0f2744', border:'#3b82f6', color:'#ffffff'}, act:{bg:'#3b82f6', border:'#3b82f6', color:'#fff'}},
     'chip-purple':  {inact:{bg:'#3b0764', border:'#8b5cf6', color:'#ffffff'}, act:{bg:'#7c3aed', border:'#7c3aed', color:'#fff'}},
     'chip-orange':  {inact:{bg:'#2e1a0e', border:'#8a5230', color:'#ffedd5'}, act:{bg:'#7a3d1f', border:'#7a3d1f', color:'#fff'}},
+    'chip-teal':   {inact:{bg:'#0d3340', border:'#0d9488', color:'#5eead4'}, act:{bg:'#0f766e', border:'#0f766e', color:'#fff'}},
   };
   const row = h('div',{class:'multi-toggle'});
   function refresh() {
@@ -882,6 +884,7 @@ function makeMultiToggle(options, values, onChange, label, defaultColor) {
     'chip-accent':  {inact:{bg:'#0f2744', border:'#3b82f6', color:'#ffffff'}, act:{bg:'#3b82f6', border:'#3b82f6', color:'#fff'}},
     'chip-purple':  {inact:{bg:'#3b0764', border:'#8b5cf6', color:'#ffffff'}, act:{bg:'#7c3aed', border:'#7c3aed', color:'#fff'}},
     'chip-orange':  {inact:{bg:'#2e1a0e', border:'#8a5230', color:'#ffedd5'}, act:{bg:'#7a3d1f', border:'#7a3d1f', color:'#fff'}},
+    'chip-teal':   {inact:{bg:'#0d3340', border:'#0d9488', color:'#5eead4'}, act:{bg:'#0f766e', border:'#0f766e', color:'#fff'}},
   };
   function refresh() {
     row.innerHTML='';
@@ -1227,7 +1230,7 @@ function renderCard(c, idx) {
   });
 
   if(c.bedroomsMin) chips2.append(bigChip(c.bedroomsMin+'+ hab.','chip-accent'));
-  (c.propertyTypes||[]).forEach(pt=>{ if(pt) chips2.append(bigChip(pt, TAG_COLORS[pt]||'chip-warn')); });
+  (c.propertyTypes||[]).forEach(pt=>{ if(pt) chips2.prepend(bigChip(pt,'chip-teal')); });
   if(c.needsMortgage) chips2.append(bigChip('Hipoteca','chip-warn'));
   if(c.investmentType) chips2.append(bigChip(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
 
@@ -1367,7 +1370,7 @@ function renderDetail() {
 
   // Bloque datos rápidos
   const detailUrgLightBg = '#161616';
-  const heroRight = h('div',{style:{flex:'1',padding:'16px 20px',display:'flex',flexDirection:'column',justifyContent:'center',gap:'8px',background:detailUrgLightBg}});
+  const heroRight = h('div',{style:{flex:'1',padding:'16px 20px',display:'flex',flexDirection:'column',justifyContent:'center',gap:'8px',background:detailUrgLightBg,borderLeft:'2px solid rgba(255,255,255,.12)'}});
 
   // Fila: teléfono + email + fecha + presupuesto
   const quickRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'14px',alignItems:'center'}});
@@ -1383,7 +1386,7 @@ function renderDetail() {
     background:'#0f1a2e',border:'1.5px solid #2563eb',borderRadius:'20px',
     padding:'3px 12px',whiteSpace:'nowrap'
   }},c.email));
-  if(c.budgetMax) quickRow.append(h('span',{style:{fontSize:'15px',fontWeight:'700',color:'#60a5fa'}},'💶 '+fmt(c.budgetMax)));
+  if(c.budgetMax) quickRow.append(h('span',{style:{fontSize:'15px',fontWeight:'700',color:'#60a5fa',background:'#0f2744',border:'1.5px solid #3b82f6',borderRadius:'8px',padding:'3px 12px',whiteSpace:'nowrap'}},'💶 '+fmt(c.budgetMax)));
   if(c.lastContact) quickRow.append(h('div',{style:{marginLeft:'auto',fontSize:'13px',color:'#aaaaaa',whiteSpace:'nowrap'}},'📅 '+fmtDate(c.lastContact)));
   heroRight.append(quickRow);
 
@@ -1391,7 +1394,7 @@ function renderDetail() {
   const tagsRow = h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px'}});
   const bigChip2=(t,cls)=>{const el=chip(t,cls);el.style.fontSize='13px';el.style.padding='4px 12px';el.style.fontWeight='600';return el;};
   (c.searchZones||[]).forEach(z=>tagsRow.append(bigChip2(z,ZONE_GREEN.includes(z)?'chip-orange':ZONE_BURDO.includes(z)?'chip-purple':'chip-accent')));
-  (c.propertyTypes||[]).forEach(pt=>{ if(pt) tagsRow.append(bigChip2(pt, TAG_COLORS[pt]||'chip-warn')); });
+  (c.propertyTypes||[]).forEach(pt=>{ if(pt) tagsRow.prepend(bigChip2(pt,'chip-teal')); });
   if(c.investmentType) tagsRow.append(bigChip2(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
   if(c.bedroomsMin) tagsRow.append(bigChip2(c.bedroomsMin+'+ hab.','chip-accent'));
   if(c.needsMortgage) tagsRow.append(bigChip2('Hipoteca','chip-warn'));
