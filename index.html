@@ -1088,29 +1088,48 @@ function renderForm() {
     h('button',{class:'btn btn-primary',onClick:saveForm},'Guardar contacto')
   );
 
-  // Campo de nota inicial (solo en nuevo contacto)
+  // Nota + Recordatorio en 2 columnas (solo en nuevo contacto)
   const isNewContact = !state.contacts.find(x=>x.id===form.id);
   let initNoteText = '';
+  let initRemText = '', initRemDate = '';
   if(isNewContact) {
-    const noteSection = h('div',{style:{marginTop:'12px',background:'#0d1f14',border:'1.5px solid #22c55e',borderRadius:'10px',padding:'14px'}});
+    const noteRemGrid = h('div',{style:{marginTop:'12px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}});
+
+    // Columna izq: Nota inicial
+    const noteSection = h('div',{style:{background:'#0d1f14',border:'1.5px solid #22c55e',borderRadius:'10px',padding:'14px'}});
     noteSection.append(h('label',{style:{fontSize:'13px',fontWeight:'800',color:'#86efac',textTransform:'uppercase',letterSpacing:'.05em',display:'block',marginBottom:'8px'}},'Nota inicial (opcional)'));
-    const noteTA = h('textarea',{style:{width:'100%',minHeight:'80px',background:'#111',border:'1px solid #333',borderRadius:'8px',padding:'10px',color:'#ffffff',fontSize:'15px',resize:'vertical',fontFamily:'var(--font)'},placeholder:'Agregá una nota sobre este contacto...'});
+    const noteTA = h('textarea',{style:{width:'100%',minHeight:'90px',background:'#111',border:'1px solid #333',borderRadius:'8px',padding:'10px',color:'#ffffff',fontSize:'15px',resize:'vertical',fontFamily:'var(--font)'},placeholder:'Agregá una nota sobre este contacto...'});
     noteTA.addEventListener('input',e=>{ initNoteText=e.target.value; });
     noteSection.append(noteTA);
-    wrap.append(noteSection);
+
+    // Columna der: Recordatorio inicial
+    const remSection = h('div',{style:{background:'#0a1a2e',border:'1.5px solid #3b82f6',borderRadius:'10px',padding:'14px'}});
+    remSection.append(h('label',{style:{fontSize:'13px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.05em',display:'block',marginBottom:'8px'}},'Recordatorio (opcional)'));
+    const remTextInp = h('input',{type:'text',placeholder:'Ej: Llamar para ver oferta...',style:{width:'100%',marginBottom:'8px',fontSize:'14px'}});
+    remTextInp.addEventListener('input',e=>{ initRemText=e.target.value; });
+    const remDateInp = h('input',{type:'date',style:{width:'100%',fontSize:'14px'}});
+    remDateInp.addEventListener('change',e=>{ initRemDate=e.target.value; });
+    remSection.append(remTextInp, remDateInp);
+
+    noteRemGrid.append(noteSection, remSection);
+    wrap.append(noteRemGrid);
   }
   wrap.append(footer);
 
   function saveForm() {
     if(!form.name.trim()){errDiv.textContent='El nombre es obligatorio';errDiv.style.display='block';return;}
     errDiv.style.display='none';
-    // Si hay nota inicial, agregarla al contacto
+    // Nota inicial
     if(initNoteText.trim()) {
       const noteEntry = {id:Date.now().toString(),v:'otro',text:initNoteText.trim(),date:new Date().toISOString().split('T')[0]};
       form.notes = [...(form.notes||[]), noteEntry];
     }
+    // Recordatorio inicial
+    if(initRemText.trim() && initRemDate) {
+      const remEntry = {id:Date.now().toString(),text:initRemText.trim(),date:initRemDate};
+      form.reminders = [...(form.reminders||[]), remEntry];
+    }
     saveContact(form).then ? saveContact(form) : saveContact(form);
-    // Siempre volver a la lista al guardar
     setTimeout(()=>{ setState({view:'list', editContact:null, focusNotes:false}); window.scrollTo({top:0}); }, 100);
   }
 
@@ -1386,7 +1405,7 @@ function renderDetail() {
     background:'#0f1a2e',border:'1.5px solid #2563eb',borderRadius:'20px',
     padding:'3px 12px',whiteSpace:'nowrap'
   }},c.email));
-  if(c.budgetMax) quickRow.append(h('span',{style:{fontSize:'15px',fontWeight:'700',color:'#60a5fa',background:'#0f2744',border:'1.5px solid #3b82f6',borderRadius:'8px',padding:'3px 12px',whiteSpace:'nowrap'}},'💶 '+fmt(c.budgetMax)));
+  if(c.budgetMax) quickRow.append(h('span',{style:{fontSize:'15px',fontWeight:'700',color:'#dbeafe',background:'#0f2744',border:'1.5px solid #3b82f6',borderRadius:'8px',padding:'3px 12px',whiteSpace:'nowrap'}},'💶 '+fmt(c.budgetMax)));
   if(c.lastContact) quickRow.append(h('div',{style:{marginLeft:'auto',fontSize:'13px',color:'#aaaaaa',whiteSpace:'nowrap'}},'📅 '+fmtDate(c.lastContact)));
   heroRight.append(quickRow);
 
