@@ -136,8 +136,8 @@
   .card { background: #1a1a1a; border: 1px solid #333; border-radius: var(--radius); padding: 0 16px 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
   .card.vip { border-color: var(--vip-border); background: linear-gradient(135deg, #fffdf7 0%, #fff 100%); }
   .section { background: #0f1a2e; border: 1.5px solid #1e3a5f; border-radius: var(--radius); padding: 0 16px 14px 16px; }
-  .section-title { font-size: 14px; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; padding: 9px 16px; margin: 0 -16px 14px -16px; background: #0a1525; border-bottom: 1px solid #1e3a5f; border-radius: var(--radius) var(--radius) 0 0; }
-  .section-form { background: #0d1f14; border: 1px solid #1a4a2e; border-radius: var(--radius); padding: 0 16px 14px 16px; }
+  .section-title { font-size: 13px; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: .07em; padding: 7px 14px; margin: 0 -14px 10px -14px; background: #0a1525; border-bottom: 1px solid #1e3a5f; border-radius: var(--radius) var(--radius) 0 0; }
+  .section-form { background: #0d1f14; border: 1px solid #1a4a2e; border-radius: var(--radius); padding: 0 14px 10px 14px; }
   .section-form .section-title { background: #1a3a28; border-bottom-color: #1a3a28; color: #4ade80; font-weight: 800; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -214,7 +214,7 @@
 
   /* Form */
   .form-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .form-sections { display: grid; gap: 10px; background: #0a1a10; padding: 8px; border-radius: var(--radius); }
+  .form-sections { display: grid; gap: 6px; background: #0a1a10; padding: 8px; border-radius: var(--radius); }
   .field { display: grid; gap: 4px; }
   .form-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
@@ -1022,7 +1022,7 @@ function renderForm() {
   row2.append(fld('Forma contacto', contactSel));
   row2.append(fld('Último contacto', inp('date','lastContact','',form.lastContact)));
 
-  sections.append(formSectionEl('Datos personales', row1, row2));
+  sections.append(formSectionEl('Datos personales', h('div',{style:{display:'grid',gap:'6px'}}, row1, row2)));
 
   // ── BLOQUE 2+3: Todo junto — 3 columnas (Opción B) ──
   // Preparar zonas
@@ -1045,7 +1045,7 @@ function renderForm() {
   propSel.addEventListener('change',e=>{ form.propertyTypes = e.target.value ? [e.target.value] : []; });
 
   // FILA 1: Tipo inmueble + Urgencia + Tipo inversión + Presupuesto + Dormitorios
-  const topRow = h('div',{style:{display:'grid',gridTemplateColumns:'160px 1fr 1fr 1fr 1fr 1fr',gap:'10px',alignItems:'end'}});
+  const topRow = h('div',{style:{display:'grid',gridTemplateColumns:'160px 1fr 1fr 1fr 1fr 1fr',gap:'8px',alignItems:'end'}});
   topRow.append(fld('Tipo de inmueble', propSel));
   topRow.append(fld('Urgencia', urgSel));
   topRow.append(fld('Tipo inversión', sel('investmentType',invOpts,form.investmentType)));
@@ -1072,7 +1072,7 @@ function renderForm() {
   zonasInner.append(zonaLeft, zonaRight);
   zonaCol2.append(zonasInner);
 
-  const etiqZonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1.6fr',gap:'14px',marginTop:'16px'}});
+  const etiqZonasGrid = h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1.6fr',gap:'10px',marginTop:'10px'}});
   etiqZonasGrid.append(tagField2, zonaCol2);
   const zonasGrid = etiqZonasGrid; // alias para el check
 
@@ -1325,7 +1325,7 @@ function renderDetail() {
   hero.append(h('div',{style:{width:'6px',background:urgBg,flexShrink:'0'}}));
 
   // Bloque nombre + acciones
-  const heroLeft = h('div',{style:{background:'#0d0d0d',borderLeft:'6px solid '+urgBg,padding:'16px 20px',minWidth:'220px',maxWidth:'300px',display:'flex',flexDirection:'column',gap:'6px'}});
+  const heroLeft = h('div',{style:{background:'#0d0d0d',borderLeft:'6px solid '+urgBg,padding:'14px 18px',minWidth:'280px',maxWidth:'420px',display:'flex',flexDirection:'column',gap:'6px'}});
   const heroNameRow = h('div',{style:{display:'flex',alignItems:'center',gap:'12px'}});
   const av = avatar(c.name);
   if(c.isVIP){const star=h('div',{class:'vip-star'},'★');av.append(star);}
