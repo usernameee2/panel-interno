@@ -488,7 +488,7 @@ const ZONE_SUGG=[
   'Toda la Costa',
   'Alicante','San Vicente','El Campello','Muchavista','Carolinas','Florida','San Blas','Garbinet','Vistahermosa','San Juan Pueblo','Playa San Juan','Pau 5',
   'Torrevieja','Playa Flamenca','Orihuela Costa','San Miguel de Salinas',
-  'Guardamar del Segura','Pilar de la Horadada','La Mata','Cabo Roig','Ciudad Quesada',
+  'Guardamar del Segura','Pilar de la Horadada','La Mata','Cabo Roig','Ciudad Quesada','Frutales',
   'Rojales','Santa Pola','Gran Alacant','Algorfa','Los Montesinos',
   'Elche','Crevillente','Almoradí','Elda','Alcoy','Villena','Ibi',
   'Cocentaina','Benidorm','Jávea','Calpe','Villajoyosa','La Nucía','Polop','Alfaz','Denia',
@@ -1093,7 +1093,7 @@ function renderForm() {
   let initNoteText = '';
   let initRemText = '', initRemDate = '';
   if(isNewContact) {
-    const noteRemGrid = h('div',{style:{marginTop:'12px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}});
+    const noteRemGrid = h('div',{style:{marginTop:'12px',display:'grid',gridTemplateColumns:'1.6fr 1fr',gap:'12px'}});
 
     // Columna izq: Nota inicial
     const noteSection = h('div',{style:{background:'#0d1f14',border:'1.5px solid #22c55e',borderRadius:'10px',padding:'14px'}});
