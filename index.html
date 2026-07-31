@@ -299,6 +299,8 @@
   .sidebar-chip.active-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); font-weight: 600; }
   .sidebar-select { width: 100%; font-family: var(--font); font-size: 13px; padding: 6px 10px; border-radius: var(--radius-sm); border: 2px solid #3b82f6; background: #1a1a1a; color: #60a5fa; cursor: pointer; margin-bottom: 4px; font-weight: 700; }
   .sidebar-select.active { border-color: var(--accent-border); color: var(--accent); background: var(--accent-bg); font-weight: 600; }
+  .sidebar-select optgroup { color: #60a5fa; font-weight: 800; font-style: normal; background: #0f1a2e; }
+  .sidebar-select option { color: #e0e0e0; font-weight: 500; background: #111111; }
   .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
   .sidebar-clear { width: 100%; font-family: var(--font); font-size: 13px; color: #f87171; background: none; border: none; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); text-align: left; font-weight: 600; }
   .sidebar-clear:hover { background: var(--danger-bg); }
@@ -635,7 +637,7 @@ let state = {
   editContact: null,
   detailContact: null,
   search: '',
-  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false, hasPremium:false, hasPlaya:false, hasReforma:false, hasInvAlq:false },
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false, hasPremium:false, hasPlaya:false, hasReforma:false, hasInvAlq:false, propertyType:'' },
   showFilters: false,
   sort: 'date_desc',
   toast: null,
@@ -746,6 +748,7 @@ function getFiltered() {
   if (f.hasPlaya) list = list.filter(c=>c.tags?.includes('Playa'));
   if (f.hasReforma) list = list.filter(c=>c.tags?.includes('Abierto a reformar'));
   if (f.hasInvAlq) list = list.filter(c=>c.investmentType==='Inversión alquiler');
+  if (f.propertyType) list = list.filter(c=>c.propertyTypes?.includes(f.propertyType));
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
     if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
@@ -1999,43 +2002,17 @@ function renderList() {
   zoneSection.append(zoneWrap);
   sidebar.append(zoneSection);
 
-
-  // Presupuesto
-  const budSection=h('div',{class:'sidebar-section'});
-  budSection.append(h('span',{class:'sidebar-section-label'},'Presupuesto máx.'));
-  const budgetSel=h('select',{class:'sidebar-select'+(f.budgetMax?' active':'')});
-  [['','Todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
-    const o=h('option',{value:v},l);if(f.budgetMax===v)o.selected=true;budgetSel.append(o);
-  });
-  budgetSel.addEventListener('change',e=>setState({filters:{...f,budgetMax:e.target.value}}));
-  budSection.append(budgetSel);
-  sidebar.append(budSection);
-
-  // Etiqueta
-  const tagSection=h('div',{class:'sidebar-section'});
-  tagSection.append(h('span',{class:'sidebar-section-label'},'Etiqueta'));
-  const tagSel=h('select',{class:'sidebar-select'+(f.tag?' active':'')},
-    h('option',{value:''},'Todas'),
-    ...TAG_SUGG.map(t=>h('option',{value:t},t))
+  const propSection=h('div',{class:'sidebar-section'});
+  propSection.append(h('span',{class:'sidebar-section-label'},'Tipo de propiedad'));
+  const propFSel=h('select',{class:'sidebar-select'+(f.propertyType?' active':'')},
+    h('option',{value:''},'Todos'),
+    ...['Piso','Casa','Chalet','Casa / Piso / Chalet','Villa','Solar','Local','Nave'].map(p=>h('option',{value:p,selected:f.propertyType===p},p))
   );
-  tagSel.value=f.tag||'';
-  tagSel.addEventListener('change',e=>setState({filters:{...f,tag:e.target.value}}));
-  tagSection.append(tagSel);
-  sidebar.append(tagSection);
+  propFSel.value=f.propertyType||'';
+  propFSel.addEventListener('change',e=>setState({filters:{...f,propertyType:e.target.value}}));
+  propSection.append(propFSel);
+  sidebar.append(propSection);
 
-  // Urgencia
-  const urgSection=h('div',{class:'sidebar-section'});
-  urgSection.append(h('span',{class:'sidebar-section-label'},'Urgencia'));
-  const urgSel=h('select',{class:'sidebar-select'+(f.urgencyMin>0?' active':'')},
-    h('option',{value:'0'},'Todas'),
-    ...[1,2,3].map(v=>h('option',{value:String(v)},URGENCY[v].l+' o más'))
-  );
-  urgSel.value=String(f.urgencyMin);
-  urgSel.addEventListener('change',e=>setState({filters:{...f,urgencyMin:Number(e.target.value)}}));
-  urgSection.append(urgSel);
-  sidebar.append(urgSection);
-
-  // Dormitorios
   const bedsSection=h('div',{class:'sidebar-section'});
   bedsSection.append(h('span',{class:'sidebar-section-label'},'Dormitorios mín.'));
   const bedsSideSel=h('select',{class:'sidebar-select'+(f.bedroomsMin?' active':'')},
@@ -2047,11 +2024,52 @@ function renderList() {
   bedsSection.append(bedsSideSel);
   sidebar.append(bedsSection);
 
+  const budSection=h('div',{class:'sidebar-section'});
+  budSection.append(h('span',{class:'sidebar-section-label'},'Presupuesto máx.'));
+  const budgetSel=h('select',{class:'sidebar-select'+(f.budgetMax?' active':'')});
+  [['','Todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);if(f.budgetMax===v)o.selected=true;budgetSel.append(o);
+  });
+  budgetSel.addEventListener('change',e=>setState({filters:{...f,budgetMax:e.target.value}}));
+  budSection.append(budgetSel);
+  sidebar.append(budSection);
+
+  const tagSection=h('div',{class:'sidebar-section'});
+  tagSection.append(h('span',{class:'sidebar-section-label'},'Etiqueta'));
+  const tagSel=h('select',{class:'sidebar-select'+(f.tag?' active':'')});
+  const tagGroups = [
+    {label:'— Todas —', opts:[['','Todas']]},
+    {label:'Tipo de cliente', opts:[['Premium','★ Premium'],['Inversor','Inversor'],['No Inversor','No Inversor'],['Extranjero','Extranjero'],['Español','Español']]},
+    {label:'Propósito', opts:[['Para vivir','Para vivir'],['Para vacacionar','Para vacacionar'],['Primera vivienda','Primera vivienda'],['Segunda vivienda','Segunda vivienda'],['Vivienda propia','Vivienda propia']]},
+    {label:'Idioma / Docs', opts:[['Habla inglés','Habla inglés'],['Tiene NIE','Tiene NIE'],['Sin NIE','Sin NIE']]},
+    {label:'Financiamiento', opts:[['Tiene efectivo','Tiene efectivo'],['Necesita hipoteca','Necesita hipoteca']]},
+    {label:'Características', opts:[['Piscina','Piscina'],['Playa','Playa'],['Planta Baja','Planta Baja'],['1 línea','1 línea'],['2 línea','2 línea'],['Okupa OK','Okupa OK'],['Abierto a reformar','Abierto a reformar']]},
+  ];
+  tagGroups.forEach(g=>{
+    if(g.label !== '— Todas —') tagSel.append(h('optgroup',{label:g.label},...g.opts.map(([v,l])=>h('option',{value:v,selected:f.tag===v},l))));
+    else g.opts.forEach(([v,l])=>tagSel.append(h('option',{value:v,selected:f.tag===v},l)));
+  });
+  tagSel.addEventListener('change',e=>setState({filters:{...f,tag:e.target.value}}));
+  tagSection.append(tagSel);
+  sidebar.append(tagSection);
+
+  const urgSection=h('div',{class:'sidebar-section'});
+  urgSection.append(h('span',{class:'sidebar-section-label'},'Urgencia'));
+  const urgSel=h('select',{class:'sidebar-select'+(f.urgencyMin>0?' active':'')},
+    h('option',{value:'0'},'Todas'),
+    ...[1,2,3].map(v=>h('option',{value:String(v)},URGENCY[v].l+' o más'))
+  );
+  urgSel.value=String(f.urgencyMin);
+  urgSel.addEventListener('change',e=>setState({filters:{...f,urgencyMin:Number(e.target.value)}}));
+  urgSection.append(urgSel);
+  sidebar.append(urgSection);
+
+
   // Limpiar
   if(af>0){
     sidebar.append(h('hr',{class:'sidebar-divider'}));
     sidebar.append(h('button',{class:'sidebar-clear',
-      onClick:()=>setState({displayCount:50,filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false,hasPlaya:false,hasReforma:false,hasInvAlq:false}})
+      onClick:()=>setState({displayCount:50,filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false,hasPlaya:false,hasReforma:false,hasInvAlq:false,propertyType:''}})
     },'✕ Limpiar filtros ('+af+')'));
   }
   // Chips de filtros activos en sidebar
