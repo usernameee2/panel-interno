@@ -635,7 +635,7 @@ let state = {
   editContact: null,
   detailContact: null,
   search: '',
-  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false, hasPremium:false, hasPlaya:false, hasReforma:false },
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false, hasPremium:false, hasPlaya:false, hasReforma:false, hasInvAlq:false },
   showFilters: false,
   sort: 'date_desc',
   toast: null,
@@ -745,6 +745,7 @@ function getFiltered() {
   if (f.hasPremium) list = list.filter(c=>c.tags?.includes('Premium'));
   if (f.hasPlaya) list = list.filter(c=>c.tags?.includes('Playa'));
   if (f.hasReforma) list = list.filter(c=>c.tags?.includes('Abierto a reformar'));
+  if (f.hasInvAlq) list = list.filter(c=>c.investmentType==='Inversión alquiler');
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
     if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
@@ -1494,7 +1495,7 @@ function renderNotesSection(c) {
       entry.style.borderLeftColor = n.v==='llamada'?'var(--accent)':n.v==='reunion'||n.v==='visita'?'var(--warn)':n.v==='whatsapp'?'var(--success)':'var(--border)';
       const meta = h('div',{class:'note-meta'});
       meta.append(h('span',{class:'chip '+nt.c,style:{fontSize:'10px',padding:'1px 7px'}},nt.l));
-      meta.append(h('span',{class:'note-date'},n.date));
+      meta.append(h('span',{class:'note-date'},fmtDate(n.date)));
       if(n.createdBy) meta.append(h('span',{style:{fontSize:'11px',color:'var(--text3)'}},n.createdBy));
       const delBtn = h('button',{
         style:{marginLeft:'auto',fontSize:'11px',color:'var(--text3)',border:'none',background:'none',cursor:'pointer',padding:'0 2px'},
@@ -1843,6 +1844,7 @@ function renderList() {
     ['🇬🇧 Habla inglés','hablaIngles','active'],
     ['🏖 Playa','hasPlaya','active'],
     ['🔨 Reforma OK','hasReforma','active-warn'],
+    ['🏠 Inv. alquiler','hasInvAlq','active'],
   ];
   chips.forEach(([label,field,cls])=>{
     const c=h('button',{class:'filter-chip'+(f[field]?' '+cls:''),onClick:()=>setState({filters:{...f,[field]:!f[field]}})},label);
@@ -1946,17 +1948,57 @@ function renderList() {
   const sidebar=h('div',{class:'sidebar'});
   sidebar.append(h('div',{class:'sidebar-title'},'Filtros'));
 
-  // Zona
+  // Zona — selector con colores agrupados
   const zoneSection=h('div',{class:'sidebar-section'});
   zoneSection.append(h('span',{class:'sidebar-section-label'},'Zona'));
-  const zoneSel=h('select',{class:'sidebar-select'+(f.zone?' active':'')},
-    h('option',{value:''},'Todas las zonas'),
-    ...ZONE_SUGG.map(z=>h('option',{value:z},z))
-  );
-  zoneSel.value=f.zone||'';
-  zoneSel.addEventListener('change',e=>setState({filters:{...f,zone:e.target.value}}));
-  zoneSection.append(zoneSel);
+
+  const zoneBtn = h('button',{style:{
+    width:'100%',textAlign:'left',fontFamily:'var(--font)',fontSize:'13px',fontWeight:'700',
+    padding:'6px 10px',borderRadius:'var(--radius-sm)',
+    border:'2px solid '+(f.zone?'#3b82f6':'#1e3a5f'),
+    background:'#1a1a1a',color:f.zone?'#93c5fd':'#6b93b8',cursor:'pointer',
+    display:'flex',justifyContent:'space-between',alignItems:'center'
+  }},h('span',{},f.zone||'Todas las zonas'),h('span',{},'▾'));
+
+  const zoneDropdown = h('div',{style:{
+    display:'none',position:'absolute',zIndex:'200',background:'#0a1020',
+    border:'1.5px solid #1e3a5f',borderRadius:'8px',padding:'6px',
+    marginTop:'2px',maxHeight:'300px',overflowY:'auto',width:'220px',
+    boxShadow:'0 6px 24px rgba(0,0,0,.7)'
+  }});
+
+  const addZoneGroup=(label,bg,fg,zones)=>{
+    if(label) zoneDropdown.append(h('div',{style:{fontSize:'10px',fontWeight:'800',color:'#555',textTransform:'uppercase',padding:'6px 6px 2px',letterSpacing:'.05em'}},label));
+    zones.forEach(z=>{
+      const opt=h('div',{style:{
+        padding:'4px 10px',borderRadius:'5px',cursor:'pointer',fontSize:'13px',fontWeight:'600',
+        color:fg,background:f.zone===z?bg.replace('0.4','0.7'):bg,marginBottom:'2px',
+        border:f.zone===z?'1px solid #3b82f6':'1px solid transparent',opacity:'1'
+      }},z);
+      opt.addEventListener('mouseenter',()=>{opt.style.opacity='.75';});
+      opt.addEventListener('mouseleave',()=>{opt.style.opacity='1';});
+      opt.addEventListener('click',e=>{e.stopPropagation();setState({filters:{...f,zone:z}});zoneDropdown.style.display='none';});
+      zoneDropdown.append(opt);
+    });
+  };
+
+  const allOpt2=h('div',{style:{padding:'5px 10px',borderRadius:'5px',cursor:'pointer',fontSize:'13px',fontWeight:'700',color:'#ffffff',marginBottom:'6px',borderBottom:'1px solid #1e3a5f',paddingBottom:'8px'}},'Todas las zonas');
+  allOpt2.addEventListener('click',e=>{e.stopPropagation();setState({filters:{...f,zone:''}});zoneDropdown.style.display='none';});
+  zoneDropdown.append(allOpt2);
+
+  const ZONE_BLUE_LIST=ZONE_SUGG.filter(z=>!ZONE_GREEN.includes(z)&&!ZONE_BURDO.includes(z));
+  addZoneGroup('Alicante y barrios','#1a3d10','#d1fae5',ZONE_GREEN);
+  addZoneGroup('Costa sur','#0f2744','#bfdbfe',ZONE_BLUE_LIST);
+  addZoneGroup('Interior y norte','#3b0764','#ede9fe',ZONE_BURDO);
+
+  zoneBtn.addEventListener('click',e=>{e.stopPropagation();zoneDropdown.style.display=zoneDropdown.style.display==='none'?'block':'none';});
+  document.addEventListener('click',()=>{zoneDropdown.style.display='none';});
+
+  const zoneWrap=h('div',{style:{position:'relative'}});
+  zoneWrap.append(zoneBtn,zoneDropdown);
+  zoneSection.append(zoneWrap);
   sidebar.append(zoneSection);
+
 
   // Presupuesto
   const budSection=h('div',{class:'sidebar-section'});
@@ -2009,7 +2051,7 @@ function renderList() {
   if(af>0){
     sidebar.append(h('hr',{class:'sidebar-divider'}));
     sidebar.append(h('button',{class:'sidebar-clear',
-      onClick:()=>setState({displayCount:50,filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false,hasPlaya:false,hasReforma:false}})
+      onClick:()=>setState({displayCount:50,filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false,hasPlaya:false,hasReforma:false,hasInvAlq:false}})
     },'✕ Limpiar filtros ('+af+')'));
   }
   // Chips de filtros activos en sidebar
