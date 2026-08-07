@@ -637,7 +637,7 @@ let state = {
   editContact: null,
   detailContact: null,
   search: '',
-  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false, hasPremium:false, hasPlaya:false, hasReforma:false, hasInvAlq:false, propertyType:'' },
+  filters: { isVIP:false, urgencyMin:0, needsMortgage:false, wantsPool:false, zone:'', tag:'', budgetMin:'', budgetMax:'', hasEfectivo:false, hasNIE:false, noNIE:false, bedroomsMin:'', hasOkupa:false, hablaIngles:false, hasPremium:false, hasPlaya:false, hasReforma:false, hasInvAlq:false, propertyType:'' },
   showFilters: false,
   sort: 'date_desc',
   toast: null,
@@ -733,9 +733,18 @@ function getFiltered() {
   if (f.urgencyMin>0) list = list.filter(c=>c.urgency>=f.urgencyMin);
   if (f.zone) {
     if (f.zone === 'Toda la Costa') { list = list.filter(c => c.searchZones?.some(z => COAST_ZONES.includes(z) || z === 'Toda la Costa')); }
-    else { list = list.filter(c => c.searchZones?.some(z => z.toLowerCase().includes(f.zone.toLowerCase()) || z === 'Toda la Costa')); }
+    else {
+      // Zonas que son "subzonas" de Orihuela Costa
+      const orihuelaSubzones = ['Torrevieja','Playa Flamenca','La Mata','Cabo Roig','Ciudad Quesada','Rojales'];
+      list = list.filter(c => c.searchZones?.some(z =>
+        z.toLowerCase().includes(f.zone.toLowerCase()) ||
+        z === 'Toda la Costa' ||
+        (orihuelaSubzones.includes(f.zone) && z === 'Orihuela Costa')
+      ));
+    }
   }
   if (f.tag) list = list.filter(c=>c.tags?.some(t=>t.toLowerCase()===f.tag.toLowerCase()));
+  if (f.budgetMin) list = list.filter(c=>!c.budgetMax || Number(c.budgetMax)>=Number(f.budgetMin));
   if (f.budgetMax) list = list.filter(c=>!c.budgetMax || Number(c.budgetMax) <= Number(f.budgetMax));
   if (f.hasEfectivo) list = list.filter(c=>c.tags?.includes('Tiene efectivo'));
   if (f.hasNIE) list = list.filter(c=>c.tags?.includes('Tiene NIE'));
@@ -748,7 +757,15 @@ function getFiltered() {
   if (f.hasPlaya) list = list.filter(c=>c.tags?.includes('Playa'));
   if (f.hasReforma) list = list.filter(c=>c.tags?.includes('Abierto a reformar'));
   if (f.hasInvAlq) list = list.filter(c=>c.investmentType==='Inversión alquiler');
-  if (f.propertyType) list = list.filter(c=>c.propertyTypes?.includes(f.propertyType));
+  if (f.propertyType) {
+    const grouped = ['Piso','Casa','Chalet'];
+    list = list.filter(c=> {
+      if(c.propertyTypes?.includes(f.propertyType)) return true;
+      // Si el contacto tiene "Casa / Piso / Chalet" y se filtra por alguno de los tres
+      if(grouped.includes(f.propertyType) && c.propertyTypes?.includes('Casa / Piso / Chalet')) return true;
+      return false;
+    });
+  }
   list.sort((a,b) => {
     if (state.sort==='date_desc') return new Date(b.createdAt)-new Date(a.createdAt);
     if (state.sort==='name') return (a.name||'').localeCompare(b.name||'','es');
@@ -1958,8 +1975,8 @@ function renderList() {
   const zoneBtn = h('button',{style:{
     width:'100%',textAlign:'left',fontFamily:'var(--font)',fontSize:'13px',fontWeight:'700',
     padding:'6px 10px',borderRadius:'var(--radius-sm)',
-    border:'2px solid '+(f.zone?'#3b82f6':'#1e3a5f'),
-    background:'#1a1a1a',color:f.zone?'#93c5fd':'#6b93b8',cursor:'pointer',
+    border:'2px solid #3b82f6',
+    background:'#1a1a1a',color:f.zone?'#93c5fd':'#60a5fa',cursor:'pointer',
     display:'flex',justifyContent:'space-between',alignItems:'center'
   }},h('span',{},f.zone||'Todas las zonas'),h('span',{},'▾'));
 
@@ -2025,7 +2042,16 @@ function renderList() {
   sidebar.append(bedsSection);
 
   const budSection=h('div',{class:'sidebar-section'});
-  budSection.append(h('span',{class:'sidebar-section-label'},'Presupuesto máx.'));
+  // Presupuesto mínimo
+  budSection.append(h('span',{class:'sidebar-section-label'},'Presupuesto mín.'));
+  const budgetMinSel=h('select',{class:'sidebar-select'+(f.budgetMin?' active':'')});
+  [['','Desde...'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Desde '+l])].forEach(([v,l])=>{
+    const o=h('option',{value:v},l);if(f.budgetMin===v)o.selected=true;budgetMinSel.append(o);
+  });
+  budgetMinSel.addEventListener('change',e=>setState({filters:{...f,budgetMin:e.target.value}}));
+  budSection.append(budgetMinSel);
+  // Presupuesto máximo
+  budSection.append(h('span',{class:'sidebar-section-label',style:{marginTop:'6px',display:'block'}},'Presupuesto máx.'));
   const budgetSel=h('select',{class:'sidebar-select'+(f.budgetMax?' active':'')});
   [['','Todos'],...BUDGET_OPTS.slice(1).map(([v,l])=>[v,'Hasta '+l])].forEach(([v,l])=>{
     const o=h('option',{value:v},l);if(f.budgetMax===v)o.selected=true;budgetSel.append(o);
@@ -2069,7 +2095,7 @@ function renderList() {
   if(af>0){
     sidebar.append(h('hr',{class:'sidebar-divider'}));
     sidebar.append(h('button',{class:'sidebar-clear',
-      onClick:()=>setState({displayCount:50,filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false,hasPlaya:false,hasReforma:false,hasInvAlq:false,propertyType:''}})
+      onClick:()=>setState({displayCount:50,filters:{isVIP:false,urgencyMin:0,needsMortgage:false,wantsPool:false,zone:'',tag:'',budgetMax:'',hasEfectivo:false,hasNIE:false,noNIE:false,bedroomsMin:'',hasOkupa:false,hablaIngles:false,hasPremium:false,hasPlaya:false,hasReforma:false,hasInvAlq:false,propertyType:'',budgetMin:''}})
     },'✕ Limpiar filtros ('+af+')'));
   }
   // Chips de filtros activos en sidebar
