@@ -1152,12 +1152,15 @@ function renderForm() {
   function saveForm() {
     if(!form.name.trim()){errDiv.textContent='El nombre es obligatorio';errDiv.style.display='block';return;}
     errDiv.style.display='none';
-    // Nota inicial
+    // Nota inicial — leer valor directamente del DOM
+    initNoteText = (typeof noteTA !== "undefined" ? noteTA.value : initNoteText);
     if(initNoteText.trim()) {
       const noteEntry = {id:Date.now().toString(),v:'otro',text:initNoteText.trim(),date:new Date().toISOString().split('T')[0]};
       form.notes = [...(form.notes||[]), noteEntry];
     }
-    // Recordatorio inicial
+    // Recordatorio inicial — leer valores directamente del DOM
+    if(typeof remTextInp !== "undefined") initRemText = remTextInp.value;
+    if(typeof remDateInp !== "undefined") initRemDate = remDateInp.value;
     if(initRemText.trim() && initRemDate) {
       const remEntry = {id:Date.now().toString(),text:initRemText.trim(),date:initRemDate};
       form.reminders = [...(form.reminders||[]), remEntry];
@@ -1592,7 +1595,7 @@ function renderNotesSection(c) {
   const textarea = h('textarea',{placeholder:'Escribí tu nota aquí...',style:{minHeight:'120px',fontSize:'15px',resize:'vertical',width:'100%'}});
   textarea.addEventListener('input',e=>newText=e.target.value);
   const addBtn = h('button',{class:'btn btn-primary',style:{width:'100%',marginTop:'6px'},onClick:()=>{
-    if(!newText.trim()) return;
+    newText=textarea.value; if(!newText.trim()) return;
     const newNote={v:newType,text:newText.trim(),date:new Date().toISOString().split('T')[0],createdBy:c.createdBy||''};
     const updated={...c,notes:[...notes,newNote]};
     saveContact(updated);
@@ -1654,9 +1657,11 @@ function renderRemindersSection(c) {
   const addBtn = h('button',{
     class:'btn btn-secondary btn-sm',
     onClick:()=>{
-      if(!newText.trim()||!newDate){return;}
-      const updated={...c,reminders:[...(c.reminders||[]),{text:newText.trim(),date:newDate}].sort((a,b)=>a.date>b.date?1:-1)};
+      newText=textInp.value; newDate=dateInp.value;
+      if(!newText.trim()||!newDate){showToast({msg:'Completá el texto y la fecha',type:'error'});return;}
+      const updated={...c,reminders:[...(c.reminders||[]),{id:Date.now().toString(),text:newText.trim(),date:newDate}].sort((a,b)=>a.date>b.date?1:-1)};
       saveContact(updated);
+      textInp.value=''; dateInp.value=''; newText=''; newDate='';
     }
   },'+ Añadir');
   addRow.append(textInp, dateInp, addBtn);
@@ -1959,47 +1964,172 @@ function renderList() {
   homeGrid.append(leftCol2);
 
   // Recordatorios — col derecha
+  function saveReminder(contactId, remId, patch) {
+    const c = state.contacts.find(x=>x.id===contactId);
+    if(!c) return;
+    const newRems = (c.reminders||[]).map(r=>r.id===remId?{...r,...patch}:r);
+    saveContact({...c, reminders:newRems});
+  }
+  function deleteReminder(contactId, remId) {
+    const c = state.contacts.find(x=>x.id===contactId);
+    if(!c) return;
+    const newRems = (c.reminders||[]).filter(r=>r.id!==remId);
+    saveContact({...c, reminders:newRems});
+  }
+
   function renderReminderBody() {
-    const body = h('div',{id:'rem-panel', style:{padding:'10px 14px', minHeight:'48px'}});
+    const body = h('div',{id:'rem-panel', style:{padding:'10px 14px'}});
+
     if(state.reminderTab === 'hoy') {
+      // ── PENDIENTES (vencidos + hoy) ──────────────────────────────────────
       if(allDue.length === 0) {
-        body.append(h('div',{style:{color:'#6b93b8', fontSize:'15px', fontWeight:'600', padding:'8px 0'}},'✓ Sin recordatorios pendientes hoy'));
+        body.append(h('div',{style:{color:'#86efac', fontSize:'14px', fontWeight:'600', padding:'8px 0'}},'✓ Sin recordatorios pendientes'));
       } else {
-        allDue.forEach(r => {
+        const pendTitle = h('div',{style:{fontSize:'11px',fontWeight:'800',color:'#f87171',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'6px'}},
+          '⚠ Pendientes ('+allDue.length+')');
+        body.append(pendTitle);
+
+        const MAX_VISIBLE = 4;
+        const visible = allDue.slice(0, MAX_VISIBLE);
+        const hidden = allDue.slice(MAX_VISIBLE);
+        let showAll = false;
+
+        const listWrap = h('div',{});
+
+        const renderRemItem = (r) => {
           const isOverdue = r.date < today;
-          const row = h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'5px 8px',borderRadius:'6px',cursor:'pointer',background:isOverdue?'#2a0f0f':'#0f1f10',marginBottom:'4px',border:'1px solid '+(isOverdue?'#7f1d1d':'#14532d')}});
-          row.addEventListener('click',()=>{ setState({view:'detail',detailContact:r.contact}); window.scrollTo({top:0,behavior:'smooth'}); });
-          row.append(h('span',{style:{fontSize:'11px',color:isOverdue?'#fca5a5':'#86efac',fontWeight:'700',flexShrink:'0'}}, isOverdue?'⚠ '+fmtDate(r.date):'📅 Hoy'));
-          row.append(h('span',{style:{fontSize:'15px',color:'#ffffff',fontWeight:'600',flex:'1'}}, r.contact.name));
-          row.append(h('span',{style:{fontSize:'13px',color:'#aaaaaa',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}, r.text||''));
-          body.append(row);
+          const row = h('div',{style:{
+            display:'flex',alignItems:'center',gap:'8px',padding:'6px 8px',
+            borderRadius:'6px',marginBottom:'4px',
+            background:isOverdue?'#2a0f0f':'#0f1f10',
+            border:'1px solid '+(isOverdue?'#7f1d1d':'#14532d')
+          }});
+
+          // Info del contacto
+          const info = h('div',{style:{flex:'1',minWidth:'0',cursor:'pointer'}});
+          info.append(h('div',{style:{fontSize:'13px',color:'#ffffff',fontWeight:'600',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}, r.contact?.name||''));
+          info.append(h('div',{style:{fontSize:'11px',color:'#aaaaaa',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}, (r.text||'')+' · '+fmtDate(r.date)));
+          info.addEventListener('click',()=>{ setState({view:'detail',detailContact:r.contact}); window.scrollTo({top:0,behavior:'smooth'}); });
+          row.append(info);
+
+          // Botones de acción
+          const btns = h('div',{style:{display:'flex',gap:'4px',flexShrink:'0'}});
+
+          // Reprogramar 📅
+          const reBtn = h('button',{style:{
+            background:'#1e3a5f',border:'1px solid #3b82f6',borderRadius:'6px',
+            color:'#93c5fd',fontSize:'11px',padding:'3px 6px',cursor:'pointer',fontFamily:'var(--font)',fontWeight:'700'
+          }},'📅');
+          reBtn.title = 'Reprogramar';
+          // Mini datepicker inline
+          let pickerVisible = false;
+          reBtn.addEventListener('click',e=>{
+            e.stopPropagation();
+            const existingPicker = row.querySelector('.repicker');
+            if(existingPicker) { existingPicker.remove(); pickerVisible=false; return; }
+            pickerVisible = true;
+            const picker = h('div',{class:'repicker',style:{
+              position:'absolute',zIndex:'300',background:'#0a1a2e',
+              border:'1.5px solid #3b82f6',borderRadius:'8px',padding:'10px',
+              marginTop:'4px',boxShadow:'0 4px 16px rgba(0,0,0,.6)'
+            }});
+            picker.append(h('div',{style:{fontSize:'11px',color:'#93c5fd',fontWeight:'700',marginBottom:'6px',textTransform:'uppercase'}},'Nueva fecha'));
+            const dateInp = h('input',{type:'date',style:{width:'100%',marginBottom:'6px',fontSize:'13px'}});
+            dateInp.value = r.date;
+            const saveBtn2 = h('button',{style:{
+              width:'100%',background:'#2563eb',border:'none',borderRadius:'6px',
+              color:'#fff',fontSize:'12px',fontWeight:'700',padding:'5px',cursor:'pointer',fontFamily:'var(--font)'
+            }},'Guardar');
+            saveBtn2.addEventListener('click',e=>{
+              e.stopPropagation();
+              if(!dateInp.value) return;
+              saveReminder(r.contact?.id, r.id, {date:dateInp.value});
+              picker.remove();
+            });
+            picker.append(dateInp, saveBtn2);
+            row.style.position='relative';
+            row.append(picker);
+          });
+          btns.append(reBtn);
+
+          // Marcar como hecho ✓
+          const doneBtn = h('button',{style:{
+            background:'#14532d',border:'1px solid #22c55e',borderRadius:'6px',
+            color:'#86efac',fontSize:'11px',padding:'3px 6px',cursor:'pointer',fontFamily:'var(--font)',fontWeight:'700'
+          }},'✓');
+          doneBtn.title = 'Marcar como hecho';
+          doneBtn.addEventListener('click',e=>{
+            e.stopPropagation();
+            if(confirm('¿Marcar como hecho y eliminar este recordatorio?')) {
+              deleteReminder(r.contact?.id, r.id);
+            }
+          });
+          btns.append(doneBtn);
+          row.append(btns);
+          return row;
+        };
+
+        visible.forEach(r => listWrap.append(renderRemItem(r)));
+
+        if(hidden.length > 0) {
+          const moreBtn = h('button',{style:{
+            width:'100%',background:'none',border:'1px solid #333',borderRadius:'6px',
+            color:'#666',fontSize:'11px',padding:'4px',cursor:'pointer',marginTop:'2px',fontFamily:'var(--font)'
+          }}, '+ '+hidden.length+' más...');
+          moreBtn.addEventListener('click',()=>{
+            hidden.forEach(r => listWrap.insertBefore(renderRemItem(r), moreBtn));
+            moreBtn.remove();
+          });
+          listWrap.append(moreBtn);
+        }
+
+        body.append(listWrap);
+      }
+
+    } else {
+      // ── PRÓXIMOS 14 DÍAS ─────────────────────────────────────────────────
+      const next14 = [];
+      for(let i=0; i<14; i++) {
+        const d = new Date(todayDate);
+        d.setDate(d.getDate() + (i===0?1:i)); // empezar desde mañana
+        const ds = d.toISOString().split('T')[0];
+        const rems = allReminders.filter(r=>r.date===ds);
+        if(rems.length) next14.push({ds, label:fmtDate(ds), rems, isToday:ds===today});
+      }
+
+      if(next14.length===0) {
+        body.append(h('div',{style:{color:'#6b93b8',fontSize:'14px',fontWeight:'600',padding:'8px 0'}},'Sin recordatorios en los próximos 14 días'));
+      } else {
+        next14.forEach(({ds,label,rems})=>{
+          const dayRow = h('div',{style:{marginBottom:'8px'}});
+          dayRow.append(h('div',{style:{fontSize:'11px',fontWeight:'800',color:'#60a5fa',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:'3px'}}, label));
+          rems.forEach(r=>{
+            const item = h('div',{style:{
+              display:'flex',alignItems:'center',gap:'8px',padding:'5px 8px',
+              borderRadius:'6px',background:'#0f1525',border:'1px solid #1e2a3a',
+              marginBottom:'2px',cursor:'pointer'
+            }});
+            item.append(h('div',{style:{flex:'1',minWidth:'0'}},
+              h('span',{style:{fontSize:'13px',color:'#ffffff',fontWeight:'600'}}, r.contact?.name||''),
+              h('span',{style:{fontSize:'11px',color:'#aaaaaa',marginLeft:'6px'}}, r.text||'')
+            ));
+            item.addEventListener('click',()=>{ setState({view:'detail',detailContact:r.contact}); window.scrollTo({top:0,behavior:'smooth'}); });
+            dayRow.append(item);
+          });
+          body.append(dayRow);
         });
       }
-    } else {
-      const calGrid = h('div',{style:{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'4px',padding:'4px'}});
-      weekRems.forEach(({date, dayName, dayNum, rems, isToday}) => {
-        const col = h('div',{style:{background:isToday?'#1e3a5f':'#0f1525',border:'1px solid '+(isToday?'#3b82f6':'#1e2a3a'),borderRadius:'6px',padding:'4px',minHeight:'60px'}});
-        col.append(h('div',{style:{fontSize:'9px',fontWeight:'800',color:isToday?'#60a5fa':'#6b93b8',textAlign:'center',letterSpacing:'.04em'}}, dayName));
-        col.append(h('div',{style:{fontSize:'14px',fontWeight:'700',color:isToday?'#ffffff':'#888',textAlign:'center',marginBottom:'3px'}}, String(dayNum)));
-        rems.forEach(r => {
-          const item = h('div',{style:{fontSize:'9px',fontWeight:'600',color:'#ffffff',background:'#1e3a5f',borderRadius:'3px',padding:'2px 4px',marginBottom:'2px',cursor:'pointer',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}, r.contact.name);
-          item.title = r.text||r.contact.name;
-          item.addEventListener('click',()=>{ setState({view:'detail',detailContact:r.contact}); window.scrollTo({top:0,behavior:'smooth'}); });
-          col.append(item);
-        });
-        if(rems.length===0) col.append(h('div',{style:{fontSize:'9px',color:'#333',textAlign:'center',marginTop:'3px'}},'–'));
-        calGrid.append(col);
-      });
-      body.append(calGrid);
     }
     return body;
   }
-  const remCol = h('div',{id:'rem-panel-wrap',style:{background:'#0a1a2e',border:'1.5px solid #1e3a5f',borderRadius:'10px',overflow:'hidden'}});
+
+  // ── Construir panel de recordatorios ──────────────────────────────────────
+  const remCol = h('div',{id:'rem-panel-wrap',style:{background:'#0a1a2e',border:'1.5px solid #1e3a5f',borderRadius:'10px',overflow:'hidden',minWidth:'540px'}});
   const remHead = h('div',{style:{display:'flex',alignItems:'center',borderBottom:'1px solid #1e3a5f',background:'#0d2040'}});
-  remHead.append(h('span',{style:{fontSize:'14px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.06em',padding:'7px 10px',flexShrink:'0'}},'🔔 Recordatorios'));
-  const makeTab2=(label,key,cnt)=>{const active=state.reminderTab===key;const btn=h('button',{style:{fontFamily:'var(--font)',fontSize:'13px',fontWeight:'700',padding:'7px 10px',background:active?'#1e3a5f':'transparent',color:active?'#fff':'#6b93b8',border:'none',cursor:'pointer',borderLeft:'1px solid #1e3a5f',whiteSpace:'nowrap'}},label+(cnt>0?` (${cnt})`:''));btn.addEventListener('click',()=>{state.reminderTab=key;const rp=document.getElementById('rem-panel');if(rp)rp.replaceWith(renderReminderBody());});return btn;};
-  remHead.append(makeTab2('Hoy','hoy',allDue.length));
-  remHead.append(makeTab2('Semana','semana',0));
+  remHead.append(h('span',{style:{fontSize:'11px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.06em',padding:'7px 10px',flexShrink:'0'}},'🔔 Recordatorios'));
+  const makeTab2=(label,key,cnt)=>{const active=state.reminderTab===key;const btn=h('button',{style:{fontFamily:'var(--font)',fontSize:'11px',fontWeight:'700',padding:'7px 10px',background:active?'#1e3a5f':'transparent',color:active?'#fff':'#6b93b8',border:'none',cursor:'pointer',borderLeft:'1px solid #1e3a5f',whiteSpace:'nowrap'}},label+(cnt>0?` (${cnt})`:''));btn.addEventListener('click',()=>{state.reminderTab=key;const rp=document.getElementById('rem-panel');if(rp)rp.replaceWith(renderReminderBody());});return btn;};
+  remHead.append(makeTab2('Pendientes','hoy',allDue.length));
+  remHead.append(makeTab2('Próx. 14 días','semana',0));
   remCol.append(remHead);
   remCol.append(renderReminderBody());
   homeGrid.append(remCol);
