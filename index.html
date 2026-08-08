@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRM Inmobiliario</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -734,13 +735,24 @@ function getFiltered() {
   if (f.zone) {
     if (f.zone === 'Toda la Costa') { list = list.filter(c => c.searchZones?.some(z => COAST_ZONES.includes(z) || z === 'Toda la Costa')); }
     else {
-      // Zonas que son "subzonas" de Orihuela Costa
-      const orihuelaSubzones = ['Torrevieja','Playa Flamenca','La Mata','Cabo Roig','Ciudad Quesada','Rojales'];
-      list = list.filter(c => c.searchZones?.some(z =>
-        z.toLowerCase().includes(f.zone.toLowerCase()) ||
-        z === 'Toda la Costa' ||
-        (orihuelaSubzones.includes(f.zone) && z === 'Orihuela Costa')
-      ));
+      // Subzonas de Orihuela Costa
+      const orihuelaSubzones = ['Torrevieja','Playa Flamenca','La Mata','Cabo Roig','Ciudad Quesada','Rojales','Frutales'];
+      // Barrios de Alicante ciudad
+      const alicanteSubzones = ['Carolinas','Florida','San Blas','Garbinet','Muchavista','Vistahermosa','San Juan Pueblo','Playa San Juan','Pau 5','San Vicente','El Campello'];
+
+      list = list.filter(c => c.searchZones?.some(z => {
+        // Coincidencia directa
+        if(z.toLowerCase().includes(f.zone.toLowerCase())) return true;
+        // Siempre incluir Toda la Costa
+        if(z === 'Toda la Costa') return true;
+        // Filtro por subzona → mostrar contactos con zona padre
+        if(orihuelaSubzones.includes(f.zone) && z === 'Orihuela Costa') return true;
+        if(alicanteSubzones.includes(f.zone) && z === 'Alicante') return true;
+        // Filtro por zona padre → mostrar contactos con subzonas
+        if(f.zone === 'Orihuela Costa' && orihuelaSubzones.includes(z)) return true;
+        if(f.zone === 'Alicante' && alicanteSubzones.includes(z)) return true;
+        return false;
+      }));
     }
   }
   if (f.tag) list = list.filter(c=>c.tags?.some(t=>t.toLowerCase()===f.tag.toLowerCase()));
@@ -1259,6 +1271,49 @@ function renderCard(c, idx) {
     return el;
   };
 
+  // Orden de categorías para los chips
+  const TAG_ORDER = [
+    // 1. Tipo de propiedad (teal) — ya se agrega via prepend
+    // 2. Premium
+    'Premium',
+    // 3. Tipo de inversión
+    'Uso propio','Para vivir','Para vacacionar','Primera vivienda','Segunda vivienda','Vivienda propia',
+    // 4. Perfil cliente
+    'Inversor','No Inversor','Extranjero','Español',
+    // 5. Idioma / Docs
+    'Habla inglés','Tiene NIE','Sin NIE',
+    // 6. Financiamiento
+    'Tiene efectivo','Necesita hipoteca',
+    // 7. Características
+    'Piscina','Playa','Planta Baja','1 línea','2 línea','Okupa OK','Abierto a reformar'
+  ];
+  const sortTags = tags => {
+    const known = TAG_ORDER.filter(t=>tags.includes(t));
+    const rest = tags.filter(t=>!TAG_ORDER.includes(t));
+    return [...known,...rest];
+  };
+
+  // 1 — Tipo de propiedad (primero)
+  (c.propertyTypes||[]).forEach(pt=>{ if(pt) chips2.append(bigChip(pt,'chip-teal')); });
+
+  // 2 — Tags ordenados por categoría
+  sortTags(c.tags||[]).forEach(t=>{
+    const isActive=state.filters.tag===t;
+    const tc=bigChip(t,TAG_COLORS[t]||'chip-accent');
+    tc.style.cursor='pointer';
+    if(isActive) tc.style.boxShadow='0 0 0 2px var(--accent)';
+    tc.addEventListener('click',e=>{e.stopPropagation();setState({filters:{...state.filters,tag:isActive?'':t}});});
+    chips2.append(tc);
+  });
+
+  // 3 — Tipo de inversión
+  if(c.investmentType) chips2.append(bigChip(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
+  if(c.needsMortgage) chips2.append(bigChip('Hipoteca','chip-warn'));
+
+  // 4 — Dormitorios
+  if(c.bedroomsMin) chips2.append(bigChip(c.bedroomsMin+'+ hab.','chip-accent'));
+
+  // 5 — Zonas (al final)
   (c.searchZones||[]).forEach(z=>{
     const isActive=state.filters.zone===z;
     const zColor=isActive?'chip-accent':ZGREEN.includes(z)?'chip-success':ZBURDO.includes(z)?'chip-warn':'chip-accent';
@@ -1267,20 +1322,6 @@ function renderCard(c, idx) {
     if(isActive) zc.style.boxShadow='0 0 0 2px var(--accent)';
     zc.addEventListener('click',e=>{e.stopPropagation();setState({filters:{...state.filters,zone:isActive?'':z}});});
     chips2.append(zc);
-  });
-
-  if(c.bedroomsMin) chips2.append(bigChip(c.bedroomsMin+'+ hab.','chip-accent'));
-  (c.propertyTypes||[]).forEach(pt=>{ if(pt) chips2.prepend(bigChip(pt,'chip-teal')); });
-  if(c.needsMortgage) chips2.append(bigChip('Hipoteca','chip-warn'));
-  if(c.investmentType) chips2.append(bigChip(c.investmentType,TAG_COLORS[c.investmentType]||'chip-accent'));
-
-  (c.tags||[]).forEach(t=>{
-    const isActive=state.filters.tag===t;
-    const tc=bigChip(t,TAG_COLORS[t]||'chip-accent');
-    tc.style.cursor='pointer';
-    if(isActive) tc.style.boxShadow='0 0 0 2px var(--accent)';
-    tc.addEventListener('click',e=>{e.stopPropagation();setState({filters:{...state.filters,tag:isActive?'':t}});});
-    chips2.append(tc);
   });
 
   const today=new Date().toISOString().split('T')[0];
@@ -1902,6 +1943,10 @@ function renderList() {
   const sinp=h('input',{type:'text',value:state.search,placeholder:'Buscar por nombre, zona, email, etiqueta...','data-searchbox':'true',style:{width:'220px',background:'#1a1a1a',border:'2px solid #3b82f6',borderRadius:'8px',padding:'7px 10px',color:'#ffffff',fontSize:'14px',outline:'none',caretColor:'#ffffff'}});
   sinp.addEventListener('input',e=>setState({search:e.target.value}));
   fbar.append(sinp);
+  // Cruz para limpiar búsqueda
+  const clearSearch = h('button',{style:{background:'none',border:'none',cursor:'pointer',fontSize:'16px',color:'#ef4444',padding:'0 4px',lineHeight:'1',flexShrink:'0',display:state.search?'block':'none'}},'✕');
+  clearSearch.addEventListener('click',()=>setState({search:''}));
+  fbar.append(clearSearch);
   const notesChk=h('label',{style:{display:'flex',alignItems:'center',gap:'4px',fontSize:'12px',color:'#aaaaaa',cursor:'pointer',whiteSpace:'nowrap',userSelect:'none',flexShrink:'0'}});
   const chkInput=h('input',{type:'checkbox',style:{width:'13px',height:'13px',cursor:'pointer',accentColor:'#3b82f6',margin:'0'}});
   chkInput.checked = state.searchNotes === true;
@@ -2012,7 +2057,10 @@ function renderList() {
   addZoneGroup('Interior y norte','#3b0764','#ede9fe',ZONE_BURDO);
 
   zoneBtn.addEventListener('click',e=>{e.stopPropagation();zoneDropdown.style.display=zoneDropdown.style.display==='none'?'block':'none';});
-  document.addEventListener('click',()=>{zoneDropdown.style.display='none';});
+  const _zoneClose=()=>{zoneDropdown.style.display='none';};
+  document.addEventListener('click',_zoneClose,{once:false});
+  // Limpiar al re-renderizar
+  wrap._cleanup=()=>document.removeEventListener('click',_zoneClose);
 
   const zoneWrap=h('div',{style:{position:'relative'}});
   zoneWrap.append(zoneBtn,zoneDropdown);
