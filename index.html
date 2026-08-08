@@ -2035,19 +2035,43 @@ function renderList() {
       }
 
     } else if(state.reminderTab === 'hoy') {
-      // ── HOY ───────────────────────────────────────────────────────────────
-      if(todayRems.length === 0) {
-        body.append(h('div',{style:{color:'#86efac',fontSize:'14px',fontWeight:'600',padding:'8px 0'}},'✓ Sin recordatorios para hoy'));
+      // ── PENDIENTES (hoy + próximos con acordeón) ──────────────────────────
+      const pendAll = allReminders.filter(r=>r.date>=today).sort((a,b)=>a.date>b.date?1:-1);
+      if(pendAll.length === 0) {
+        body.append(h('div',{style:{color:'#86efac',fontSize:'14px',fontWeight:'600',padding:'8px 0'}},'✓ Sin recordatorios pendientes'));
       } else {
-        body.append(h('div',{style:{fontSize:'11px',fontWeight:'800',color:'#60a5fa',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'6px'}},'📅 Hoy ('+todayRems.length+')'));
-        const MAX=4; const listW=h('div',{});
-        todayRems.slice(0,MAX).forEach(r=>listW.append(remItem(r)));
-        if(todayRems.length>MAX){
-          const mb=h('button',{style:{width:'100%',background:'none',border:'1px solid #333',borderRadius:'6px',color:'#666',fontSize:'11px',padding:'4px',cursor:'pointer',marginTop:'2px',fontFamily:'var(--font)'}},'+ '+(todayRems.length-MAX)+' más...');
-          mb.addEventListener('click',()=>{todayRems.slice(MAX).forEach(r=>listW.insertBefore(remItem(r),mb));mb.remove();});
-          listW.append(mb);
+        // Hoy
+        if(todayRems.length>0) {
+          body.append(h('div',{style:{fontSize:'11px',fontWeight:'800',color:'#60a5fa',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:'4px'}},'📅 Hoy ('+todayRems.length+')'));
+          todayRems.forEach(r=>body.append(remItem(r)));
         }
-        body.append(listW);
+        // Días futuros como acordeón
+        const futureDays={};
+        pendAll.filter(r=>r.date>today).forEach(r=>{
+          if(!futureDays[r.date]) futureDays[r.date]=[];
+          futureDays[r.date].push(r);
+        });
+        const futureDates=Object.keys(futureDays).sort();
+        if(futureDates.length>0){
+          body.append(h('div',{style:{fontSize:'11px',fontWeight:'800',color:'#6b93b8',textTransform:'uppercase',letterSpacing:'.06em',margin:'8px 0 4px'}},'Próximos'));
+          futureDates.forEach(ds=>{
+            const rems=futureDays[ds]; let open=false;
+            const wrap=h('div',{style:{marginBottom:'3px'}});
+            const hdr=h('div',{style:{display:'flex',alignItems:'center',gap:'8px',padding:'5px 8px',background:'#0f1525',border:'1px solid #1e2a3a',borderRadius:'6px',cursor:'pointer',userSelect:'none'}});
+            const arrow=h('span',{style:{fontSize:'10px',color:'#6b93b8',marginLeft:'auto'}},'▶');
+            hdr.append(
+              h('span',{style:{fontSize:'12px',fontWeight:'700',color:'#93c5fd'}},fmtDate(ds)),
+              h('span',{style:{fontSize:'11px',color:'#6b93b8'}},rems.length+' rec.'),
+              arrow
+            );
+            const bd2=h('div',{style:{display:'none',paddingTop:'3px'}});
+            rems.forEach(r=>bd2.append(remItem(r)));
+            hdr.addEventListener('click',()=>{open=!open;bd2.style.display=open?'block':'none';arrow.textContent=open?'▼':'▶';});
+            wrap.append(hdr,bd2);
+            body.append(wrap);
+          });
+        }
+        if(pendAll.length===0 && todayRems.length===0) body.append(h('div',{style:{color:'#86efac',fontSize:'14px',padding:'8px 0'}},'✓ Sin pendientes'));
       }
 
     } else {
@@ -2102,10 +2126,20 @@ function renderList() {
   // ── Construir panel de recordatorios ──────────────────────────────────────
   const remCol = h('div',{id:'rem-panel-wrap',style:{background:'#0a1a2e',border:'1.5px solid #1e3a5f',borderRadius:'10px',overflow:'hidden',minWidth:'540px'}});
   const remHead = h('div',{style:{display:'flex',alignItems:'center',borderBottom:'1px solid #1e3a5f',background:'#0d2040'}});
-  remHead.append(h('span',{style:{fontSize:'11px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.06em',padding:'7px 10px',flexShrink:'0'}},'🔔 Recordatorios'));
+  let remBodyVisible = true;
+  const remToggleBtn = h('span',{style:{fontSize:'11px',fontWeight:'800',color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.06em',padding:'7px 10px',flexShrink:'0',cursor:'pointer',userSelect:'none'}});
+  remToggleBtn.textContent = '🔔 Recordatorios ▾';
+  remToggleBtn.addEventListener('click',()=>{
+    remBodyVisible = !remBodyVisible;
+    const rb = document.getElementById('rem-panel');
+    if(rb) rb.style.display = remBodyVisible ? 'block' : 'none';
+    remToggleBtn.textContent = remBodyVisible ? '🔔 Recordatorios ▾' : '🔔 Recordatorios ▸';
+  });
+  remHead.append(remToggleBtn);
   const makeTab2=(label,key,cnt)=>{const active=state.reminderTab===key;const btn=h('button',{style:{fontFamily:'var(--font)',fontSize:'11px',fontWeight:'700',padding:'7px 10px',background:active?'#1e3a5f':'transparent',color:active?'#fff':'#6b93b8',border:'none',cursor:'pointer',borderLeft:'1px solid #1e3a5f',whiteSpace:'nowrap'}},label+(cnt>0?` (${cnt})`:''));btn.addEventListener('click',()=>{state.reminderTab=key;const rp=document.getElementById('rem-panel');if(rp)rp.replaceWith(renderReminderBody());});return btn;};
+  const pendCount = allReminders.filter(r=>r.date>=today).length;
   remHead.append(makeTab2('Pasados','pasados',overdueRems.length));
-  remHead.append(makeTab2('Hoy','hoy',todayRems.length));
+  remHead.append(makeTab2('Pendientes','hoy',pendCount));
   remHead.append(makeTab2('Semana','semana',0));
   remCol.append(remHead);
   remCol.append(renderReminderBody());
